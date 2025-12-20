@@ -54,14 +54,15 @@
 
     // Reserve tickets
     window.reserveTickets = function() {
-        const quantity = parseInt(document.getElementById('ticketQuantity').value) || 1;
-        // Check if user is logged in (you can implement this check)
-        // For now, redirect to login or show a message
-        if (confirm(`Reserve ${quantity} ticket(s) for this event?`)) {
-            // In a real application, this would submit to a reservation handler
-            alert('Reservation functionality will be implemented with user authentication.');
-            // window.location.href = 'reservation.php?eventId=' + eventId + '&quantity=' + quantity;
-        }
+        const quantityInput = document.getElementById('ticketQuantity');
+        const quantity = parseInt(quantityInput.value) || 1;
+        
+        // Get event ID from URL or use default
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id') || 1;
+        
+        // Redirect to reservation page
+        window.location.href = 'reservation.php?eventId=' + eventId + '&quantity=' + quantity;
     };
 
     // AI Assistant functionality
