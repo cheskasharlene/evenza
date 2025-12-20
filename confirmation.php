@@ -1,14 +1,11 @@
 <?php
-// Get reservation data from URL parameters
+
 $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 1;
 $quantity = isset($_GET['quantity']) ? intval($_GET['quantity']) : 1;
 $fullName = isset($_GET['fullName']) ? htmlspecialchars($_GET['fullName']) : 'Guest User';
 $email = isset($_GET['email']) ? htmlspecialchars($_GET['email']) : '';
-
-// Generate a unique ticket ID
 $ticketId = 'EVZ-' . strtoupper(substr(md5($eventId . $fullName . time()), 0, 8));
 
-// Sample events data
 $eventsData = [
     1 => [
         'name' => 'Business Innovation Summit 2024',
@@ -52,10 +49,7 @@ $eventsData = [
     ]
 ];
 
-// Get event data or use default
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
-
-// Calculate total amount
 $totalAmount = $event['price'] * $quantity;
 ?>
 <!DOCTYPE html>
@@ -64,23 +58,14 @@ $totalAmount = $event['price'] * $quantity;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking Confirmation - EVENZA</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts - Serif + Sans-serif pairing -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- QR Code Library -->
     <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
@@ -112,14 +97,11 @@ $totalAmount = $event['price'] * $quantity;
         </div>
     </nav>
 
-    <!-- Confirmation Section -->
     <section class="confirmation-page-section py-5 mt-5">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
-                    <!-- Confirmation Card -->
                     <div class="luxury-card confirmation-card p-5">
-                        <!-- Thank You Message -->
                         <div class="thank-you-message text-center mb-5">
                             <div class="success-icon mb-3">
                                 <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -133,15 +115,12 @@ $totalAmount = $event['price'] * $quantity;
 
                         <hr class="my-5">
 
-                        <!-- Event Details -->
                         <div class="confirmation-content">
-                            <!-- Event Name -->
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">Event Name</div>
                                 <div class="confirmation-value"><?php echo htmlspecialchars($event['name']); ?></div>
                             </div>
 
-                            <!-- Category -->
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">Category</div>
                                 <div class="confirmation-value">
@@ -149,13 +128,11 @@ $totalAmount = $event['price'] * $quantity;
                                 </div>
                             </div>
 
-                            <!-- Ticket ID -->
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">Ticket ID</div>
                                 <div class="confirmation-value ticket-id"><?php echo htmlspecialchars($ticketId); ?></div>
                             </div>
 
-                            <!-- QR Code -->
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">QR Code</div>
                                 <div class="confirmation-value">
@@ -164,7 +141,6 @@ $totalAmount = $event['price'] * $quantity;
                                 </div>
                             </div>
 
-                            <!-- Event Date & Venue -->
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">Event Date & Venue</div>
                                 <div class="confirmation-value">
@@ -189,13 +165,11 @@ $totalAmount = $event['price'] * $quantity;
                                 </div>
                             </div>
 
-                            <!-- Ticket Quantity -->
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">Number of Tickets</div>
                                 <div class="confirmation-value"><?php echo $quantity; ?> ticket(s)</div>
                             </div>
 
-                            <!-- Total Amount -->
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">Total Amount Paid</div>
                                 <div class="confirmation-value price-amount">$<?php echo number_format($totalAmount); ?></div>
@@ -203,7 +177,6 @@ $totalAmount = $event['price'] * $quantity;
 
                             <hr class="my-4">
 
-                            <!-- Note -->
                             <div class="confirmation-note">
                                 <div class="note-icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -216,7 +189,6 @@ $totalAmount = $event['price'] * $quantity;
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
                         <div class="confirmation-actions mt-5">
                             <div class="row g-3">
                                 <div class="col-md-6">
@@ -238,7 +210,6 @@ $totalAmount = $event['price'] * $quantity;
                         </div>
                     </div>
 
-                    <!-- Additional Information Card -->
                     <div class="luxury-card p-4 mt-4">
                         <h5 class="mb-3">Important Information</h5>
                         <ul class="list-unstyled mb-0">
@@ -273,7 +244,6 @@ $totalAmount = $event['price'] * $quantity;
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="luxury-footer py-5">
         <div class="container">
             <div class="row">
@@ -307,10 +277,7 @@ $totalAmount = $event['price'] * $quantity;
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/confirmation.js"></script>
 </body>

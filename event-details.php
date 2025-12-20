@@ -1,8 +1,7 @@
 <?php
-// Get event ID from URL parameter
+
 $eventId = isset($_GET['id']) ? intval($_GET['id']) : 1;
 
-// Sample events data
 $eventsData = [
     1 => [
         'name' => 'Business Innovation Summit 2024',
@@ -62,7 +61,6 @@ $eventsData = [
     ]
 ];
 
-// Get event data or use default
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 ?>
 <!DOCTYPE html>
@@ -71,20 +69,13 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($event['name']); ?> - EVENZA</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts - Serif + Sans-serif pairing -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
@@ -116,13 +107,10 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
         </div>
     </nav>
 
-    <!-- Event Details Section -->
     <section class="event-details-section py-5 mt-5">
         <div class="container">
             <div class="row">
-                <!-- Main Content (Left) -->
                 <div class="col-lg-8 mb-4">
-                    <!-- Breadcrumb -->
                     <nav aria-label="breadcrumb" class="mb-4">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="index.php">Home</a></li>
@@ -131,14 +119,12 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                         </ol>
                     </nav>
 
-                    <!-- Event Image -->
                     <div class="event-detail-image mb-4">
                         <div class="image-placeholder-detail <?php echo htmlspecialchars($event['imageClass']); ?>">
                             <span class="event-category-badge"><?php echo htmlspecialchars($event['category']); ?></span>
                         </div>
                     </div>
 
-                    <!-- Event Information -->
                     <div class="luxury-card p-4 mb-4">
                         <h1 class="event-detail-name mb-3"><?php echo htmlspecialchars($event['name']); ?></h1>
                         <div class="event-detail-category mb-4">
@@ -151,7 +137,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 
                         <hr class="my-4">
 
-                        <!-- Event Details Grid -->
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
                                 <div class="detail-item">
@@ -187,7 +172,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 
                         <hr class="my-4">
 
-                        <!-- Pricing and Availability -->
                         <div class="row g-4 mb-4">
                             <div class="col-md-6">
                                 <div class="detail-item">
@@ -222,7 +206,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             </div>
                         </div>
 
-                        <!-- Action Section -->
                         <div class="reservation-section luxury-card p-4">
                             <h4 class="mb-4">Reserve Your Tickets</h4>
                             <div class="row align-items-end">
@@ -246,9 +229,7 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                     </div>
                 </div>
 
-                <!-- Side Panel (Right) -->
                 <div class="col-lg-4">
-                    <!-- AI Assistant Widget -->
                     <div class="luxury-card p-4 mb-4">
                         <div class="ai-assistant-header mb-3">
                             <div class="ai-icon">
@@ -275,7 +256,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                         </div>
                     </div>
 
-                    <!-- FAQs -->
                     <div class="luxury-card p-4 mb-4">
                         <h5 class="mb-4">Frequently Asked Questions</h5>
                         <div class="faq-list">
@@ -334,7 +314,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                         </div>
                     </div>
 
-                    <!-- Event Recommendations -->
                     <div class="luxury-card p-4">
                         <h5 class="mb-4">You Might Also Like</h5>
                         <div class="recommended-events">
@@ -365,7 +344,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="luxury-footer py-5">
         <div class="container">
             <div class="row">
@@ -399,10 +377,7 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
-    
-    <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/event-details.js"></script>
 </body>

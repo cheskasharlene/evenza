@@ -1,35 +1,21 @@
-/**
- * EVENZA - Confirmation Page JavaScript
- * QR Code generation
- */
-
 (function() {
     'use strict';
 
-    // Generate QR Code when page loads
     document.addEventListener('DOMContentLoaded', function() {
-        // Get ticket ID from the page
         const ticketIdElement = document.querySelector('.ticket-id');
         const ticketId = ticketIdElement ? ticketIdElement.textContent.trim() : 'EVZ-00000000';
-        
-        // Get event details for QR code data
         const eventName = document.querySelector('.confirmation-value')?.textContent.trim() || 'Event';
-        
-        // Create QR code data (you can customize this format)
         const qrData = JSON.stringify({
             ticketId: ticketId,
             event: eventName,
             timestamp: new Date().toISOString()
         });
         
-        // Generate QR Code
         const qrContainer = document.getElementById('qrcode');
         if (qrContainer) {
             if (typeof QRCode !== 'undefined') {
-                // Clear container
                 qrContainer.innerHTML = '';
                 
-                // Use QRCode.js library (davidshimjs version)
                 new QRCode(qrContainer, {
                     text: qrData,
                     width: 200,
@@ -39,7 +25,6 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
             } else {
-                // Fallback if QRCode library didn't load
                 showQRFallback(qrContainer, ticketId);
             }
         }
@@ -56,9 +41,7 @@
         }
     });
 
-    // Print functionality enhancement
     window.addEventListener('beforeprint', function() {
-        // Add print-specific styles if needed
         document.body.classList.add('printing');
     });
 

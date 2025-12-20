@@ -1,8 +1,7 @@
 <?php
-// Get category from URL parameter
+
 $category = isset($_GET['category']) ? $_GET['category'] : '';
 
-// Category names mapping
 $categoryNames = [
     'conference' => 'Conference',
     'wedding' => 'Wedding',
@@ -10,7 +9,6 @@ $categoryNames = [
     'hotel-hosted' => 'Hotel-Hosted Events'
 ];
 
-// Get category display name
 $categoryDisplayName = isset($categoryNames[$category]) ? $categoryNames[$category] : 'All Categories';
 $pageTitle = $categoryDisplayName . ' Events';
 ?>
@@ -20,20 +18,13 @@ $pageTitle = $categoryDisplayName . ' Events';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($pageTitle); ?> - EVENZA</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts - Serif + Sans-serif pairing -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
@@ -65,7 +56,6 @@ $pageTitle = $categoryDisplayName . ' Events';
         </div>
     </nav>
 
-    <!-- Category Header -->
     <section class="category-header py-5 mt-5">
         <div class="container">
             <div class="row">
@@ -84,14 +74,12 @@ $pageTitle = $categoryDisplayName . ' Events';
         </div>
     </section>
 
-    <!-- Category Events Grid -->
     <section class="category-events-section py-5">
         <div class="container">
             <div class="row g-4" id="categoryEventsGrid">
                 <?php
-                // Sample events data - filtered by category
+
                 $allEvents = [
-                    // Conference Events
                     [
                         'id' => 1,
                         'name' => 'Business Innovation Summit 2024',
@@ -165,7 +153,6 @@ $pageTitle = $categoryDisplayName . ' Events';
                         'slots' => 15,
                         'imageClass' => 'wedding-bg'
                     ],
-                    // Seminar Events
                     [
                         'id' => 3,
                         'name' => 'Digital Marketing Masterclass',
@@ -202,7 +189,6 @@ $pageTitle = $categoryDisplayName . ' Events';
                         'slots' => 60,
                         'imageClass' => 'seminar-bg'
                     ],
-                    // Hotel-Hosted Events
                     [
                         'id' => 4,
                         'name' => 'New Year\'s Eve Gala Dinner',
@@ -241,12 +227,10 @@ $pageTitle = $categoryDisplayName . ' Events';
                     ]
                 ];
 
-                // Filter events by category
                 $filteredEvents = array_filter($allEvents, function($event) use ($category) {
                     return $event['category'] === $category;
                 });
 
-                // Display events
                 if (empty($filteredEvents)) {
                     echo '<div class="col-12"><div class="luxury-card p-5 text-center"><h3>No events found in this category</h3><p class="text-muted">Please check back later or browse our <a href="events.php">all events</a> page.</p></div></div>';
                 } else {
@@ -300,7 +284,6 @@ $pageTitle = $categoryDisplayName . ' Events';
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="luxury-footer py-5">
         <div class="container">
             <div class="row">
@@ -334,10 +317,7 @@ $pageTitle = $categoryDisplayName . ' Events';
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
 </body>
 </html>

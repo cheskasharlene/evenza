@@ -4,20 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EVENZA - Premium Event Reservation & Ticketing</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts - Serif + Sans-serif pairing -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
@@ -49,7 +42,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero-section">
         <div class="hero-overlay"></div>
         <div class="container">
@@ -67,7 +59,6 @@
         </div>
     </section>
 
-    <!-- Featured Events Section -->
     <section class="featured-events py-5">
         <div class="container">
             <div class="section-header text-center mb-5">
@@ -124,7 +115,6 @@
         </div>
     </section>
 
-    <!-- Categories Section -->
     <section class="categories-section py-5 bg-light-luxury">
         <div class="container">
             <div class="section-header text-center mb-5">
@@ -207,7 +197,6 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
     <section class="cta-section py-5">
         <div class="container">
             <div class="luxury-card cta-card text-center p-5">
@@ -218,7 +207,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="luxury-footer py-5">
         <div class="container">
             <div class="row">
@@ -252,10 +240,7 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS for smooth scrolling and animations -->
     <script src="assets/js/main.js"></script>
 </body>
 </html>

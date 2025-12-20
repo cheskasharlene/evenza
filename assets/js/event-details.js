@@ -1,15 +1,9 @@
-/**
- * EVENZA - Event Details Page JavaScript
- * Quantity selector and reservation functionality
- */
-
 (function() {
     'use strict';
 
     const eventPrice = parseFloat(document.querySelector('.price-large')?.textContent.replace('$', '').replace(',', '')) || 299;
     const maxTickets = parseInt(document.getElementById('ticketQuantity')?.getAttribute('max')) || 1;
 
-    // Increase quantity
     window.increaseQuantity = function() {
         const quantityInput = document.getElementById('ticketQuantity');
         let currentValue = parseInt(quantityInput.value) || 1;
@@ -19,7 +13,6 @@
         }
     };
 
-    // Decrease quantity
     window.decreaseQuantity = function() {
         const quantityInput = document.getElementById('ticketQuantity');
         let currentValue = parseInt(quantityInput.value) || 1;
@@ -29,7 +22,6 @@
         }
     };
 
-    // Update total price
     function updateTotalPrice() {
         const quantityInput = document.getElementById('ticketQuantity');
         const totalPriceElement = document.getElementById('totalPrice');
@@ -38,7 +30,6 @@
         totalPriceElement.textContent = '$' + total.toLocaleString();
     }
 
-    // Quantity input change
     document.addEventListener('DOMContentLoaded', function() {
         const quantityInput = document.getElementById('ticketQuantity');
         if (quantityInput) {
@@ -52,20 +43,14 @@
         }
     });
 
-    // Reserve tickets
     window.reserveTickets = function() {
         const quantityInput = document.getElementById('ticketQuantity');
         const quantity = parseInt(quantityInput.value) || 1;
-        
-        // Get event ID from URL or use default
         const urlParams = new URLSearchParams(window.location.search);
         const eventId = urlParams.get('id') || 1;
-        
-        // Redirect to reservation page
         window.location.href = 'reservation.php?eventId=' + eventId + '&quantity=' + quantity;
     };
 
-    // AI Assistant functionality
     window.askAI = function() {
         const questionInput = document.getElementById('aiQuestion');
         const question = questionInput.value.trim();
@@ -74,17 +59,14 @@
             return;
         }
 
-        // Add user question to chat
         const chatBox = document.querySelector('.ai-chat-box');
         const userMessage = document.createElement('div');
         userMessage.className = 'user-message mb-2';
         userMessage.innerHTML = '<p class="mb-0"><strong>You:</strong> ' + question + '</p>';
         chatBox.appendChild(userMessage);
 
-        // Clear input
         questionInput.value = '';
 
-        // Simulate AI response (in a real app, this would call an API)
         setTimeout(function() {
             const aiMessage = document.createElement('div');
             aiMessage.className = 'ai-message';
@@ -94,7 +76,6 @@
         }, 1000);
     };
 
-    // Get AI response (simulated)
     function getAIResponse(question) {
         const lowerQuestion = question.toLowerCase();
         
@@ -113,7 +94,6 @@
         }
     }
 
-    // Allow Enter key to submit AI question
     document.addEventListener('DOMContentLoaded', function() {
         const aiQuestionInput = document.getElementById('aiQuestion');
         if (aiQuestionInput) {

@@ -1,12 +1,11 @@
 <?php
-// Get reservation data from POST or GET
+
 $eventId = isset($_POST['eventId']) ? intval($_POST['eventId']) : (isset($_GET['eventId']) ? intval($_GET['eventId']) : 1);
 $quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : (isset($_GET['quantity']) ? intval($_GET['quantity']) : 1);
 $fullName = isset($_POST['fullName']) ? htmlspecialchars($_POST['fullName']) : '';
 $email = isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '';
 $mobile = isset($_POST['mobile']) ? htmlspecialchars($_POST['mobile']) : '';
 
-// Sample events data (same as reservation.php)
 $eventsData = [
     1 => [
         'name' => 'Business Innovation Summit 2024',
@@ -46,13 +45,9 @@ $eventsData = [
     ]
 ];
 
-// Get event data or use default
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
-
-// Calculate total amount
 $totalAmount = $event['price'] * $quantity;
 
-// Check payment status
 $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
 ?>
 <!DOCTYPE html>
@@ -61,20 +56,13 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment - EVENZA</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts - Serif + Sans-serif pairing -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
@@ -106,12 +94,10 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
         </div>
     </nav>
 
-    <!-- Payment Section -->
     <section class="payment-page-section py-5 mt-5">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
-                    <!-- Breadcrumb -->
                     <nav aria-label="breadcrumb" class="mb-4">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="index.php">Home</a></li>
@@ -122,18 +108,15 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                         </ol>
                     </nav>
 
-                    <!-- Payment Summary Card -->
                     <div class="luxury-card payment-summary-card p-5 mb-4">
                         <h2 class="page-title mb-4 text-center">Payment Summary</h2>
                         
                         <div class="payment-summary-content">
-                            <!-- Event Name -->
                             <div class="payment-summary-item mb-4">
                                 <div class="payment-label">Event Name</div>
                                 <div class="payment-value"><?php echo htmlspecialchars($event['name']); ?></div>
                             </div>
 
-                            <!-- Category -->
                             <div class="payment-summary-item mb-4">
                                 <div class="payment-label">Category</div>
                                 <div class="payment-value">
@@ -141,7 +124,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                 </div>
                             </div>
 
-                            <!-- Ticket Quantity -->
                             <div class="payment-summary-item mb-4">
                                 <div class="payment-label">Ticket Quantity</div>
                                 <div class="payment-value"><?php echo $quantity; ?> ticket(s)</div>
@@ -149,14 +131,12 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
 
                             <hr class="my-4">
 
-                            <!-- Total Price -->
                             <div class="payment-total">
                                 <div class="payment-total-label">Total Amount</div>
                                 <div class="payment-total-value">$<?php echo number_format($totalAmount); ?></div>
                             </div>
                         </div>
 
-                        <!-- Payment Button -->
                         <?php if ($paymentStatus === 'pending'): ?>
                             <div class="payment-button-section mt-5">
                                 <button type="button" class="btn btn-paypal w-100 btn-lg" onclick="processPayment()">
@@ -168,7 +148,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                             </div>
                         <?php endif; ?>
 
-                        <!-- Status Messages -->
                         <div id="statusMessages" class="mt-4">
                             <?php if ($paymentStatus === 'processing'): ?>
                                 <div class="status-message status-processing">
@@ -200,7 +179,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                     </div>
                                 </div>
                                 <script>
-                                    // Auto-redirect to confirmation page after 2 seconds
                                     setTimeout(function() {
                                         window.location.href = 'confirmation.php?eventId=<?php echo $eventId; ?>&quantity=<?php echo $quantity; ?>&fullName=<?php echo urlencode($fullName); ?>&email=<?php echo urlencode($email); ?>';
                                     }, 2000);
@@ -209,7 +187,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                         </div>
                     </div>
 
-                    <!-- Additional Information -->
                     <div class="luxury-card p-4">
                         <h5 class="mb-3">Payment Information</h5>
                         <div class="row">
@@ -242,7 +219,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="luxury-footer py-5">
         <div class="container">
             <div class="row">
@@ -276,10 +252,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/payment.js"></script>
 </body>

@@ -1,12 +1,11 @@
 <?php
-// Sample user data (in real app, this would come from session/database)
+
 $userData = [
     'name' => 'John Doe',
     'email' => 'john.doe@example.com',
     'mobile' => '+1 (555) 123-4567'
 ];
 
-// Sample reservations data
 $reservations = [
     [
         'id' => 1,
@@ -55,20 +54,13 @@ $reservations = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Profile - EVENZA</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts - Serif + Sans-serif pairing -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
@@ -100,22 +92,18 @@ $reservations = [
         </div>
     </nav>
 
-    <!-- Profile Section -->
     <section class="profile-page-section py-5 mt-5">
         <div class="container">
-            <!-- Page Header -->
             <div class="page-header mb-5">
                 <h1 class="page-title">My Profile</h1>
                 <p class="page-subtitle">Manage your account and view your reservations</p>
             </div>
 
             <div class="row">
-                <!-- Profile Info (Left) -->
                 <div class="col-lg-4 mb-4">
                     <div class="luxury-card p-4">
                         <h3 class="mb-4">Profile Information</h3>
-                        
-                        <!-- Name -->
+
                         <div class="profile-info-item mb-4">
                             <div class="profile-info-label">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
@@ -127,7 +115,6 @@ $reservations = [
                             <div class="profile-info-value"><?php echo htmlspecialchars($userData['name']); ?></div>
                         </div>
 
-                        <!-- Email -->
                         <div class="profile-info-item mb-4">
                             <div class="profile-info-label">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
@@ -139,7 +126,6 @@ $reservations = [
                             <div class="profile-info-value"><?php echo htmlspecialchars($userData['email']); ?></div>
                         </div>
 
-                        <!-- Mobile Number -->
                         <div class="profile-info-item mb-4">
                             <div class="profile-info-label">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
@@ -150,14 +136,12 @@ $reservations = [
                             <div class="profile-info-value"><?php echo htmlspecialchars($userData['mobile']); ?></div>
                         </div>
 
-                        <!-- Edit Profile Button -->
                         <button type="button" class="btn btn-outline-luxury w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
                             Edit Profile
                         </button>
                     </div>
                 </div>
 
-                <!-- My Reservations (Right) -->
                 <div class="col-lg-8">
                     <div class="luxury-card p-4">
                         <h3 class="mb-4">My Reservations</h3>
@@ -177,15 +161,12 @@ $reservations = [
                                     <div class="reservation-item luxury-card p-4 mb-3">
                                         <div class="row align-items-center">
                                             <div class="col-md-6 mb-3 mb-md-0">
-                                                <!-- Event Name -->
                                                 <h5 class="reservation-event-name mb-2"><?php echo htmlspecialchars($reservation['eventName']); ?></h5>
                                                 
-                                                <!-- Category -->
                                                 <div class="mb-2">
                                                     <span class="event-category"><?php echo htmlspecialchars($reservation['category']); ?></span>
                                                 </div>
                                                 
-                                                <!-- Date -->
                                                 <div class="reservation-date mb-2">
                                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px; color: var(--accent-olive);">
                                                         <circle cx="12" cy="12" r="10"/>
@@ -195,7 +176,6 @@ $reservations = [
                                                     <span class="text-muted ms-2"><?php echo htmlspecialchars($reservation['time']); ?></span>
                                                 </div>
                                                 
-                                                <!-- Venue -->
                                                 <div class="reservation-venue text-muted small">
                                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
                                                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
@@ -206,7 +186,6 @@ $reservations = [
                                             </div>
                                             
                                             <div class="col-md-3 text-center mb-3 mb-md-0">
-                                                <!-- Ticket Status -->
                                                 <div class="ticket-status mb-2">
                                                     <?php if ($reservation['status'] === 'confirmed'): ?>
                                                         <span class="status-badge status-confirmed">
@@ -227,7 +206,6 @@ $reservations = [
                                                     <?php endif; ?>
                                                 </div>
                                                 
-                                                <!-- Ticket Details -->
                                                 <div class="ticket-details small text-muted">
                                                     <div>Qty: <?php echo $reservation['quantity']; ?></div>
                                                     <div>Total: $<?php echo number_format($reservation['totalAmount']); ?></div>
@@ -235,7 +213,6 @@ $reservations = [
                                             </div>
                                             
                                             <div class="col-md-3 text-center">
-                                                <!-- View Ticket Button -->
                                                 <a href="confirmation.php?eventId=<?php echo $reservation['eventId']; ?>&quantity=<?php echo $reservation['quantity']; ?>&ticketId=<?php echo htmlspecialchars($reservation['ticketId']); ?>" class="btn btn-primary-luxury w-100">
                                                     View Ticket
                                                 </a>
@@ -251,7 +228,6 @@ $reservations = [
         </div>
     </section>
 
-    <!-- Edit Profile Modal -->
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content luxury-card">
@@ -283,7 +259,6 @@ $reservations = [
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="luxury-footer py-5">
         <div class="container">
             <div class="row">
@@ -317,10 +292,7 @@ $reservations = [
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/profile.js"></script>
 </body>

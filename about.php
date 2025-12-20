@@ -4,20 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About EVENZA - Premium Event Reservation Platform</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts - Serif + Sans-serif pairing -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
@@ -49,16 +42,13 @@
         </div>
     </nav>
 
-    <!-- About Section -->
     <section class="about-page-section py-5 mt-5">
         <div class="container">
-            <!-- Page Header -->
             <div class="page-header text-center mb-5">
                 <h1 class="page-title">About EVENZA</h1>
                 <p class="page-subtitle">Your trusted partner for premium event reservations</p>
             </div>
 
-            <!-- What is EVENZA -->
             <div class="luxury-card p-5 mb-5">
                 <div class="row align-items-center">
                     <div class="col-lg-6 mb-4 mb-lg-0">
@@ -80,13 +70,11 @@
                 </div>
             </div>
 
-            <!-- How the System Works -->
             <div class="luxury-card p-5 mb-5">
                 <h2 class="section-title text-center mb-5">How the System Works</h2>
                 <p class="text-center mb-5 lead">Reserving your perfect event is simple with our streamlined 3-step process</p>
                 
                 <div class="row g-4">
-                    <!-- Step 1 -->
                     <div class="col-md-4">
                         <div class="process-step text-center">
                             <div class="step-number">1</div>
@@ -101,7 +89,6 @@
                         </div>
                     </div>
 
-                    <!-- Step 2 -->
                     <div class="col-md-4">
                         <div class="process-step text-center">
                             <div class="step-number">2</div>
@@ -115,7 +102,6 @@
                         </div>
                     </div>
 
-                    <!-- Step 3 -->
                     <div class="col-md-4">
                         <div class="process-step text-center">
                             <div class="step-number">3</div>
@@ -132,10 +118,8 @@
                 </div>
             </div>
 
-            <!-- Benefits Section -->
             <div class="benefits-section">
                 <div class="row g-4">
-                    <!-- Benefits for Guests -->
                     <div class="col-lg-6">
                         <div class="luxury-card p-5 h-100">
                             <div class="benefits-header mb-4">
@@ -187,7 +171,6 @@
                         </div>
                     </div>
 
-                    <!-- Benefits for Hotels -->
                     <div class="col-lg-6">
                         <div class="luxury-card p-5 h-100">
                             <div class="benefits-header mb-4">
@@ -241,7 +224,6 @@
                 </div>
             </div>
 
-            <!-- Call to Action -->
             <div class="cta-section text-center mt-5">
                 <div class="luxury-card cta-card p-5">
                     <h2 class="cta-title mb-3">Ready to Experience EVENZA?</h2>
@@ -255,7 +237,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="luxury-footer py-5">
         <div class="container">
             <div class="row">
@@ -289,10 +270,7 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
 </body>
 </html>

@@ -1,21 +1,13 @@
-/**
- * EVENZA - Payment Page JavaScript
- * Payment processing simulation
- */
-
 (function() {
     'use strict';
 
-    // Process payment
     window.processPayment = function() {
         const payButton = document.querySelector('.btn-paypal');
         const statusMessages = document.getElementById('statusMessages');
         
-        // Disable button
         payButton.disabled = true;
         payButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
         
-        // Show processing message
         statusMessages.innerHTML = `
             <div class="status-message status-processing">
                 <div class="status-icon">
@@ -65,7 +57,6 @@
         }, 3000); // Simulate 3 second processing time
     };
 
-    // Auto-scroll to status message if processing or success
     document.addEventListener('DOMContentLoaded', function() {
         const urlParams = new URLSearchParams(window.location.search);
         const status = urlParams.get('status');

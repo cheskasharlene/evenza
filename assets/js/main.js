@@ -1,12 +1,6 @@
-/**
- * EVENZA - Main JavaScript
- * Smooth scrolling and subtle animations
- */
-
 (function() {
     'use strict';
 
-    // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             const href = this.getAttribute('href');
@@ -23,7 +17,6 @@
         });
     });
 
-    // Navbar scroll effect
     let lastScroll = 0;
     const navbar = document.querySelector('.luxury-nav');
     
@@ -39,7 +32,6 @@
         lastScroll = currentScroll;
     });
 
-    // Intersection Observer for fade-in animations
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px'
@@ -54,7 +46,6 @@
         });
     }, observerOptions);
 
-    // Observe elements for animation
     document.addEventListener('DOMContentLoaded', () => {
         const animatedElements = document.querySelectorAll('.luxury-card, .section-header');
         
@@ -66,14 +57,12 @@
         });
     });
 
-    // Card hover effect enhancement
     document.querySelectorAll('.luxury-card').forEach(card => {
         card.addEventListener('mouseenter', function() {
             this.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
         });
     });
 
-    // Button ripple effect
     document.querySelectorAll('.btn-primary-luxury, .btn-register').forEach(button => {
         button.addEventListener('click', function(e) {
             const ripple = document.createElement('span');
@@ -95,7 +84,6 @@
         });
     });
 
-    // Add ripple CSS dynamically
     const style = document.createElement('style');
     style.textContent = `
         .btn-primary-luxury, .btn-register {

@@ -1,9 +1,8 @@
 <?php
-// Get event ID from URL parameter
+
 $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 1;
 $quantity = isset($_GET['quantity']) ? intval($_GET['quantity']) : 1;
 
-// Sample events data (same as event-details.php)
 $eventsData = [
     1 => [
         'name' => 'Business Innovation Summit 2024',
@@ -47,10 +46,8 @@ $eventsData = [
     ]
 ];
 
-// Get event data or use default
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 
-// Calculate total amount
 $totalAmount = $event['price'] * $quantity;
 ?>
 <!DOCTYPE html>
@@ -59,20 +56,13 @@ $totalAmount = $event['price'] * $quantity;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservation - EVENZA</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts - Serif + Sans-serif pairing -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
@@ -104,10 +94,8 @@ $totalAmount = $event['price'] * $quantity;
         </div>
     </nav>
 
-    <!-- Reservation Section -->
     <section class="reservation-page-section py-5 mt-5">
         <div class="container">
-            <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.php">Home</a></li>
@@ -118,7 +106,6 @@ $totalAmount = $event['price'] * $quantity;
             </nav>
 
             <div class="row">
-                <!-- Reservation Form (Left) -->
                 <div class="col-lg-7 mb-4">
                     <div class="luxury-card p-4">
                         <h2 class="page-title mb-4">Reservation Form</h2>
@@ -127,25 +114,21 @@ $totalAmount = $event['price'] * $quantity;
                             <input type="hidden" name="eventId" value="<?php echo $eventId; ?>">
                             <input type="hidden" name="quantity" id="hiddenQuantity" value="<?php echo $quantity; ?>">
                             
-                            <!-- Full Name -->
                             <div class="mb-4">
                                 <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control luxury-input" id="fullName" name="fullName" required placeholder="Enter your full name">
                             </div>
 
-                            <!-- Email Address -->
                             <div class="mb-4">
                                 <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
                                 <input type="email" class="form-control luxury-input" id="email" name="email" required placeholder="your.email@example.com">
                             </div>
 
-                            <!-- Mobile Number -->
                             <div class="mb-4">
                                 <label for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
                                 <input type="tel" class="form-control luxury-input" id="mobile" name="mobile" required placeholder="+1 (555) 123-4567">
                             </div>
 
-                            <!-- Number of Tickets -->
                             <div class="mb-4">
                                 <label for="ticketQuantity" class="form-label">Number of Tickets <span class="text-danger">*</span></label>
                                 <div class="quantity-selector">
@@ -156,7 +139,6 @@ $totalAmount = $event['price'] * $quantity;
                                 <small class="text-muted">Maximum <?php echo htmlspecialchars($event['slots']); ?> tickets available</small>
                             </div>
 
-                            <!-- Form Actions -->
                             <div class="d-flex gap-3 mt-4">
                                 <a href="event-details.php?id=<?php echo $eventId; ?>" class="btn btn-outline-luxury flex-fill">Back to Event</a>
                                 <button type="submit" class="btn btn-primary-luxury flex-fill">Proceed to Payment</button>
@@ -165,18 +147,15 @@ $totalAmount = $event['price'] * $quantity;
                     </div>
                 </div>
 
-                <!-- Summary Box (Right) -->
                 <div class="col-lg-5">
                     <div class="luxury-card reservation-summary p-4 sticky-top" style="top: 100px;">
                         <h4 class="mb-4">Reservation Summary</h4>
                         
-                        <!-- Event Name -->
                         <div class="summary-item mb-3">
                             <div class="summary-label">Event Name</div>
                             <div class="summary-value"><?php echo htmlspecialchars($event['name']); ?></div>
                         </div>
 
-                        <!-- Category -->
                         <div class="summary-item mb-3">
                             <div class="summary-label">Category</div>
                             <div class="summary-value">
@@ -184,7 +163,6 @@ $totalAmount = $event['price'] * $quantity;
                             </div>
                         </div>
 
-                        <!-- Event Date & Time -->
                         <div class="summary-item mb-3">
                             <div class="summary-label">Date & Time</div>
                             <div class="summary-value">
@@ -193,15 +171,12 @@ $totalAmount = $event['price'] * $quantity;
                             </div>
                         </div>
 
-                        <!-- Venue -->
                         <div class="summary-item mb-3">
                             <div class="summary-label">Venue</div>
                             <div class="summary-value small"><?php echo htmlspecialchars($event['venue']); ?></div>
                         </div>
 
                         <hr class="my-4">
-
-                        <!-- Ticket Details -->
                         <div class="summary-item mb-2">
                             <div class="summary-label">Ticket Price</div>
                             <div class="summary-value">$<?php echo number_format($event['price']); ?> <?php echo htmlspecialchars($event['priceType']); ?></div>
@@ -213,14 +188,11 @@ $totalAmount = $event['price'] * $quantity;
                         </div>
 
                         <hr class="my-4">
-
-                        <!-- Total Amount -->
                         <div class="summary-total">
                             <div class="summary-total-label">Total Amount</div>
                             <div class="summary-total-value" id="summaryTotal">$<?php echo number_format($totalAmount); ?></div>
                         </div>
 
-                        <!-- Additional Info -->
                         <div class="summary-note mt-4">
                             <p class="small text-muted mb-0">
                                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 5px;">
@@ -237,7 +209,6 @@ $totalAmount = $event['price'] * $quantity;
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="luxury-footer py-5">
         <div class="container">
             <div class="row">
@@ -271,13 +242,9 @@ $totalAmount = $event['price'] * $quantity;
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
     <script>
-        // Pass PHP variables to JavaScript
         const reservationData = {
             ticketPrice: <?php echo $event['price']; ?>,
             maxTickets: <?php echo $event['slots']; ?>,

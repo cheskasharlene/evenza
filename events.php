@@ -4,20 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Available Events - EVENZA</title>
-    
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts - Serif + Sans-serif pairing -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
@@ -49,14 +42,12 @@
         </div>
     </nav>
 
-    <!-- Page Header -->
     <section class="page-header py-5 mt-5">
         <div class="container">
             <div class="row">
                 <div class="col-12">
                     <h1 class="page-title mb-4">Available Events</h1>
-                    
-                    <!-- Search and Filter Section -->
+
                     <div class="search-filter-section">
                         <div class="row g-3">
                             <div class="col-md-5">
@@ -87,11 +78,9 @@
         </div>
     </section>
 
-    <!-- Events Grid Section -->
     <section class="events-grid-section py-5">
         <div class="container">
             <div class="row g-4" id="eventsGrid">
-                <!-- Event Card 1 -->
                 <div class="col-lg-4 col-md-6" data-category="conference">
                     <div class="luxury-card event-card-grid">
                         <div class="event-image-grid">
@@ -131,7 +120,6 @@
                     </div>
                 </div>
 
-                <!-- Event Card 2 -->
                 <div class="col-lg-4 col-md-6" data-category="wedding">
                     <div class="luxury-card event-card-grid">
                         <div class="event-image-grid">
@@ -171,7 +159,6 @@
                     </div>
                 </div>
 
-                <!-- Event Card 3 -->
                 <div class="col-lg-4 col-md-6" data-category="seminar">
                     <div class="luxury-card event-card-grid">
                         <div class="event-image-grid">
@@ -211,7 +198,6 @@
                     </div>
                 </div>
 
-                <!-- Event Card 4 -->
                 <div class="col-lg-4 col-md-6" data-category="hotel-hosted">
                     <div class="luxury-card event-card-grid">
                         <div class="event-image-grid">
@@ -251,7 +237,6 @@
                     </div>
                 </div>
 
-                <!-- Event Card 5 -->
                 <div class="col-lg-4 col-md-6" data-category="conference">
                     <div class="luxury-card event-card-grid">
                         <div class="event-image-grid">
@@ -291,7 +276,6 @@
                     </div>
                 </div>
 
-                <!-- Event Card 6 -->
                 <div class="col-lg-4 col-md-6" data-category="wedding">
                     <div class="luxury-card event-card-grid">
                         <div class="event-image-grid">
@@ -334,7 +318,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="luxury-footer py-5">
         <div class="container">
             <div class="row">
@@ -368,10 +351,7 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JS -->
     <script src="assets/js/main.js"></script>
     <script src="assets/js/events.js"></script>
 </body>
