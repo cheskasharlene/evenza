@@ -11,10 +11,6 @@
         statusMessages.innerHTML = `
             <div class="status-message status-processing">
                 <div class="status-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <polyline points="12 6 12 12 16 14"/>
-                    </svg>
                 </div>
                 <div class="status-content">
                     <h5>Payment Processing</h5>

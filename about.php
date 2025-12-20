@@ -60,10 +60,6 @@
                     <div class="col-lg-6">
                         <div class="about-image-placeholder">
                             <div class="image-placeholder-about">
-                                <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="opacity: 0.3;">
-                                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                    <polyline points="9 22 9 12 15 12 15 22"/>
-                                </svg>
                             </div>
                         </div>
                     </div>
@@ -79,10 +75,7 @@
                         <div class="process-step text-center">
                             <div class="step-number">1</div>
                             <div class="step-icon mb-4">
-                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
+
                             </div>
                             <h4 class="step-title mb-3">Browse & Select</h4>
                             <p class="step-description">Explore our curated collection of premium events. Filter by category, date, or venue to find the perfect experience that matches your preferences.</p>
@@ -93,9 +86,7 @@
                         <div class="process-step text-center">
                             <div class="step-number">2</div>
                             <div class="step-icon mb-4">
-                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                </svg>
+
                             </div>
                             <h4 class="step-title mb-3">Reserve & Pay</h4>
                             <p class="step-description">Complete your reservation with ease. Enter your details, select ticket quantity, and securely process payment through our integrated PayPal system.</p>
@@ -106,10 +97,7 @@
                         <div class="process-step text-center">
                             <div class="step-number">3</div>
                             <div class="step-icon mb-4">
-                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22 4 12 14.01 9 11.01"/>
-                                </svg>
+
                             </div>
                             <h4 class="step-title mb-3">Receive Confirmation</h4>
                             <p class="step-description">Get instant confirmation with your unique ticket ID and QR code. You'll receive email and SMS notifications with all event details and important information.</p>
@@ -124,47 +112,23 @@
                         <div class="luxury-card p-5 h-100">
                             <div class="benefits-header mb-4">
                                 <div class="benefits-icon mb-3">
-                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="12" cy="7" r="4"/>
-                                    </svg>
                                 </div>
                                 <h3 class="benefits-title">Benefits for Guests</h3>
                             </div>
                             <ul class="benefits-list">
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>Exclusive Access:</strong> Discover and reserve premium events at luxury hotels that aren't available elsewhere.</span>
                                 </li>
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>Seamless Booking:</strong> Simple 3-step reservation process with secure payment and instant confirmation.</span>
                                 </li>
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>Digital Tickets:</strong> Receive QR code tickets instantly via email and SMS for easy event entry.</span>
                                 </li>
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>24/7 Support:</strong> Access to AI assistant and customer support whenever you need assistance.</span>
                                 </li>
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>Event Management:</strong> View all your reservations in one place with easy access to tickets and details.</span>
                                 </li>
                             </ul>
@@ -175,47 +139,23 @@
                         <div class="luxury-card p-5 h-100">
                             <div class="benefits-header mb-4">
                                 <div class="benefits-icon mb-3">
-                                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                        <polyline points="9 22 9 12 15 12 15 22"/>
-                                    </svg>
                                 </div>
                                 <h3 class="benefits-title">Benefits for Hotels</h3>
                             </div>
                             <ul class="benefits-list">
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>Increased Visibility:</strong> Showcase your events to a targeted audience of premium event seekers.</span>
                                 </li>
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>Streamlined Reservations:</strong> Automated booking system reduces administrative workload and errors.</span>
                                 </li>
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>Secure Payments:</strong> Integrated PayPal processing ensures reliable and secure payment collection.</span>
                                 </li>
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>Real-time Analytics:</strong> Track reservations, attendance, and revenue through comprehensive dashboard insights.</span>
                                 </li>
                                 <li>
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                        <polyline points="22 4 12 14.01 9 11.01"/>
-                                    </svg>
                                     <span><strong>Brand Partnership:</strong> Join an exclusive network of luxury hotels and enhance your brand reputation.</span>
                                 </li>
                             </ul>

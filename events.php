@@ -53,10 +53,6 @@
                             <div class="col-md-5">
                                 <div class="search-box">
                                     <input type="text" class="form-control luxury-input" id="searchInput" placeholder="Search by event name or date...">
-                                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="11" cy="11" r="8"/>
-                                        <path d="m21 21-4.35-4.35"/>
-                                    </svg>
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -93,18 +89,10 @@
                             <div class="event-meta mb-3">
                                 <span class="event-category">Conference</span>
                                 <span class="event-date-time">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12 6 12 12 16 14"/>
-                                    </svg>
                                     Dec 25, 2024 • 9:00 AM
                                 </span>
                             </div>
                             <div class="event-venue mb-2">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
                                 Grand Luxe Hotel - Grand Ballroom
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
@@ -132,18 +120,10 @@
                             <div class="event-meta mb-3">
                                 <span class="event-category">Wedding</span>
                                 <span class="event-date-time">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12 6 12 12 16 14"/>
-                                    </svg>
                                     Jan 10, 2025 • 4:00 PM
                                 </span>
                             </div>
                             <div class="event-venue mb-2">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
                                 Grand Luxe Hotel - Garden Pavilion
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
@@ -171,18 +151,10 @@
                             <div class="event-meta mb-3">
                                 <span class="event-category">Seminar</span>
                                 <span class="event-date-time">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12 6 12 12 16 14"/>
-                                    </svg>
                                     Dec 30, 2024 • 10:00 AM
                                 </span>
                             </div>
                             <div class="event-venue mb-2">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
                                 Grand Luxe Hotel - Conference Hall A
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
@@ -210,18 +182,10 @@
                             <div class="event-meta mb-3">
                                 <span class="event-category">Hotel-Hosted Events</span>
                                 <span class="event-date-time">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12 6 12 12 16 14"/>
-                                    </svg>
                                     Dec 31, 2024 • 7:00 PM
                                 </span>
                             </div>
                             <div class="event-venue mb-2">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
                                 Grand Luxe Hotel - Crystal Ballroom
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
@@ -249,18 +213,10 @@
                             <div class="event-meta mb-3">
                                 <span class="event-category">Conference</span>
                                 <span class="event-date-time">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12 6 12 12 16 14"/>
-                                    </svg>
                                     Jan 15, 2025 • 8:30 AM
                                 </span>
                             </div>
                             <div class="event-venue mb-2">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
                                 Grand Luxe Hotel - Innovation Center
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
@@ -288,18 +244,10 @@
                             <div class="event-meta mb-3">
                                 <span class="event-category">Wedding</span>
                                 <span class="event-date-time">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12 6 12 12 16 14"/>
-                                    </svg>
                                     Feb 14, 2025 • 5:00 PM
                                 </span>
                             </div>
                             <div class="event-venue mb-2">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                    <circle cx="12" cy="10" r="3"/>
-                                </svg>
                                 Grand Luxe Hotel - Oceanview Terrace
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">

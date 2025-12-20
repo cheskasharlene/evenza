@@ -104,10 +104,7 @@ $totalAmount = $event['price'] * $quantity;
                     <div class="luxury-card confirmation-card p-5">
                         <div class="thank-you-message text-center mb-5">
                             <div class="success-icon mb-3">
-                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                    <polyline points="22 4 12 14.01 9 11.01"/>
-                                </svg>
+
                             </div>
                             <h1 class="thank-you-title">Thank You!</h1>
                             <p class="thank-you-subtitle">Your reservation has been confirmed successfully.</p>
@@ -146,18 +143,10 @@ $totalAmount = $event['price'] * $quantity;
                                 <div class="confirmation-value">
                                     <div class="event-date-venue">
                                         <div class="mb-2">
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
-                                                <circle cx="12" cy="12" r="10"/>
-                                                <polyline points="12 6 12 12 16 14"/>
-                                            </svg>
                                             <strong><?php echo htmlspecialchars($event['date']); ?></strong>
                                             <span class="text-muted ms-2"><?php echo htmlspecialchars($event['time']); ?></span>
                                         </div>
                                         <div>
-                                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
-                                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                                <circle cx="12" cy="10" r="3"/>
-                                            </svg>
                                             <?php echo htmlspecialchars($event['venue']); ?>
                                             <div class="text-muted small ms-6"><?php echo htmlspecialchars($event['venueAddress']); ?></div>
                                         </div>
@@ -179,9 +168,6 @@ $totalAmount = $event['price'] * $quantity;
 
                             <div class="confirmation-note">
                                 <div class="note-icon">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                                    </svg>
                                 </div>
                                 <div class="note-content">
                                     <p class="mb-0"><strong>Note:</strong> You will receive an SMS confirmation shortly.</p>
@@ -193,11 +179,6 @@ $totalAmount = $event['price'] * $quantity;
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <button type="button" class="btn btn-primary-luxury w-100" onclick="window.print()">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px;">
-                                            <polyline points="6 9 6 2 18 2 18 9"/>
-                                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                                            <rect x="6" y="14" width="12" height="8"/>
-                                        </svg>
                                         Print Ticket
                                     </button>
                                 </div>
@@ -214,27 +195,12 @@ $totalAmount = $event['price'] * $quantity;
                         <h5 class="mb-3">Important Information</h5>
                         <ul class="list-unstyled mb-0">
                             <li class="mb-2">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="12" y1="16" x2="12" y2="12"/>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
-                                </svg>
                                 Please arrive 15 minutes before the event start time.
                             </li>
                             <li class="mb-2">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="12" y1="16" x2="12" y2="12"/>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
-                                </svg>
                                 Bring a valid ID and this confirmation for entry.
                             </li>
                             <li class="mb-0">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="12" y1="16" x2="12" y2="12"/>
-                                    <line x1="12" y1="8" x2="12.01" y2="8"/>
-                                </svg>
                                 For any questions, contact us at info@evenza.com
                             </li>
                         </ul>

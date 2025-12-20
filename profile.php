@@ -106,10 +106,6 @@ $reservations = [
 
                         <div class="profile-info-item mb-4">
                             <div class="profile-info-label">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="12" cy="7" r="4"/>
-                                </svg>
                                 Name
                             </div>
                             <div class="profile-info-value"><?php echo htmlspecialchars($userData['name']); ?></div>
@@ -117,10 +113,6 @@ $reservations = [
 
                         <div class="profile-info-item mb-4">
                             <div class="profile-info-label">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
-                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                                    <polyline points="22,6 12,13 2,6"/>
-                                </svg>
                                 Email
                             </div>
                             <div class="profile-info-value"><?php echo htmlspecialchars($userData['email']); ?></div>
@@ -128,9 +120,6 @@ $reservations = [
 
                         <div class="profile-info-item mb-4">
                             <div class="profile-info-label">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 8px; color: var(--accent-olive);">
-                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
-                                </svg>
                                 Mobile Number
                             </div>
                             <div class="profile-info-value"><?php echo htmlspecialchars($userData['mobile']); ?></div>
@@ -148,10 +137,6 @@ $reservations = [
                         
                         <?php if (empty($reservations)): ?>
                             <div class="text-center py-5">
-                                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--accent-olive); opacity: 0.5; margin-bottom: 1rem;">
-                                    <path d="M9 11H1v12h8V11zM23 11H15v12h8V11z"/>
-                                    <path d="M5 11V1a1 1 0 0 1 1h12a1 1 0 0 1 1v10M5 11h14"/>
-                                </svg>
                                 <p class="text-muted">You don't have any reservations yet.</p>
                                 <a href="events.php" class="btn btn-primary-luxury mt-3">Browse Events</a>
                             </div>
@@ -168,19 +153,11 @@ $reservations = [
                                                 </div>
                                                 
                                                 <div class="reservation-date mb-2">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 6px; color: var(--accent-olive);">
-                                                        <circle cx="12" cy="12" r="10"/>
-                                                        <polyline points="12 6 12 12 16 14"/>
-                                                    </svg>
                                                     <span><?php echo htmlspecialchars($reservation['date']); ?></span>
                                                     <span class="text-muted ms-2"><?php echo htmlspecialchars($reservation['time']); ?></span>
                                                 </div>
                                                 
                                                 <div class="reservation-venue text-muted small">
-                                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
-                                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                                        <circle cx="12" cy="10" r="3"/>
-                                                    </svg>
                                                     <?php echo htmlspecialchars($reservation['venue']); ?>
                                                 </div>
                                             </div>
@@ -189,18 +166,10 @@ $reservations = [
                                                 <div class="ticket-status mb-2">
                                                     <?php if ($reservation['status'] === 'confirmed'): ?>
                                                         <span class="status-badge status-confirmed">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                                                <polyline points="22 4 12 14.01 9 11.01"/>
-                                                            </svg>
                                                             Confirmed
                                                         </span>
                                                     <?php else: ?>
                                                         <span class="status-badge status-pending">
-                                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                                                <circle cx="12" cy="12" r="10"/>
-                                                                <polyline points="12 6 12 12 16 14"/>
-                                                            </svg>
                                                             Pending
                                                         </span>
                                                     <?php endif; ?>

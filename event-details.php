@@ -141,10 +141,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             <div class="col-md-6">
                                 <div class="detail-item">
                                     <div class="detail-icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <polyline points="12 6 12 12 16 14"/>
-                                        </svg>
                                     </div>
                                     <div class="detail-content">
                                         <h6 class="detail-label">Date & Time</h6>
@@ -156,10 +152,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             <div class="col-md-6">
                                 <div class="detail-item">
                                     <div class="detail-icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                            <circle cx="12" cy="10" r="3"/>
-                                        </svg>
                                     </div>
                                     <div class="detail-content">
                                         <h6 class="detail-label">Venue</h6>
@@ -176,10 +168,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             <div class="col-md-6">
                                 <div class="detail-item">
                                     <div class="detail-icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <line x1="12" y1="1" x2="12" y2="23"/>
-                                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-                                        </svg>
                                     </div>
                                     <div class="detail-content">
                                         <h6 class="detail-label">Ticket Price</h6>
@@ -191,11 +179,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             <div class="col-md-6">
                                 <div class="detail-item">
                                     <div class="detail-icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                            <circle cx="9" cy="7" r="4"/>
-                                            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-                                        </svg>
                                     </div>
                                     <div class="detail-content">
                                         <h6 class="detail-label">Available Slots</h6>
@@ -233,9 +216,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                     <div class="luxury-card p-4 mb-4">
                         <div class="ai-assistant-header mb-3">
                             <div class="ai-icon">
-                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                                </svg>
                             </div>
                             <h5 class="mb-0">AI Assistant</h5>
                         </div>
@@ -248,10 +228,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                         <div class="input-group">
                             <input type="text" class="form-control luxury-input" id="aiQuestion" placeholder="Ask a question...">
                             <button class="btn btn-primary-luxury" type="button" onclick="askAI()">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="22" y1="2" x2="11" y2="13"/>
-                                    <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-                                </svg>
                             </button>
                         </div>
                     </div>
@@ -262,9 +238,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             <div class="faq-item mb-3">
                                 <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
                                     What is included in the ticket price?
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="6 9 12 15 18 9"/>
-                                    </svg>
                                 </button>
                                 <div class="collapse" id="faq1">
                                     <div class="faq-answer">
@@ -275,9 +248,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             <div class="faq-item mb-3">
                                 <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
                                     Can I cancel or refund my reservation?
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="6 9 12 15 18 9"/>
-                                    </svg>
                                 </button>
                                 <div class="collapse" id="faq2">
                                     <div class="faq-answer">
@@ -288,9 +258,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             <div class="faq-item mb-3">
                                 <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
                                     Is parking available at the venue?
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="6 9 12 15 18 9"/>
-                                    </svg>
                                 </button>
                                 <div class="collapse" id="faq3">
                                     <div class="faq-answer">
@@ -301,9 +268,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             <div class="faq-item mb-3">
                                 <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
                                     What should I bring to the event?
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polyline points="6 9 12 15 18 9"/>
-                                    </svg>
                                 </button>
                                 <div class="collapse" id="faq4">
                                     <div class="faq-answer">

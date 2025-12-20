@@ -140,9 +140,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                         <?php if ($paymentStatus === 'pending'): ?>
                             <div class="payment-button-section mt-5">
                                 <button type="button" class="btn btn-paypal w-100 btn-lg" onclick="processPayment()">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 10px; vertical-align: middle;">
-                                        <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.174 1.27 1.68 2.962 1.495 4.957-.24 2.618-1.647 4.36-4.266 5.24-.36.12-.738.21-1.133.27v.06c.03.01.06.02.09.03 1.236.396 2.2 1.06 2.864 1.96.664.9.99 1.99.99 3.24 0 .87-.18 1.67-.54 2.4-.36.73-.87 1.36-1.53 1.89-.66.53-1.44.96-2.34 1.29-.9.33-1.89.5-2.97.5H9.23c-.6 0-1.08-.45-1.14-1.04L7.076 21.336zm.66-12.3c.12 1.17.78 1.95 1.98 2.34 1.2.39 2.76.39 4.68 0 1.32-.3 2.28-.87 2.88-1.71.6-.84.78-1.89.54-3.15-.18-1.02-.66-1.77-1.44-2.25-.78-.48-1.86-.72-3.24-.72H8.76c-.3 0-.54.21-.57.51l-1.47 8.98z"/>
-                                    </svg>
                                     Pay with PayPal
                                 </button>
                             </div>
@@ -152,10 +149,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                             <?php if ($paymentStatus === 'processing'): ?>
                                 <div class="status-message status-processing">
                                     <div class="status-icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="12" cy="12" r="10"/>
-                                            <polyline points="12 6 12 12 16 14"/>
-                                        </svg>
                                     </div>
                                     <div class="status-content">
                                         <h5>Payment Processing</h5>
@@ -165,10 +158,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                             <?php elseif ($paymentStatus === 'success'): ?>
                                 <div class="status-message status-success">
                                     <div class="status-icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                                            <polyline points="22 4 12 14.01 9 11.01"/>
-                                        </svg>
                                     </div>
                                     <div class="status-content">
                                         <h5>Payment Successful</h5>
