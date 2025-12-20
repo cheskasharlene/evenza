@@ -63,7 +63,7 @@ $totalAmount = $event['price'] * $quantity;
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
+    <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -92,18 +92,18 @@ $totalAmount = $event['price'] * $quantity;
                 </ul>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <section class="reservation-page-section py-5 mt-5">
+    <div class="reservation-page-section py-5 mt-5">
         <div class="container">
-            <nav aria-label="breadcrumb" class="mb-4">
+            <div aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.php">Home</a></li>
                     <li class="breadcrumb-item"><a href="events.php">Events</a></li>
                     <li class="breadcrumb-item"><a href="event-details.php?id=<?php echo $eventId; ?>">Event Details</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Reservation</li>
                 </ol>
-            </nav>
+            </div>
 
             <div class="row">
                 <div class="col-lg-7 mb-4">
@@ -207,9 +207,9 @@ $totalAmount = $event['price'] * $quantity;
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <footer class="luxury-footer py-5">
+    <div class="luxury-footer py-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
@@ -240,7 +240,7 @@ $totalAmount = $event['price'] * $quantity;
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>

@@ -76,7 +76,7 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
+    <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -105,19 +105,19 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                 </ul>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <section class="event-details-section py-5 mt-5">
+    <div class="event-details-section py-5 mt-5">
         <div class="container">
             <div class="row">
                 <div class="col-lg-8 mb-4">
-                    <nav aria-label="breadcrumb" class="mb-4">
+                    <div aria-label="breadcrumb" class="mb-4">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="index.php">Home</a></li>
                             <li class="breadcrumb-item"><a href="events.php">Events</a></li>
                             <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($event['name']); ?></li>
                         </ol>
-                    </nav>
+                    </div>
 
                     <div class="event-detail-image mb-4">
                         <div class="image-placeholder-detail <?php echo htmlspecialchars($event['imageClass']); ?>">
@@ -342,9 +342,9 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <footer class="luxury-footer py-5">
+    <div class="luxury-footer py-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
@@ -375,7 +375,7 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
     <script src="assets/js/main.js"></script>

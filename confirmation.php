@@ -66,7 +66,7 @@ $totalAmount = $event['price'] * $quantity;
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
+    <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,9 +95,9 @@ $totalAmount = $event['price'] * $quantity;
                 </ul>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <section class="confirmation-page-section py-5 mt-5">
+    <div class="confirmation-page-section py-5 mt-5">
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-8">
@@ -242,9 +242,9 @@ $totalAmount = $event['price'] * $quantity;
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <footer class="luxury-footer py-5">
+    <div class="luxury-footer py-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
@@ -275,7 +275,7 @@ $totalAmount = $event['price'] * $quantity;
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>

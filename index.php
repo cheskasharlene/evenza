@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
+    <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,9 +40,9 @@
                 </ul>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <section class="hero-section">
+    <div class="hero-section">
         <div class="hero-overlay"></div>
         <div class="container">
             <div class="row align-items-center min-vh-100">
@@ -57,9 +57,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="featured-events py-5">
+    <div class="featured-events py-5">
         <div class="container">
             <div class="section-header text-center mb-5">
                 <h2 class="section-title">Featured Events</h2>
@@ -113,91 +113,9 @@
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <section class="categories-section py-5 bg-light-luxury">
-        <div class="container">
-            <div class="section-header text-center mb-5">
-                <h2 class="section-title">Event Categories</h2>
-                <p class="section-subtitle">Find your perfect experience</p>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-3 col-sm-6">
-                    <a href="categories.php?category=conference" class="category-link">
-                        <div class="category-card luxury-card text-center">
-                            <div class="category-image">
-                                <div class="category-icon mb-3">
-                                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                                        <circle cx="9" cy="7" r="4"/>
-                                        <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="category-content p-4">
-                                <h4 class="category-name mb-3">Conference</h4>
-                                <a href="categories.php?category=conference" class="btn btn-sm btn-primary-luxury">View Events</a>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <a href="categories.php?category=wedding" class="category-link">
-                        <div class="category-card luxury-card text-center">
-                            <div class="category-image">
-                                <div class="category-icon mb-3">
-                                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="category-content p-4">
-                                <h4 class="category-name mb-3">Wedding</h4>
-                                <a href="categories.php?category=wedding" class="btn btn-sm btn-primary-luxury">View Events</a>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <a href="categories.php?category=seminar" class="category-link">
-                        <div class="category-card luxury-card text-center">
-                            <div class="category-image">
-                                <div class="category-icon mb-3">
-                                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="category-content p-4">
-                                <h4 class="category-name mb-3">Seminar</h4>
-                                <a href="categories.php?category=seminar" class="btn btn-sm btn-primary-luxury">View Events</a>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-3 col-sm-6">
-                    <a href="categories.php?category=hotel-hosted" class="category-link">
-                        <div class="category-card luxury-card text-center">
-                            <div class="category-image">
-                                <div class="category-icon mb-3">
-                                    <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                                        <polyline points="9 22 9 12 15 12 15 22"/>
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="category-content p-4">
-                                <h4 class="category-name mb-3">Hotel-Hosted Events</h4>
-                                <a href="categories.php?category=hotel-hosted" class="btn btn-sm btn-primary-luxury">View Events</a>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="cta-section py-5">
+    <div class="cta-section py-5">
         <div class="container">
             <div class="luxury-card cta-card text-center p-5">
                 <h2 class="cta-title mb-3">Ready to Reserve Your Experience?</h2>
@@ -205,9 +123,9 @@
                 <a href="register.php" class="btn btn-primary-luxury btn-lg">Create Account</a>
             </div>
         </div>
-    </section>
+    </div>
 
-    <footer class="luxury-footer py-5">
+    <div class="luxury-footer py-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
@@ -238,7 +156,7 @@
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>

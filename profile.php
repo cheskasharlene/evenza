@@ -61,7 +61,7 @@ $reservations = [
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
+    <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
             <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -90,9 +90,9 @@ $reservations = [
                 </ul>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <section class="profile-page-section py-5 mt-5">
+    <div class="profile-page-section py-5 mt-5">
         <div class="container">
             <div class="page-header mb-5">
                 <h1 class="page-title">My Profile</h1>
@@ -226,7 +226,7 @@ $reservations = [
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
     <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -259,7 +259,7 @@ $reservations = [
         </div>
     </div>
 
-    <footer class="luxury-footer py-5">
+    <div class="luxury-footer py-5">
         <div class="container">
             <div class="row">
                 <div class="col-md-4 mb-4">
@@ -290,7 +290,7 @@ $reservations = [
                 </div>
             </div>
         </div>
-    </footer>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
