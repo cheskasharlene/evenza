@@ -916,7 +916,6 @@ html {
     color: var(--accent-olive);
 }
 
-/* AI Assistant Widget */
 .ai-assistant-header {
     display: flex;
     align-items: center;
@@ -963,7 +962,6 @@ html {
     color: white;
 }
 
-/* FAQs */
 .faq-question {
     width: 100%;
     text-align: left;
@@ -1001,7 +999,6 @@ html {
     line-height: 1.6;
 }
 
-/* Recommended Events */
 .recommended-event-item {
     display: flex;
     gap: 1rem;
@@ -1065,7 +1062,6 @@ html {
     }
 }
 
-/* Reservation Page Styles */
 .reservation-page-section {
     background-color: var(--bg-warm-beige);
     min-height: 100vh;
@@ -1154,7 +1150,6 @@ html {
     }
 }
 
-/* Payment Page Styles */
 .payment-page-section {
     background-color: var(--bg-warm-beige);
     min-height: 100vh;
@@ -1514,7 +1509,6 @@ html {
     }
 }
 
-/* Profile Page Styles */
 .profile-page-section {
     background-color: var(--bg-warm-beige);
     min-height: 100vh;
@@ -1664,7 +1658,6 @@ html {
     }
 }
 
-/* About Page Styles */
 .about-page-section {
     background-color: var(--bg-warm-beige);
     min-height: 100vh;
@@ -1688,7 +1681,6 @@ html {
     color: var(--accent-olive);
 }
 
-/* Process Steps */
 .process-step {
     padding: 2rem 1rem;
     position: relative;
@@ -1733,7 +1725,6 @@ html {
     font-size: 0.95rem;
 }
 
-/* Benefits Section */
 .benefits-section {
     margin-top: 3rem;
 }
