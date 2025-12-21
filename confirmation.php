@@ -49,8 +49,52 @@ $eventsData = [
     ]
 ];
 
+session_start();
+
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 $totalAmount = $event['price'] * $quantity;
+
+// Persist reservation for logged-in users
+$reservationsFile = __DIR__ . '/data/reservations.json';
+if (!is_dir(__DIR__ . '/data')) {
+    mkdir(__DIR__ . '/data', 0755, true);
+}
+
+$reservationRecord = [
+    'id' => uniqid('res_'),
+    'userId' => isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null,
+    'eventId' => $eventId,
+    'eventName' => $event['name'],
+    'date' => $event['date'],
+    'time' => $event['time'],
+    'venue' => $event['venue'],
+    'ticketId' => $ticketId,
+    'quantity' => $quantity,
+    'totalAmount' => $totalAmount,
+    'status' => 'confirmed',
+    'createdAt' => date('c')
+];
+
+// Only save if we have a logged-in user and this ticket doesn't already exist
+if (!empty($reservationRecord['userId'])) {
+    $existing = [];
+    if (file_exists($reservationsFile)) {
+        $existing = json_decode(file_get_contents($reservationsFile), true) ?? [];
+    }
+
+    $found = false;
+    foreach ($existing as $r) {
+        if (isset($r['ticketId']) && $r['ticketId'] === $ticketId) {
+            $found = true;
+            break;
+        }
+    }
+
+    if (!$found) {
+        $existing[] = $reservationRecord;
+        file_put_contents($reservationsFile, json_encode($existing, JSON_PRETTY_PRINT));
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,18 +124,25 @@ $totalAmount = $event['price'] * $quantity;
                     <li class="nav-item">
                         <a class="nav-link" href="events.php">Events</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="categories.php">Categories</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="about.php">About</a>
                     </li>
-                    <li class="nav-item ms-3">
-                        <a class="nav-link btn-login" href="login.php">Login</a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <a class="nav-link btn-register" href="register.php">Register</a>
-                    </li>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link" href="profile.php">My Profile</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="logout.php">Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link btn-login" href="login.php">Login</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="register.php">Register</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -118,12 +169,7 @@ $totalAmount = $event['price'] * $quantity;
                                 <div class="confirmation-value"><?php echo htmlspecialchars($event['name']); ?></div>
                             </div>
 
-                            <div class="confirmation-item mb-4">
-                                <div class="confirmation-label">Category</div>
-                                <div class="confirmation-value">
-                                    <span class="event-category"><?php echo htmlspecialchars($event['category']); ?></span>
-                                </div>
-                            </div>
+                            <!-- category removed -->
 
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">Ticket ID</div>

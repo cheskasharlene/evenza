@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 $eventId = isset($_GET['id']) ? intval($_GET['id']) : 1;
 
@@ -90,18 +91,25 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                     <li class="nav-item">
                         <a class="nav-link active" href="events.php">Events</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="categories.php">Categories</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="about.php">About</a>
                     </li>
-                    <li class="nav-item ms-3">
-                        <a class="nav-link btn-login" href="login.php">Login</a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <a class="nav-link btn-register" href="register.php">Register</a>
-                    </li>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link" href="profile.php">My Profile</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="logout.php">Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link btn-login" href="login.php">Login</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="register.php">Register</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -121,15 +129,12 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 
                     <div class="event-detail-image mb-4">
                         <div class="image-placeholder-detail <?php echo htmlspecialchars($event['imageClass']); ?>">
-                            <span class="event-category-badge"><?php echo htmlspecialchars($event['category']); ?></span>
                         </div>
                     </div>
 
                     <div class="luxury-card p-4 mb-4">
                         <h1 class="event-detail-name mb-3"><?php echo htmlspecialchars($event['name']); ?></h1>
-                        <div class="event-detail-category mb-4">
-                            <span class="event-category"><?php echo htmlspecialchars($event['category']); ?></span>
-                        </div>
+                        <!-- category removed -->
                         
                         <div class="event-detail-description mb-4">
                             <p><?php echo htmlspecialchars($event['description']); ?></p>

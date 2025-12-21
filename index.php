@@ -1,3 +1,4 @@
+<?php session_start(); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,18 +26,25 @@
                     <li class="nav-item">
                         <a class="nav-link" href="events.php">Events</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="categories.php">Categories</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="about.php">About</a>
                     </li>
-                    <li class="nav-item ms-3">
-                        <a class="nav-link btn-login" href="login.php">Login</a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <a class="nav-link btn-register" href="register.php">Register</a>
-                    </li>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link" href="profile.php">My Profile</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="logout.php">Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link btn-login" href="login.php">Login</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="register.php">Register</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>

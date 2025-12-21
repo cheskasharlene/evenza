@@ -1,4 +1,5 @@
 <?php
+session_start();
 
 $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 1;
 $quantity = isset($_GET['quantity']) ? intval($_GET['quantity']) : 1;
@@ -77,18 +78,25 @@ $totalAmount = $event['price'] * $quantity;
                     <li class="nav-item">
                         <a class="nav-link" href="events.php">Events</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="categories.php">Categories</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="about.php">About</a>
                     </li>
-                    <li class="nav-item ms-3">
-                        <a class="nav-link btn-login" href="login.php">Login</a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <a class="nav-link btn-register" href="register.php">Register</a>
-                    </li>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link" href="profile.php">My Profile</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="logout.php">Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link btn-login" href="login.php">Login</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="register.php">Register</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -156,12 +164,7 @@ $totalAmount = $event['price'] * $quantity;
                             <div class="summary-value"><?php echo htmlspecialchars($event['name']); ?></div>
                         </div>
 
-                        <div class="summary-item mb-3">
-                            <div class="summary-label">Category</div>
-                            <div class="summary-value">
-                                <span class="event-category"><?php echo htmlspecialchars($event['category']); ?></span>
-                            </div>
-                        </div>
+                        <!-- category removed -->
 
                         <div class="summary-item mb-3">
                             <div class="summary-label">Date & Time</div>

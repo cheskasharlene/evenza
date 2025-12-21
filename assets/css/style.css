@@ -298,59 +298,7 @@ h1, h2, h3, h4, h5, h6 {
     background-color: var(--bg-off-white);
 }
 
-.category-link {
-    text-decoration: none;
-    display: block;
-    height: 100%;
-}
-
-.category-card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.category-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 40px var(--shadow-medium);
-}
-
-.category-image {
-    padding: 2.5rem 1.5rem 1rem;
-    background: linear-gradient(135deg, rgba(107, 127, 90, 0.05) 0%, rgba(184, 160, 130, 0.05) 100%);
-}
-
-.category-icon {
-    color: var(--accent-olive);
-    transition: all 0.3s ease;
-    margin: 0 auto;
-}
-
-.category-card:hover .category-icon {
-    transform: scale(1.15);
-    color: var(--accent-muted-gold);
-}
-
-.category-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.category-name {
-    font-size: 1.2rem;
-    color: var(--text-charcoal);
-    font-weight: 500;
-    margin-bottom: 0;
-}
-
-.category-card .btn-primary-luxury {
-    width: 100%;
-    margin-top: auto;
-}
+.category styles removed: these selectors were for the categories UI which is now removed.
 
 .cta-section {
     background: linear-gradient(135deg, var(--bg-warm-beige) 0%, var(--bg-off-white) 100%);
@@ -606,18 +554,7 @@ html {
     background: linear-gradient(135deg, #B8A082 0%, #A6907A 100%);
 }
 
-.event-category-badge {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    background-color: rgba(253, 252, 249, 0.95);
-    color: var(--accent-olive);
-    padding: 0.4rem 1rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
+/* Category badges removed — UI no longer shows category pills */
 
 .event-content-grid {
     flex: 1;
@@ -640,16 +577,7 @@ html {
     gap: 0.5rem;
 }
 
-.event-category {
-    display: inline-block;
-    background-color: rgba(107, 127, 90, 0.1);
-    color: var(--accent-olive);
-    padding: 0.3rem 0.8rem;
-    border-radius: 15px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    width: fit-content;
-}
+/* Category pills removed — styling disabled */
 
 .event-date-time {
     display: flex;

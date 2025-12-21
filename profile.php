@@ -1,52 +1,29 @@
 <?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
 
 $userData = [
-    'name' => 'John Doe',
-    'email' => 'john.doe@example.com',
-    'mobile' => '+1 (555) 123-4567'
+    'name' => $_SESSION['user_name'] ?? 'User',
+    'email' => $_SESSION['user_email'] ?? '',
+    'mobile' => $_SESSION['user_mobile'] ?? ''
 ];
 
-$reservations = [
-    [
-        'id' => 1,
-        'eventId' => 1,
-        'eventName' => 'Business Innovation Summit 2024',
-        'category' => 'Conference',
-        'date' => 'December 25, 2024',
-        'time' => '9:00 AM - 6:00 PM',
-        'ticketId' => 'EVZ-A1B2C3D4',
-        'quantity' => 2,
-        'totalAmount' => 598,
-        'status' => 'confirmed',
-        'venue' => 'Grand Luxe Hotel - Grand Ballroom'
-    ],
-    [
-        'id' => 2,
-        'eventId' => 3,
-        'eventName' => 'Digital Marketing Masterclass',
-        'category' => 'Seminar',
-        'date' => 'December 30, 2024',
-        'time' => '10:00 AM - 5:00 PM',
-        'ticketId' => 'EVZ-E5F6G7H8',
-        'quantity' => 1,
-        'totalAmount' => 149,
-        'status' => 'confirmed',
-        'venue' => 'Grand Luxe Hotel - Conference Hall A'
-    ],
-    [
-        'id' => 3,
-        'eventId' => 4,
-        'eventName' => 'New Year\'s Eve Gala Dinner',
-        'category' => 'Hotel-Hosted Events',
-        'date' => 'December 31, 2024',
-        'time' => '7:00 PM - 1:00 AM',
-        'ticketId' => 'EVZ-I9J0K1L2',
-        'quantity' => 2,
-        'totalAmount' => 900,
-        'status' => 'pending',
-        'venue' => 'Grand Luxe Hotel - Crystal Ballroom'
-    ]
-];
+// Load reservations for this user from data/reservations.json
+$reservationsFile = __DIR__ . '/data/reservations.json';
+$reservations = [];
+if (file_exists($reservationsFile)) {
+    $all = json_decode(file_get_contents($reservationsFile), true) ?? [];
+    foreach ($all as $r) {
+        if (isset($r['userId']) && $r['userId'] === $_SESSION['user_id']) {
+            $reservations[] = $r;
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -75,18 +52,25 @@ $reservations = [
                     <li class="nav-item">
                         <a class="nav-link" href="events.php">Events</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="categories.php">Categories</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="about.php">About</a>
                     </li>
-                    <li class="nav-item ms-3">
-                        <a class="nav-link active" href="profile.php">My Profile</a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        <a class="nav-link btn-register" href="login.php">Logout</a>
-                    </li>
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link active" href="profile.php">My Profile</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="logout.php">Logout</a>
+                        </li>
+                    <?php else: ?>
+                        <li class="nav-item ms-3">
+                            <a class="nav-link btn-login" href="login.php">Login</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-register" href="register.php">Register</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -148,9 +132,7 @@ $reservations = [
                                             <div class="col-md-6 mb-3 mb-md-0">
                                                 <h5 class="reservation-event-name mb-2"><?php echo htmlspecialchars($reservation['eventName']); ?></h5>
                                                 
-                                                <div class="mb-2">
-                                                    <span class="event-category"><?php echo htmlspecialchars($reservation['category']); ?></span>
-                                                </div>
+                                                <!-- category removed -->
                                                 
                                                 <div class="reservation-date mb-2">
                                                     <span><?php echo htmlspecialchars($reservation['date']); ?></span>
