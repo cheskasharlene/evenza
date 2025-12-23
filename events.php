@@ -57,19 +57,21 @@
                     <h1 class="page-title mb-4">Available Events</h1>
 
                     <div class="search-filter-section">
-                        <div class="row g-3">
-                            <div class="col-md-5">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-8">
                                 <div class="search-box">
-                                    <input type="text" class="form-control luxury-input" id="searchInput" placeholder="Search by event name or date...">
+                                    <input type="text" class="form-control luxury-input" id="searchInput" placeholder="Search by event name or venue...">
                                 </div>
                             </div>
-                            <div class="col-md-7">
-                                <div class="search-box">
-                                    <input type="text" class="form-control luxury-input" id="searchInput" placeholder="Search by event name or date...">
-                                </div>
-                            </div>
-                            <div class="col-md-5">
-                                <button class="btn btn-primary-luxury w-100" onclick="filterEvents()">Search</button>
+                            <div class="col-md-4">
+                                <select class="form-select luxury-input" id="categoryFilter">
+                                    <option value="all">All Categories</option>
+                                    <option value="premium">Premium</option>
+                                    <option value="business">Business</option>
+                                    <option value="weddings">Weddings</option>
+                                    <option value="socials">Socials</option>
+                                    <option value="workshops">Workshops</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -81,158 +83,215 @@
     <div class="events-grid-section py-5">
         <div class="container">
             <div class="row g-4" id="eventsGrid">
-                <div class="col-lg-4 col-md-6">
-                    <div class="luxury-card event-card-grid">
-                        <div class="event-image-grid">
-                            <div class="image-placeholder-grid">
-                                
-                            </div>
-                        </div>
-                        <div class="event-content-grid p-4">
-                            <h3 class="event-name">Business Innovation Summit 2024</h3>
-
-                            <div class="event-venue mb-2">
-                                Grand Luxe Hotel - Grand Ballroom
-                            </div>
-                            <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
-                                <div class="event-price">
-                                    <strong>₱ 299.00</strong> <span class="text-muted">per person</span>
+                <!-- Premium Event Card 1: Gala Evening -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="premium" data-name="Gala Evening">
+                    <div class="card event-card h-100">
+                                <div class="event-card-image position-relative">
+                                    <img src="assets/images/event_images/galaEvening.jpg" class="card-img-top" alt="Gala Evening">
+                                    <span class="badge rounded-pill position-absolute top-0 end-0 m-3">Premium</span>
                                 </div>
-                                <div class="event-slots">
-                                    <span class="slots-available">45 slots available</span>
-                                </div>
-                            </div>
-                            <a href="event-details.php?id=1" class="btn btn-primary-luxury w-100">View Details</a>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Gala Evening</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Crystal Ballroom</p>
+                            <a href="event-details.php?id=101" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4 col-md-6">
-                    <div class="luxury-card event-card-grid">
-                        <div class="event-image-grid">
-                            <div class="image-placeholder-grid wedding-bg">
-                                
-                            </div>
+                <!-- Premium Event Card 2: Wine Tasting Experience -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="premium" data-name="Wine Tasting Experience">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image position-relative">
+                            <img src="assets/images/event_images/wineCellar.jpg" class="card-img-top" alt="Wine Tasting Experience">
+                            <span class="badge rounded-pill position-absolute top-0 end-0 m-3">Premium</span>
                         </div>
-                        <div class="event-content-grid p-4">
-                            <h3 class="event-name">Elegant Garden Wedding</h3>
-
-                            <div class="event-venue mb-2">
-                                Grand Luxe Hotel - Garden Pavilion
-                            </div>
-                            <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
-                                <div class="event-price">
-                                    <strong>₱ 5,500.00</strong> <span class="text-muted">package</span>
-                                </div>
-                                <div class="event-slots">
-                                    <span class="slots-available">12 slots available</span>
-                                </div>
-                            </div>
-                            <a href="event-details.php?id=2" class="btn btn-primary-luxury w-100">View Details</a>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Wine Tasting Experience</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Wine Cellar</p>
+                            <a href="event-details.php?id=102" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4 col-md-6">
-                    <div class="luxury-card event-card-grid">
-                        <div class="event-image-grid">
-                            <div class="image-placeholder-grid seminar-bg">
-                                
-                            </div>
+                <!-- Premium Event Card 3: Art Exhibition Opening -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="premium" data-name="Art Exhibition Opening">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image position-relative">
+                            <img src="assets/images/event_images/artExhibition.jpg" class="card-img-top" alt="Art Exhibition Opening">
+                            <span class="badge rounded-pill position-absolute top-0 end-0 m-3">Premium</span>
                         </div>
-                        <div class="event-content-grid p-4">
-                            <h3 class="event-name">Digital Marketing Masterclass</h3>
-
-                            <div class="event-venue mb-2">
-                                Grand Luxe Hotel - Conference Hall A
-                            </div>
-                            <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
-                                <div class="event-price">
-                                    <strong>₱ 149.00</strong> <span class="text-muted">per person</span>
-                                </div>
-                                <div class="event-slots">
-                                    <span class="slots-available">78 slots available</span>
-                                </div>
-                            </div>
-                            <a href="event-details.php?id=3" class="btn btn-primary-luxury w-100">View Details</a>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Art Exhibition Opening</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Art Gallery</p>
+                            <a href="event-details.php?id=103" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4 col-md-6">
-                    <div class="luxury-card event-card-grid">
-                        <div class="event-image-grid">
-                            <div class="image-placeholder-grid hotel-bg">
-                                
-                            </div>
+                <!-- Event Card 1: Business Innovation Summit 2024 -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Business Innovation Summit 2024">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <img src="assets/images/event_images/businessInnovation.jpg" class="card-img-top" alt="Business Innovation Summit">
                         </div>
-                        <div class="event-content-grid p-4">
-                            <h3 class="event-name">New Year's Eve Gala Dinner</h3>
-
-                            <div class="event-venue mb-2">
-                                Grand Luxe Hotel - Crystal Ballroom
-                            </div>
-                            <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
-                                <div class="event-price">
-                                    <strong>₱ 450.00</strong> <span class="text-muted">per person</span>
-                                </div>
-                                <div class="event-slots">
-                                    <span class="slots-available">23 slots available</span>
-                                </div>
-                            </div>
-                            <a href="event-details.php?id=4" class="btn btn-primary-luxury w-100">View Details</a>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Business Innovation Summit</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Grand Ballroom</p>
+                            <a href="event-details.php?id=1" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4 col-md-6">
-                    <div class="luxury-card event-card-grid">
-                        <div class="event-image-grid">
-                            <div class="image-placeholder-grid">
-                                
-                            </div>
+                <!-- Event Card 2: Elegant Garden Wedding -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="weddings" data-name="Elegant Garden Wedding">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <img src="assets/images/event_images/gardenWedding.jpg" class="card-img-top" alt="Elegant Garden Wedding">
                         </div>
-                        <div class="event-content-grid p-4">
-                            <h3 class="event-name">Tech Leaders Forum 2025</h3>
-
-                            <div class="event-venue mb-2">
-                                Grand Luxe Hotel - Innovation Center
-                            </div>
-                            <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
-                                <div class="event-price">
-                                    <strong>₱ 399.00</strong> <span class="text-muted">per person</span>
-                                </div>
-                                <div class="event-slots">
-                                    <span class="slots-available">120 slots available</span>
-                                </div>
-                            </div>
-                            <a href="event-details.php?id=5" class="btn btn-primary-luxury w-100">View Details</a>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Elegant Garden Wedding</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Garden Pavilion</p>
+                            <a href="event-details.php?id=2" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4 col-md-6">
-                    <div class="luxury-card event-card-grid">
-                        <div class="event-image-grid">
-                            <div class="image-placeholder-grid wedding-bg">
-                                
-                            </div>
+                <!-- Event Card 3: Digital Marketing Masterclass -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="workshops" data-name="Digital Marketing Masterclass">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <div class="image-placeholder workshop-bg"></div>
                         </div>
-                        <div class="event-content-grid p-4">
-                            <h3 class="event-name">Luxury Beach Wedding</h3>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Digital Marketing Masterclass</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Conference Hall A</p>
+                            <a href="event-details.php?id=3" class="btn btn-event-view w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
 
-                            <div class="event-venue mb-2">
-                                Grand Luxe Hotel - Oceanview Terrace
-                            </div>
-                            <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
-                                <div class="event-price">
-                                    <strong>₱ 8,500.00</strong> <span class="text-muted">package</span>
-                                </div>
-                                <div class="event-slots">
-                                    <span class="slots-available">8 slots available</span>
-                                </div>
-                            </div>
-                            <a href="event-details.php?id=6" class="btn btn-primary-luxury w-100">View Details</a>
+                <!-- Event Card 4: New Year's Eve Gala Dinner -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="socials" data-name="New Year's Eve Gala Dinner">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <img src="assets/images/event_images/nyGala.jpg" class="card-img-top" alt="New Year's Eve Gala Dinner">
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">New Year's Eve Gala Dinner</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Crystal Ballroom</p>
+                            <a href="event-details.php?id=4" class="btn btn-event-view w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 5: Tech Leaders Forum 2025 -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Tech Leaders Forum 2025">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <div class="image-placeholder business-bg"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Tech Leaders Forum</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Innovation Center</p>
+                            <a href="event-details.php?id=5" class="btn btn-event-view w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 6: Luxury Beach Wedding -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="weddings" data-name="Luxury Beach Wedding">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <div class="image-placeholder wedding-bg"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Luxury Beach Wedding</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Oceanview Terrace</p>
+                            <a href="event-details.php?id=6" class="btn btn-event-view w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 7: Corporate Team Building Retreat -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Corporate Team Building Retreat">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <div class="image-placeholder business-bg"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Corporate Team Building Retreat</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Mountain Resort Wing</p>
+                            <a href="event-details.php?id=7" class="btn btn-event-view w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 8: Spring Wedding Collection -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="weddings" data-name="Spring Wedding Collection">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <div class="image-placeholder wedding-bg"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Spring Wedding Collection</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Grand Ballroom</p>
+                            <a href="event-details.php?id=8" class="btn btn-event-view w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 9: Professional Development Workshop -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="workshops" data-name="Professional Development Workshop">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <div class="image-placeholder workshop-bg"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Professional Development Workshop</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Conference Hall B</p>
+                            <a href="event-details.php?id=9" class="btn btn-event-view w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 10: Exclusive Members Gala -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="socials" data-name="Exclusive Members Gala">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <div class="image-placeholder gala-bg"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Exclusive Members Gala</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - VIP Lounge</p>
+                            <a href="event-details.php?id=10" class="btn btn-event-view w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 11: Leadership Summit 2025 -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Leadership Summit 2025">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <div class="image-placeholder business-bg"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Leadership Summit</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Executive Center</p>
+                            <a href="event-details.php?id=11" class="btn btn-event-view w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Card 12: Advanced Skills Training -->
+                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="workshops" data-name="Advanced Skills Training">
+                    <div class="card event-card h-100">
+                        <div class="event-card-image">
+                            <div class="image-placeholder workshop-bg"></div>
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title event-title">Advanced Skills Training</h3>
+                            <p class="card-text event-venue-text">Grand Luxe Hotel - Training Center</p>
+                            <a href="event-details.php?id=12" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -251,7 +310,7 @@
                     <h6 class="footer-heading mb-3">Contact Info</h6>
                     <p class="footer-text">
                         Email: info@evenza.com<br>
-                        Phone: +1 (555) 123-4567<br>
+                        Phone: +63-9123-456-7890<br>
                         Address: 123 Luxury Avenue, Suite 100<br>
                         City, State 12345
                     </p>
@@ -276,6 +335,37 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/events.js"></script>
+    <script>
+        // Event filtering and search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const eventCards = document.querySelectorAll('.event-card-wrapper');
+
+            function filterEvents() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedCategory = categoryFilter.value;
+
+                eventCards.forEach(card => {
+                    const cardCategory = card.getAttribute('data-category');
+                    const cardName = card.getAttribute('data-name').toLowerCase();
+
+                    const matchesSearch = cardName.includes(searchTerm);
+                    const matchesCategory = selectedCategory === 'all' || cardCategory === selectedCategory;
+
+                    if (matchesSearch && matchesCategory) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            // Event listeners for real-time filtering
+            searchInput.addEventListener('input', filterEvents);
+            categoryFilter.addEventListener('change', filterEvents);
+        });
+    </script>
 </body>
 </html>
 

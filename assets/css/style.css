@@ -119,6 +119,15 @@ h1, h2, h3, h4, h5, h6 {
     transition: all 0.3s ease;
 }
 
+.navbar-nav .nav-link.btn-register {
+    color: #FDFCF9 !important;
+    font-weight: 500;
+}
+
+.navbar-nav .nav-link.btn-register:hover {
+    color: #FDFCF9 !important;
+}
+
 .btn-register:hover {
     background-color: var(--btn-dark-beige);
     transform: translateY(-2px);
@@ -182,11 +191,13 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero-subtitle {
-    font-size: 1.5rem;
-    color: var(--text-dark-gray);
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2rem;
+    color: var(--text-charcoal);
     margin-bottom: 2.5rem;
-    line-height: 1.6;
-    font-weight: 400;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: 1px;
     animation: fadeInUp 1s ease;
 }
 
@@ -860,6 +871,36 @@ html {
     min-height: 100vh;
 }
 
+/* Two-Column Layout for Event Details */
+.event-details-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.event-main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-sidebar {
+    flex: 0 0 32%;
+    min-width: 280px;
+}
+
+/* Responsive: Stack on mobile and tablet */
+@media (max-width: 992px) {
+    .event-details-layout {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .event-sidebar {
+        flex: 1;
+        width: 100%;
+    }
+}
+
 .event-detail-image {
     border-radius: 20px;
     overflow: hidden;
@@ -1150,6 +1191,46 @@ html {
 .reservation-page-section {
     background-color: var(--bg-warm-beige);
     min-height: 100vh;
+}
+
+/* Two-Column Layout for Reservation */
+.reservation-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.reservation-form-column {
+    flex: 1;
+    min-width: 0;
+}
+
+.reservation-summary-column {
+    flex: 0 0 35%;
+    min-width: 300px;
+}
+
+.sticky-summary {
+    position: sticky;
+    top: 120px;
+}
+
+/* Responsive: Stack on mobile */
+@media (max-width: 992px) {
+    .reservation-layout {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .reservation-summary-column {
+        flex: 1;
+        width: 100%;
+    }
+
+    .sticky-summary {
+        position: relative;
+        top: 0;
+    }
 }
 
 .reservation-summary {
@@ -1938,12 +2019,273 @@ html {
 .activity-item + .activity-item { margin-top: 0.6rem; }
 
 /* Package selection */
-.package-card { cursor: pointer; min-width: 180px; border: 1px solid rgba(26,26,26,0.04); transition: all 0.15s ease; }
-.package-card .package-price { font-weight: 600; color: var(--accent-olive); }
-.package-card.package-selected { border-color: var(--accent-olive); box-shadow: 0 6px 18px rgba(107,127,90,0.06); transform: none; }
+.package-tile {
+    flex: 1;
+    min-width: 140px;
+    padding: 1rem;
+    border: 2px solid rgba(107, 127, 90, 0.15);
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--card-cream) 0%, #F9F7F3 100%);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.package-tile:hover {
+    border-color: var(--accent-olive);
+    box-shadow: 0 6px 16px rgba(107, 127, 90, 0.12);
+    transform: translateY(-2px);
+}
+
+.package-tile.selected {
+    border-color: var(--accent-olive);
+    border-width: 2px;
+    background: linear-gradient(135deg, rgba(107, 127, 90, 0.08) 0%, rgba(107, 127, 90, 0.04) 100%);
+    box-shadow: 0 8px 24px rgba(107, 127, 90, 0.18);
+}
+
+.package-tile-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-charcoal);
+    margin-bottom: 0.25rem;
+}
+
+.package-tile-rate {
+    font-size: 0.75rem;
+    color: var(--text-dark-gray);
+    opacity: 0.7;
+    margin-bottom: 0.5rem;
+}
+
+.package-tile-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-olive);
+}
 
 /* Small helpers */
 .small-muted { font-size: 0.85rem; color: rgba(26,26,26,0.6); }
+
+/* ===== Events Page Styling ===== */
+
+/* Search and Filter Section */
+.search-filter-section {
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 8px var(--shadow-soft);
+}
+
+.search-box {
+    position: relative;
+}
+
+.luxury-input {
+    border: 2px solid #E8E4DC;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    color: var(--text-dark-gray);
+    background-color: #FDFCF9;
+    transition: all 0.3s ease;
+}
+
+.luxury-input:focus {
+    border-color: var(--accent-olive);
+    background-color: #FDFCF9;
+    box-shadow: 0 0 0 3px rgba(107, 127, 90, 0.1);
+    outline: none;
+}
+
+.luxury-input::placeholder {
+    color: rgba(44, 44, 44, 0.5);
+}
+
+.form-select.luxury-input {
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236B7F5A' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 12px;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+/* Event Cards Grid */
+.events-grid-section {
+    background-color: var(--bg-warm-beige);
+}
+
+.event-card-wrapper {
+    transition: all 0.3s ease;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0.8;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Event Card Styles */
+.event-card {
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #FDFCF9;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.event-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+.event-card-image {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #E8E4DC 0%, #D9D3CA 100%);
+}
+
+.event-card-image .card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.image-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(44, 44, 44, 0.3);
+    font-size: 3rem;
+    transition: all 0.3s ease;
+}
+
+.image-placeholder.business-bg {
+    background: linear-gradient(135deg, #A09480 0%, #8B7A6B 100%);
+}
+
+.image-placeholder.wedding-bg {
+    background: linear-gradient(135deg, #D4A574 0%, #C89968 100%);
+}
+
+.image-placeholder.workshop-bg {
+    background: linear-gradient(135deg, #7BA583 0%, #6B9572 100%);
+}
+
+.image-placeholder.gala-bg {
+    background: linear-gradient(135deg, #A08A7A 0%, #8B7A6B 100%);
+}
+
+.event-card:hover .image-placeholder {
+    transform: scale(1.05);
+}
+
+.event-card .card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.event-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--text-charcoal);
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+}
+
+.event-venue-text {
+    font-size: 0.9rem;
+    color: var(--text-dark-gray);
+    margin-bottom: 1.25rem;
+    flex-grow: 1;
+}
+
+.btn-event-view {
+    background-color: var(--accent-olive);
+    border: none;
+    color: #FDFCF9;
+    font-weight: 500;
+    padding: 0.7rem 1.5rem;
+    border-radius: 25px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    margin-top: auto;
+}
+
+.btn-event-view:hover {
+    background-color: #5A6B4F;
+    color: #FDFCF9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(107, 127, 90, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .search-filter-section {
+        padding: 1.5rem;
+    }
+
+    .event-card-image {
+        height: 220px;
+    }
+
+    .event-title {
+        font-size: 1.15rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .search-filter-section {
+        padding: 1rem;
+    }
+
+    .event-card-image {
+        height: 180px;
+    }
+
+    .event-title {
+        font-size: 1rem;
+    }
+
+    .event-card .card-body {
+        padding: 1rem;
+    }
+}
+
+/* Premium Badge Styling */
+.event-card-image .badge {
+    background-color: var(--bg-warm-beige) !important;
+    color: #084823 !important;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem !important;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
 
 @media (max-width: 991px) {
     .admin-sidebar { position: relative; width: 100%; border-right: none; }

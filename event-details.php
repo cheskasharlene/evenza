@@ -5,15 +5,15 @@ $eventId = isset($_GET['id']) ? intval($_GET['id']) : 1;
 
 $eventsData = [
     1 => [
-        'name' => 'Business Innovation Summit 2024',
+        'name' => 'Business Innovation Summit',
         'category' => 'Conference',
         'description' => 'Join industry leaders and innovators for a comprehensive exploration of cutting-edge business strategies, emerging technologies, and transformative ideas. This exclusive summit brings together thought leaders, entrepreneurs, and executives for a day of inspiring keynotes, interactive workshops, and networking opportunities.',
         'date' => 'December 25, 2024',
         'time' => '9:00 AM - 6:00 PM',
         'venue' => 'Grand Luxe Hotel - Grand Ballroom',
         'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 299,
-        'priceType' => 'per person',
+        'price' => 4000,
+        'priceType' => 'package',
         'slots' => 45,
         'totalCapacity' => 200,
         'imageClass' => ''
@@ -117,16 +117,17 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 
     <div class="event-details-section py-5 mt-5">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-8 mb-4">
-                    <div aria-label="breadcrumb" class="mb-4">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-                            <li class="breadcrumb-item"><a href="events.php">Events</a></li>
-                            <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($event['name']); ?></li>
-                        </ol>
-                    </div>
+            <div aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+                    <li class="breadcrumb-item"><a href="events.php">Events</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($event['name']); ?></li>
+                </ol>
+            </div>
 
+            <div class="event-details-layout">
+                <!-- Main Content Column -->
+                <div class="event-main-content">
                     <div class="event-detail-image mb-4">
                         <div class="image-placeholder-detail <?php echo htmlspecialchars($event['imageClass']); ?>">
                         </div>
@@ -143,7 +144,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                         <hr class="my-4">
 
                         <div class="row g-4 mb-4">
-
                             <div class="col-md-6">
                                 <div class="detail-item">
                                     <div class="detail-icon">
@@ -157,8 +157,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             </div>
                         </div>
 
-
-
                         <div class="reservation-section inquiry-section p-4 text-center mt-4">
                             <?php $link = isset($_SESSION['user_id']) ? 'reservation.php?eventId=' . $eventId : 'login.php?redirect=' . urlencode('reservation.php?eventId=' . $eventId); ?>
                             <div class="d-flex justify-content-center">
@@ -168,7 +166,9 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                     </div> <!-- end .luxury-card -->
                 </div>
 
-                <div class="col-lg-4">
+                <!-- Sidebar Column -->
+                <div class="event-sidebar">
+                    <!-- AI Assistant Card -->
                     <div class="luxury-card p-4 mb-4">
                         <div class="ai-assistant-header mb-3">
                             <div class="ai-icon">
@@ -188,7 +188,8 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                         </div>
                     </div>
 
-                    <div class="luxury-card p-4 mb-4">
+                    <!-- FAQ Card -->
+                    <div class="luxury-card p-4">
                         <h5 class="mb-4">Frequently Asked Questions</h5>
                         <div class="faq-list">
                             <div class="faq-item mb-3">
@@ -229,32 +230,6 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                                     <div class="faq-answer">
                                         Please bring a valid ID, your confirmation email or ticket, and any materials specified in the event details. Notepads and pens will be provided.
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="luxury-card p-4">
-                        <h5 class="mb-4">You Might Also Like</h5>
-                        <div class="recommended-events">
-                            <div class="recommended-event-item mb-3">
-                                <div class="recommended-event-image">
-                                    <div class="image-placeholder-small seminar-bg"></div>
-                                </div>
-                                <div class="recommended-event-content">
-                                    <h6 class="recommended-event-name">Digital Marketing Masterclass</h6>
-                                    <p class="recommended-event-date small text-muted">Dec 30, 2024</p>
-                                    <a href="event-details.php?id=3" class="btn btn-sm btn-outline-luxury">View Details</a>
-                                </div>
-                            </div>
-                            <div class="recommended-event-item mb-3">
-                                <div class="recommended-event-image">
-                                    <div class="image-placeholder-small"></div>
-                                </div>
-                                <div class="recommended-event-content">
-                                    <h6 class="recommended-event-name">Tech Leaders Forum 2025</h6>
-                                    <p class="recommended-event-date small text-muted">Jan 15, 2025</p>
-                                    <a href="event-details.php?id=5" class="btn btn-sm btn-outline-luxury">View Details</a>
                                 </div>
                             </div>
                         </div>

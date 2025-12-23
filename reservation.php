@@ -51,9 +51,9 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 
 // Define package options (example packages) — replace with event-specific packages as needed
 $packages = [
-    ['id' => 'gold', 'name' => 'Gold Package', 'price' => 15000],
+    ['id' => 'bronze', 'name' => 'Bronze Package', 'price' => 7000],
     ['id' => 'silver', 'name' => 'Silver Package', 'price' => 10000],
-    ['id' => 'bronze', 'name' => 'Bronze Package', 'price' => 7000]
+    ['id' => 'gold', 'name' => 'Gold Package', 'price' => 15000]
 ];
 
 $selectedPackage = $packages[0];
@@ -121,8 +121,9 @@ $totalAmount = $selectedPackage['price'];
                 </ol>
             </div>
 
-            <div class="row">
-                <div class="col-lg-7 mb-4">
+            <div class="reservation-layout">
+                <!-- Left Column: Form -->
+                <div class="reservation-form-column">
                     <div class="luxury-card p-4">
                         <h2 class="page-title mb-4">Reservation Form</h2>
                         
@@ -145,21 +146,65 @@ $totalAmount = $selectedPackage['price'];
 
                             <div class="mb-4">
                                 <label for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control luxury-input" id="mobile" name="mobile" required placeholder="+1 (555) 123-4567">
+                                <input type="tel" class="form-control luxury-input" id="mobile" name="mobile" required placeholder="+63-9123-456-7890">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="reservationDate" class="form-label">Preferred Date <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control luxury-input" id="reservationDate" name="reservationDate" required>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label for="eventStartTime" class="form-label">Event Start Time <span class="text-danger">*</span></label>
+                                    <select class="form-select luxury-input" id="eventStartTime" name="eventStartTime" required>
+                                        <option value="">Select start time</option>
+                                        <option value="08:00 AM">8:00 AM</option>
+                                        <option value="09:00 AM">9:00 AM</option>
+                                        <option value="10:00 AM">10:00 AM</option>
+                                        <option value="11:00 AM">11:00 AM</option>
+                                        <option value="12:00 PM">12:00 PM</option>
+                                        <option value="01:00 PM">1:00 PM</option>
+                                        <option value="02:00 PM">2:00 PM</option>
+                                        <option value="03:00 PM">3:00 PM</option>
+                                        <option value="04:00 PM">4:00 PM</option>
+                                        <option value="05:00 PM">5:00 PM</option>
+                                        <option value="06:00 PM">6:00 PM</option>
+                                        <option value="07:00 PM">7:00 PM</option>
+                                        <option value="08:00 PM">8:00 PM</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="eventEndTime" class="form-label">Event End Time <span class="text-danger">*</span></label>
+                                    <select class="form-select luxury-input" id="eventEndTime" name="eventEndTime" required>
+                                        <option value="">Select end time</option>
+                                        <option value="09:00 AM">9:00 AM</option>
+                                        <option value="10:00 AM">10:00 AM</option>
+                                        <option value="11:00 AM">11:00 AM</option>
+                                        <option value="12:00 PM">12:00 PM</option>
+                                        <option value="01:00 PM">1:00 PM</option>
+                                        <option value="02:00 PM">2:00 PM</option>
+                                        <option value="03:00 PM">3:00 PM</option>
+                                        <option value="04:00 PM">4:00 PM</option>
+                                        <option value="05:00 PM">5:00 PM</option>
+                                        <option value="06:00 PM">6:00 PM</option>
+                                        <option value="07:00 PM">7:00 PM</option>
+                                        <option value="08:00 PM">8:00 PM</option>
+                                        <option value="09:00 PM">9:00 PM</option>
+                                        <option value="10:00 PM">10:00 PM</option>
+                                        <option value="11:00 PM">11:00 PM</option>
+                                    </select>
+                                </div>
                             </div>
 
                             <div class="mb-4">
                                 <label class="form-label">Select Package <span class="text-danger">*</span></label>
-                                <div class="package-options d-flex flex-column flex-md-row gap-3 mt-2" id="packageOptions">
+                                <div class="package-options d-flex gap-2 mt-2 flex-wrap" id="packageOptions">
                                     <?php foreach ($packages as $p): ?>
-                                        <div class="package-card luxury-card p-3" role="button" tabindex="0" data-id="<?php echo $p['id']; ?>" data-name="<?php echo htmlspecialchars($p['name']); ?>" data-price="<?php echo $p['price']; ?>">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <div>
-                                                    <div class="fw-semibold"><?php echo htmlspecialchars($p['name']); ?></div>
-                                                    <div class="text-muted small">Flat rate</div>
-                                                </div>
-                                                <div class="package-price">₱ <?php echo number_format($p['price'], 2); ?></div>
-                                            </div>
+                                        <div class="package-tile" role="button" tabindex="0" data-id="<?php echo $p['id']; ?>" data-name="<?php echo htmlspecialchars($p['name']); ?>" data-price="<?php echo $p['price']; ?>">
+                                            <div class="package-tile-name"><?php echo htmlspecialchars($p['name']); ?></div>
+                                            <div class="package-tile-rate">Flat rate</div>
+                                            <div class="package-tile-price">₱ <?php echo number_format($p['price'], 2); ?></div>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
@@ -174,8 +219,9 @@ $totalAmount = $selectedPackage['price'];
                     </div>
                 </div>
 
-                <div class="col-lg-5">
-                    <div class="luxury-card reservation-summary p-4 sticky-top" style="top: 100px;">
+                <!-- Right Column: Sticky Summary -->
+                <div class="reservation-summary-column">
+                    <div class="luxury-card reservation-summary p-4 sticky-summary">
                         <h4 class="mb-4">Reservation Summary</h4>
                         
                         <div class="summary-item mb-3">
@@ -188,8 +234,8 @@ $totalAmount = $selectedPackage['price'];
                         <div class="summary-item mb-3">
                             <div class="summary-label">Date & Time</div>
                             <div class="summary-value">
-                                <div><?php echo htmlspecialchars($event['date']); ?></div>
-                                <div class="text-muted small"><?php echo htmlspecialchars($event['time']); ?></div>
+                                <div id="summaryDate"><?php echo htmlspecialchars($event['date']); ?></div>
+                                <div class="text-muted small" id="summaryTimeRange"><?php echo htmlspecialchars($event['time']); ?></div>
                             </div>
                         </div>
 
@@ -260,8 +306,143 @@ $totalAmount = $selectedPackage['price'];
         const reservationData = {
             packages: <?php echo json_encode($packages); ?>,
             selectedPackageId: "<?php echo $selectedPackage['id']; ?>",
-            eventId: <?php echo $eventId; ?>
+            eventId: <?php echo $eventId; ?>,
+            defaultEvent: {
+                date: "<?php echo htmlspecialchars($event['date']); ?>",
+                time: "<?php echo htmlspecialchars($event['time']); ?>"
+            }
         };
+
+        // Set minimum date to today
+        const dateInput = document.getElementById('reservationDate');
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.setAttribute('min', today);
+
+        // Format date for display
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString + 'T00:00:00');
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+
+        // Update reservation summary in real-time
+        function updateReservationSummary() {
+            const dateValue = dateInput.value;
+            const startTimeValue = document.getElementById('eventStartTime').value;
+            const endTimeValue = document.getElementById('eventEndTime').value;
+
+            // Update date
+            if (dateValue) {
+                const formattedDate = formatDate(dateValue);
+                document.getElementById('summaryDate').textContent = formattedDate;
+            } else {
+                document.getElementById('summaryDate').textContent = reservationData.defaultEvent.date;
+            }
+
+            // Update time range
+            if (startTimeValue && endTimeValue) {
+                document.getElementById('summaryTimeRange').textContent = `${startTimeValue} - ${endTimeValue}`;
+            } else if (startTimeValue) {
+                document.getElementById('summaryTimeRange').textContent = startTimeValue;
+            } else if (endTimeValue) {
+                document.getElementById('summaryTimeRange').textContent = endTimeValue;
+            } else {
+                document.getElementById('summaryTimeRange').textContent = reservationData.defaultEvent.time;
+            }
+        }
+
+        // Handle package selection and update summary
+        function setupPackageSelectionListeners() {
+            const packageTiles = document.querySelectorAll('.package-tile');
+            
+            packageTiles.forEach(tile => {
+                tile.addEventListener('click', function() {
+                    // Remove selected class from all tiles
+                    packageTiles.forEach(t => t.classList.remove('selected'));
+                    
+                    // Add selected class to clicked tile
+                    this.classList.add('selected');
+                    
+                    // Update hidden fields
+                    const packageId = this.getAttribute('data-id');
+                    const packageName = this.getAttribute('data-name');
+                    const packagePrice = this.getAttribute('data-price');
+                    
+                    document.getElementById('packageId').value = packageId;
+                    document.getElementById('packageName').value = packageName;
+                    document.getElementById('packagePrice').value = packagePrice;
+                    
+                    // Update summary
+                    document.getElementById('summaryPackage').textContent = packageName;
+                    document.getElementById('summaryTotal').textContent = '₱ ' + parseFloat(packagePrice).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                });
+
+                // Allow keyboard navigation
+                tile.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.click();
+                    }
+                });
+            });
+        }
+
+        // Add event listeners for real-time updates
+        dateInput.addEventListener('change', updateReservationSummary);
+        document.getElementById('eventStartTime').addEventListener('change', updateReservationSummary);
+        document.getElementById('eventEndTime').addEventListener('change', updateReservationSummary);
+
+        // Validate form on submission
+        document.getElementById('reservationForm').addEventListener('submit', function(e) {
+            const dateValue = dateInput.value;
+            const startTimeValue = document.getElementById('eventStartTime').value;
+            const endTimeValue = document.getElementById('eventEndTime').value;
+
+            if (!dateValue) {
+                e.preventDefault();
+                alert('Please select a preferred date.');
+                return false;
+            }
+
+            if (!startTimeValue) {
+                e.preventDefault();
+                alert('Please select an event start time.');
+                return false;
+            }
+
+            if (!endTimeValue) {
+                e.preventDefault();
+                alert('Please select an event end time.');
+                return false;
+            }
+
+            // Validate that end time is after start time
+            const timeOrder = ['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM', '06:00 PM', '07:00 PM', '08:00 PM', '09:00 PM', '10:00 PM', '11:00 PM'];
+            const startIndex = timeOrder.indexOf(startTimeValue);
+            const endIndex = timeOrder.indexOf(endTimeValue);
+
+            if (startIndex >= endIndex) {
+                e.preventDefault();
+                alert('Event end time must be after start time.');
+                return false;
+            }
+
+            // Validate date is not in past
+            const selectedDate = new Date(dateValue + 'T00:00:00');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            if (selectedDate < today) {
+                e.preventDefault();
+                alert('Please select a future date.');
+                dateInput.focus();
+                return false;
+            }
+        });
+
+        // Initialize package selection on page load
+        setupPackageSelectionListeners();
     </script>
     <script src="assets/js/reservation.js"></script>
 </body>
