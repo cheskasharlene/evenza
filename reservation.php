@@ -2,8 +2,8 @@
 session_start();
 
 $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 1;
-$quantity = isset($_GET['quantity']) ? intval($_GET['quantity']) : 1;
 
+// Package-based reservation: define packages for the event
 $eventsData = [
     1 => [
         'name' => 'Business Innovation Summit 2024',
@@ -49,7 +49,15 @@ $eventsData = [
 
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 
-$totalAmount = $event['price'] * $quantity;
+// Define package options (example packages) — replace with event-specific packages as needed
+$packages = [
+    ['id' => 'gold', 'name' => 'Gold Package', 'price' => 15000],
+    ['id' => 'silver', 'name' => 'Silver Package', 'price' => 10000],
+    ['id' => 'bronze', 'name' => 'Bronze Package', 'price' => 7000]
+];
+
+$selectedPackage = $packages[0];
+$totalAmount = $selectedPackage['price'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -66,8 +74,8 @@ $totalAmount = $event['price'] * $quantity;
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand luxury-logo" href="index.php"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -120,7 +128,10 @@ $totalAmount = $event['price'] * $quantity;
                         
                         <form id="reservationForm" method="POST" action="payment.php">
                             <input type="hidden" name="eventId" value="<?php echo $eventId; ?>">
-                            <input type="hidden" name="quantity" id="hiddenQuantity" value="<?php echo $quantity; ?>">
+                            <!-- Package selection hidden fields -->
+                            <input type="hidden" name="packageId" id="packageId" value="<?php echo $selectedPackage['id']; ?>">
+                            <input type="hidden" name="packageName" id="packageName" value="<?php echo htmlspecialchars($selectedPackage['name']); ?>">
+                            <input type="hidden" name="packagePrice" id="packagePrice" value="<?php echo $selectedPackage['price']; ?>">
                             
                             <div class="mb-4">
                                 <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
@@ -138,13 +149,21 @@ $totalAmount = $event['price'] * $quantity;
                             </div>
 
                             <div class="mb-4">
-                                <label for="ticketQuantity" class="form-label">Number of Tickets <span class="text-danger">*</span></label>
-                                <div class="quantity-selector">
-                                    <button type="button" class="quantity-btn" onclick="decreaseTicketQuantity()">-</button>
-                                    <input type="number" class="form-control luxury-input quantity-input" id="ticketQuantity" name="ticketQuantity" value="<?php echo $quantity; ?>" min="1" max="<?php echo htmlspecialchars($event['slots']); ?>" required>
-                                    <button type="button" class="quantity-btn" onclick="increaseTicketQuantity()">+</button>
+                                <label class="form-label">Select Package <span class="text-danger">*</span></label>
+                                <div class="package-options d-flex flex-column flex-md-row gap-3 mt-2" id="packageOptions">
+                                    <?php foreach ($packages as $p): ?>
+                                        <div class="package-card luxury-card p-3" role="button" tabindex="0" data-id="<?php echo $p['id']; ?>" data-name="<?php echo htmlspecialchars($p['name']); ?>" data-price="<?php echo $p['price']; ?>">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <div class="fw-semibold"><?php echo htmlspecialchars($p['name']); ?></div>
+                                                    <div class="text-muted small">Flat rate</div>
+                                                </div>
+                                                <div class="package-price">₱ <?php echo number_format($p['price'], 2); ?></div>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
-                                <small class="text-muted">Maximum <?php echo htmlspecialchars($event['slots']); ?> tickets available</small>
+                                <small class="text-muted d-block mt-2">Choose a package to reserve the event as a single purchase.</small>
                             </div>
 
                             <div class="d-flex gap-3 mt-4">
@@ -181,19 +200,14 @@ $totalAmount = $event['price'] * $quantity;
 
                         <hr class="my-4">
                         <div class="summary-item mb-2">
-                            <div class="summary-label">Ticket Price</div>
-                            <div class="summary-value">$<?php echo number_format($event['price']); ?> <?php echo htmlspecialchars($event['priceType']); ?></div>
-                        </div>
-
-                        <div class="summary-item mb-2">
-                            <div class="summary-label">Quantity</div>
-                            <div class="summary-value" id="summaryQuantity"><?php echo $quantity; ?></div>
+                            <div class="summary-label">Package</div>
+                            <div class="summary-value" id="summaryPackage"><?php echo htmlspecialchars($selectedPackage['name']); ?></div>
                         </div>
 
                         <hr class="my-4">
                         <div class="summary-total">
                             <div class="summary-total-label">Total Amount</div>
-                            <div class="summary-total-value" id="summaryTotal">$<?php echo number_format($totalAmount); ?></div>
+                            <div class="summary-total-value" id="summaryTotal">₱ <?php echo number_format($totalAmount, 2); ?></div>
                         </div>
 
                         <div class="summary-note mt-4">
@@ -244,8 +258,8 @@ $totalAmount = $event['price'] * $quantity;
     <script src="assets/js/main.js"></script>
     <script>
         const reservationData = {
-            ticketPrice: <?php echo $event['price']; ?>,
-            maxTickets: <?php echo $event['slots']; ?>,
+            packages: <?php echo json_encode($packages); ?>,
+            selectedPackageId: "<?php echo $selectedPackage['id']; ?>",
             eventId: <?php echo $eventId; ?>
         };
     </script>

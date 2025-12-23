@@ -14,8 +14,8 @@
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand luxury-logo" href="index.php"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -90,17 +90,13 @@
                         </div>
                         <div class="event-content-grid p-4">
                             <h3 class="event-name">Business Innovation Summit 2024</h3>
-                            <div class="event-meta mb-3">
-                                <span class="event-date-time">
-                                    Dec 25, 2024 • 9:00 AM
-                                </span>
-                            </div>
+
                             <div class="event-venue mb-2">
                                 Grand Luxe Hotel - Grand Ballroom
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
                                 <div class="event-price">
-                                    <strong>$299</strong> <span class="text-muted">per person</span>
+                                    <strong>₱ 299.00</strong> <span class="text-muted">per person</span>
                                 </div>
                                 <div class="event-slots">
                                     <span class="slots-available">45 slots available</span>
@@ -120,17 +116,13 @@
                         </div>
                         <div class="event-content-grid p-4">
                             <h3 class="event-name">Elegant Garden Wedding</h3>
-                            <div class="event-meta mb-3">
-                                <span class="event-date-time">
-                                    Jan 10, 2025 • 4:00 PM
-                                </span>
-                            </div>
+
                             <div class="event-venue mb-2">
                                 Grand Luxe Hotel - Garden Pavilion
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
                                 <div class="event-price">
-                                    <strong>$5,500</strong> <span class="text-muted">package</span>
+                                    <strong>₱ 5,500.00</strong> <span class="text-muted">package</span>
                                 </div>
                                 <div class="event-slots">
                                     <span class="slots-available">12 slots available</span>
@@ -150,17 +142,13 @@
                         </div>
                         <div class="event-content-grid p-4">
                             <h3 class="event-name">Digital Marketing Masterclass</h3>
-                            <div class="event-meta mb-3">
-                                <span class="event-date-time">
-                                    Dec 30, 2024 • 10:00 AM
-                                </span>
-                            </div>
+
                             <div class="event-venue mb-2">
                                 Grand Luxe Hotel - Conference Hall A
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
                                 <div class="event-price">
-                                    <strong>$149</strong> <span class="text-muted">per person</span>
+                                    <strong>₱ 149.00</strong> <span class="text-muted">per person</span>
                                 </div>
                                 <div class="event-slots">
                                     <span class="slots-available">78 slots available</span>
@@ -180,17 +168,13 @@
                         </div>
                         <div class="event-content-grid p-4">
                             <h3 class="event-name">New Year's Eve Gala Dinner</h3>
-                            <div class="event-meta mb-3">
-                                <span class="event-date-time">
-                                    Dec 31, 2024 • 7:00 PM
-                                </span>
-                            </div>
+
                             <div class="event-venue mb-2">
                                 Grand Luxe Hotel - Crystal Ballroom
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
                                 <div class="event-price">
-                                    <strong>$450</strong> <span class="text-muted">per person</span>
+                                    <strong>₱ 450.00</strong> <span class="text-muted">per person</span>
                                 </div>
                                 <div class="event-slots">
                                     <span class="slots-available">23 slots available</span>
@@ -210,17 +194,13 @@
                         </div>
                         <div class="event-content-grid p-4">
                             <h3 class="event-name">Tech Leaders Forum 2025</h3>
-                            <div class="event-meta mb-3">
-                                <span class="event-date-time">
-                                    Jan 15, 2025 • 8:30 AM
-                                </span>
-                            </div>
+
                             <div class="event-venue mb-2">
                                 Grand Luxe Hotel - Innovation Center
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
                                 <div class="event-price">
-                                    <strong>$399</strong> <span class="text-muted">per person</span>
+                                    <strong>₱ 399.00</strong> <span class="text-muted">per person</span>
                                 </div>
                                 <div class="event-slots">
                                     <span class="slots-available">120 slots available</span>
@@ -240,17 +220,13 @@
                         </div>
                         <div class="event-content-grid p-4">
                             <h3 class="event-name">Luxury Beach Wedding</h3>
-                            <div class="event-meta mb-3">
-                                <span class="event-date-time">
-                                    Feb 14, 2025 • 5:00 PM
-                                </span>
-                            </div>
+
                             <div class="event-venue mb-2">
                                 Grand Luxe Hotel - Oceanview Terrace
                             </div>
                             <div class="event-price-slot d-flex justify-content-between align-items-center mb-3">
                                 <div class="event-price">
-                                    <strong>$8,500</strong> <span class="text-muted">package</span>
+                                    <strong>₱ 8,500.00</strong> <span class="text-muted">package</span>
                                 </div>
                                 <div class="event-slots">
                                     <span class="slots-available">8 slots available</span>

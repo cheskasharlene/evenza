@@ -1,7 +1,9 @@
 <?php
 
 $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 1;
-$quantity = isset($_GET['quantity']) ? intval($_GET['quantity']) : 1;
+// Package-based confirmation
+$packageName = isset($_GET['packageName']) ? htmlspecialchars($_GET['packageName']) : 'Package';
+$packagePrice = isset($_GET['packagePrice']) ? floatval($_GET['packagePrice']) : 0.0;
 $fullName = isset($_GET['fullName']) ? htmlspecialchars($_GET['fullName']) : 'Guest User';
 $email = isset($_GET['email']) ? htmlspecialchars($_GET['email']) : '';
 $ticketId = 'EVZ-' . strtoupper(substr(md5($eventId . $fullName . time()), 0, 8));
@@ -52,7 +54,8 @@ $eventsData = [
 session_start();
 
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
-$totalAmount = $event['price'] * $quantity;
+// Use package price if provided
+$totalAmount = $packagePrice;
 
 // Persist reservation for logged-in users
 $reservationsFile = __DIR__ . '/data/reservations.json';
@@ -69,7 +72,7 @@ $reservationRecord = [
     'time' => $event['time'],
     'venue' => $event['venue'],
     'ticketId' => $ticketId,
-    'quantity' => $quantity,
+    'packageName' => $packageName,
     'totalAmount' => $totalAmount,
     'status' => 'confirmed',
     'createdAt' => date('c')
@@ -112,8 +115,8 @@ if (!empty($reservationRecord['userId'])) {
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand luxury-logo" href="index.php"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -201,13 +204,13 @@ if (!empty($reservationRecord['userId'])) {
                             </div>
 
                             <div class="confirmation-item mb-4">
-                                <div class="confirmation-label">Number of Tickets</div>
-                                <div class="confirmation-value"><?php echo $quantity; ?> ticket(s)</div>
+                                <div class="confirmation-label">Package</div>
+                                <div class="confirmation-value"><?php echo htmlspecialchars($packageName); ?></div>
                             </div>
 
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">Total Amount Paid</div>
-                                <div class="confirmation-value price-amount">$<?php echo number_format($totalAmount); ?></div>
+                                <div class="confirmation-value price-amount">₱ <?php echo number_format($totalAmount, 2); ?></div>
                             </div>
 
                             <hr class="my-4">

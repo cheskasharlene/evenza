@@ -2,7 +2,9 @@
 session_start();
 
 $eventId = isset($_POST['eventId']) ? intval($_POST['eventId']) : (isset($_GET['eventId']) ? intval($_GET['eventId']) : 1);
-$quantity = isset($_POST['quantity']) ? intval($_POST['quantity']) : (isset($_GET['quantity']) ? intval($_GET['quantity']) : 1);
+// Package-based inputs
+$packageName = isset($_POST['packageName']) ? htmlspecialchars($_POST['packageName']) : (isset($_GET['packageName']) ? htmlspecialchars($_GET['packageName']) : '');
+$packagePrice = isset($_POST['packagePrice']) ? floatval($_POST['packagePrice']) : (isset($_GET['packagePrice']) ? floatval($_GET['packagePrice']) : 0.0);
 $fullName = isset($_POST['fullName']) ? htmlspecialchars($_POST['fullName']) : '';
 $email = isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '';
 $mobile = isset($_POST['mobile']) ? htmlspecialchars($_POST['mobile']) : '';
@@ -47,7 +49,9 @@ $eventsData = [
 ];
 
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
-$totalAmount = $event['price'] * $quantity;
+
+// Use package price as the total amount (flat rate)
+$totalAmount = $packagePrice;
 
 $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
 ?>
@@ -66,8 +70,8 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand luxury-logo" href="index.php"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -111,7 +115,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                             <li class="breadcrumb-item"><a href="index.php">Home</a></li>
                             <li class="breadcrumb-item"><a href="events.php">Events</a></li>
                             <li class="breadcrumb-item"><a href="event-details.php?id=<?php echo $eventId; ?>">Event Details</a></li>
-                            <li class="breadcrumb-item"><a href="reservation.php?eventId=<?php echo $eventId; ?>&quantity=<?php echo $quantity; ?>">Reservation</a></li>
+                            <li class="breadcrumb-item"><a href="reservation.php?eventId=<?php echo $eventId; ?>&package=<?php echo urlencode($packageName); ?>">Reservation</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Payment</li>
                         </ol>
                     </div>
@@ -128,15 +132,15 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                             <!-- category removed -->
 
                             <div class="payment-summary-item mb-4">
-                                <div class="payment-label">Ticket Quantity</div>
-                                <div class="payment-value"><?php echo $quantity; ?> ticket(s)</div>
+                                <div class="payment-label">Package</div>
+                                <div class="payment-value"><?php echo htmlspecialchars($packageName); ?> - ₱ <?php echo number_format($packagePrice, 2); ?></div>
                             </div>
 
                             <hr class="my-4">
 
                             <div class="payment-total">
                                 <div class="payment-total-label">Total Amount</div>
-                                <div class="payment-total-value">$<?php echo number_format($totalAmount); ?></div>
+                                <div class="payment-total-value">₱ <?php echo number_format($totalAmount, 2); ?></div>
                             </div>
                         </div>
 
@@ -166,13 +170,13 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                         <h5>Payment Successful</h5>
                                         <p>Your payment has been processed successfully. Redirecting to confirmation page...</p>
                                         <div class="mt-3">
-                                            <a href="confirmation.php?eventId=<?php echo $eventId; ?>&quantity=<?php echo $quantity; ?>&fullName=<?php echo urlencode($fullName); ?>&email=<?php echo urlencode($email); ?>" class="btn btn-primary-luxury">View Confirmation</a>
+                                            <a href="confirmation.php?eventId=<?php echo $eventId; ?>&packageName=<?php echo urlencode($packageName); ?>&packagePrice=<?php echo $packagePrice; ?>&fullName=<?php echo urlencode($fullName); ?>&email=<?php echo urlencode($email); ?>" class="btn btn-primary-luxury">View Confirmation</a>
                                         </div>
                                     </div>
                                 </div>
                                 <script>
                                     setTimeout(function() {
-                                        window.location.href = 'confirmation.php?eventId=<?php echo $eventId; ?>&quantity=<?php echo $quantity; ?>&fullName=<?php echo urlencode($fullName); ?>&email=<?php echo urlencode($email); ?>';
+                                        window.location.href = 'confirmation.php?eventId=<?php echo $eventId; ?>&packageName=<?php echo urlencode($packageName); ?>&packagePrice=<?php echo $packagePrice; ?>&fullName=<?php echo urlencode($fullName); ?>&email=<?php echo urlencode($email); ?>';
                                     }, 2000);
                                 </script>
                             <?php endif; ?>
