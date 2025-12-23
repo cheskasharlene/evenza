@@ -3,8 +3,22 @@ session_start();
 
 $error = '';
 
+// preserve a redirect target so we can send the user back after login
+$redirect = '';
+if (isset($_GET['redirect'])) {
+    $redirect = $_GET['redirect'];
+}
+if (isset($_POST['redirect'])) {
+    $redirect = $_POST['redirect'];
+}
+
 if (isset($_SESSION['user_id'])) {
-    header('Location: profile.php');
+    // already logged in: send to redirect target if valid, otherwise profile
+    if (!empty($redirect) && strpos($redirect, 'http') === false && strpos($redirect, '//') === false) {
+        header('Location: ' . $redirect);
+    } else {
+        header('Location: profile.php');
+    }
     exit;
 }
 
@@ -24,14 +38,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $userFound = false;
         foreach ($users as $user) {
-            if ($user['email'] === $email && password_verify($password, $user['password'])) {
+                if ($user['email'] === $email && password_verify($password, $user['password'])) {
                 $userFound = true;
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['fullName'];
                 $_SESSION['user_email'] = $user['email'];
                 $_SESSION['user_mobile'] = $user['mobile'];
-                header('Location: profile.php');
-                exit;
+                    // after successful login, redirect to requested page if safe
+                    $target = 'profile.php';
+                    if (!empty($redirect) && strpos($redirect, 'http') === false && strpos($redirect, '//') === false) {
+                        $target = $redirect;
+                    }
+                    header('Location: ' . $target);
+                    exit;
             }
         }
 
@@ -116,6 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password">
                             </div>
 
+                            <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
                             <div class="d-flex justify-content-between align-items-center mb-4">
                                 <button type="submit" class="btn btn-primary-luxury">Login</button>
                                 <a href="forgot-password.php" class="text-muted small">Forgot Password?</a>

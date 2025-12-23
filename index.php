@@ -85,7 +85,8 @@
                             <h3 class="event-title">Gala Evening</h3>
                             <p class="event-date">December 15, 2024</p>
                             <p class="event-description">An elegant evening of fine dining and entertainment in an exclusive setting.</p>
-                            <a href="#" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
+                            <?php $link = isset($_SESSION['user_id']) ? 'reservation.php?eventId=1' : 'login.php?redirect=' . urlencode('reservation.php?eventId=1'); ?>
+                            <a href="<?php echo $link; ?>" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
                         </div>
                     </div>
                 </div>
@@ -100,7 +101,8 @@
                             <h3 class="event-title">Wine Tasting</h3>
                             <p class="event-date">December 20, 2024</p>
                             <p class="event-description">Discover rare vintages in an intimate tasting experience.</p>
-                            <a href="#" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
+                            <?php $link = isset($_SESSION['user_id']) ? 'reservation.php?eventId=2' : 'login.php?redirect=' . urlencode('reservation.php?eventId=2'); ?>
+                            <a href="<?php echo $link; ?>" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
                         </div>
                     </div>
                 </div>
@@ -115,7 +117,8 @@
                             <h3 class="event-title">Art Exhibition</h3>
                             <p class="event-date">January 5, 2025</p>
                             <p class="event-description">Private viewing of contemporary masterpieces.</p>
-                            <a href="#" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
+                            <?php $link = isset($_SESSION['user_id']) ? 'reservation.php?eventId=3' : 'login.php?redirect=' . urlencode('reservation.php?eventId=3'); ?>
+                            <a href="<?php echo $link; ?>" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
                         </div>
                     </div>
                 </div>
@@ -123,6 +126,9 @@
         </div>
     </div>
 
+    <!-- Call to Action / Hotel Partners Section -->
+    <?php if (!isset($_SESSION['user_id'])): ?>
+    <!-- Logged Out: Show CTA to Create Account -->
     <div class="cta-section py-5">
         <div class="container">
             <div class="luxury-card cta-card text-center p-5">
@@ -132,6 +138,42 @@
             </div>
         </div>
     </div>
+    <?php else: ?>
+    <!-- Logged In: Show Hotel Partners Section -->
+    <div class="hotel-partners-section py-5">
+        <div class="container">
+            <div class="partners-header text-center mb-5">
+                <h2 class="partners-title">Our Featured Hotel Partners</h2>
+                <p class="partners-subtitle">Experience elegance at our premium partner locations</p>
+            </div>
+            
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-4 mb-md-0">
+                    <div class="hotel-image-container">
+                        <div class="hotel-image-placeholder">
+                            <div class="hotel-image-icon">🏨</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="luxury-card hotel-card p-5">
+                        <h3 class="hotel-name mb-3">Grand Luxe Hotels</h3>
+                        <p class="hotel-description mb-4">
+                            Experience the epitome of luxury and sophistication at Grand Luxe Hotels. Our premium facilities provide the perfect backdrop for unforgettable events, from intimate gatherings to grand celebrations. With world-class service, exquisite dining, and elegantly appointed venues, we are committed to creating exceptional experiences for every occasion.
+                        </p>
+                        <div class="hotel-highlights mb-4">
+                            <span class="highlight-badge">5-Star Luxury</span>
+                            <span class="highlight-badge">Premium Venues</span>
+                            <span class="highlight-badge">Expert Service</span>
+                        </div>
+                        <a href="#" class="btn btn-primary-luxury btn-lg">View Partnership</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
 
     <div class="luxury-footer py-5">
         <div class="container">

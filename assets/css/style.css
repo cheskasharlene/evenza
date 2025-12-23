@@ -321,6 +321,96 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0.8;
 }
 
+/* Hotel Partners Section Styles */
+.hotel-partners-section {
+    background: linear-gradient(135deg, var(--bg-warm-beige) 0%, var(--bg-off-white) 100%);
+}
+
+.partners-header {
+    margin-bottom: 3rem;
+}
+
+.partners-title {
+    font-size: 2.5rem;
+    color: var(--text-charcoal);
+    margin-bottom: 1rem;
+}
+
+.partners-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-dark-gray);
+    opacity: 0.8;
+}
+
+.hotel-image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hotel-image-placeholder {
+    width: 100%;
+    max-width: 400px;
+    aspect-ratio: 4 / 3;
+    background: linear-gradient(135deg, rgba(107, 127, 90, 0.1) 0%, rgba(184, 160, 130, 0.1) 100%);
+    border-radius: 12px;
+    border: 2px solid rgba(107, 127, 90, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 8px 30px var(--shadow-medium);
+    transition: all 0.3s ease;
+}
+
+.hotel-image-placeholder:hover {
+    box-shadow: 0 12px 40px rgba(107, 127, 90, 0.15);
+    border-color: var(--accent-olive);
+}
+
+.hotel-image-icon {
+    font-size: 6rem;
+    opacity: 0.3;
+}
+
+.hotel-card {
+    background: linear-gradient(135deg, var(--card-cream) 0%, #F9F7F3 100%);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.hotel-name {
+    font-size: 2rem;
+    color: var(--text-charcoal);
+    margin-bottom: 1.5rem;
+}
+
+.hotel-description {
+    font-size: 1rem;
+    color: var(--text-dark-gray);
+    line-height: 1.8;
+    opacity: 0.9;
+}
+
+.hotel-highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin: 1.5rem 0;
+}
+
+.highlight-badge {
+    display: inline-block;
+    background-color: rgba(107, 127, 90, 0.1);
+    color: var(--accent-olive);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid var(--accent-olive);
+}
+
 .luxury-footer {
     background-color: var(--text-charcoal);
     color: rgba(255, 255, 255, 0.8);
