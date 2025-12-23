@@ -40,8 +40,8 @@ if (file_exists($reservationsFile)) {
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand luxury-logo" href="index.php"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -158,13 +158,17 @@ if (file_exists($reservationsFile)) {
                                                 </div>
                                                 
                                                 <div class="ticket-details small text-muted">
-                                                    <div>Qty: <?php echo $reservation['quantity']; ?></div>
-                                                    <div>Total: $<?php echo number_format($reservation['totalAmount']); ?></div>
+                                                    <?php if (isset($reservation['packageName'])): ?>
+                                                        <div>Package: <?php echo htmlspecialchars($reservation['packageName']); ?></div>
+                                                    <?php else: ?>
+                                                        <div>Qty: <?php echo htmlspecialchars($reservation['quantity'] ?? 1); ?></div>
+                                                    <?php endif; ?>
+                                                    <div>Total: ₱ <?php echo number_format($reservation['totalAmount'], 2); ?></div>
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-3 text-center">
-                                                <a href="confirmation.php?eventId=<?php echo $reservation['eventId']; ?>&quantity=<?php echo $reservation['quantity']; ?>&ticketId=<?php echo htmlspecialchars($reservation['ticketId']); ?>" class="btn btn-primary-luxury w-100">
+                                                <a href="confirmation.php?eventId=<?php echo $reservation['eventId']; ?><?php echo isset($reservation['packageName']) ? '&packageName=' . urlencode($reservation['packageName']) . '&packagePrice=' . urlencode($reservation['totalAmount']) : '&quantity=' . urlencode($reservation['quantity']); ?>&ticketId=<?php echo htmlspecialchars($reservation['ticketId']); ?>" class="btn btn-primary-luxury w-100">
                                                     View Ticket
                                                 </a>
                                             </div>

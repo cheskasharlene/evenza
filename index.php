@@ -14,8 +14,8 @@
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand luxury-logo" href="index.php"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"><span class="visually-hidden">EVENZA</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -56,7 +56,10 @@
             <div class="row align-items-center min-vh-100">
                 <div class="col-lg-8 col-xl-7">
                     <div class="hero-content">
-                        <h1 class="hero-title">EVENZA</h1>
+                        <div class="hero-logo-wrap mb-3">
+                            <img src="assets/images/evenzaLogo.png" alt="EVENZA" class="hero-logo img-fluid">
+                        </div>
+                        <h1 class="visually-hidden">EVENZA</h1>
                         <p class="hero-subtitle">Reserve Hotel-Hosted Events with Ease</p>
                         <div class="hero-buttons mt-4">
                             <a href="events.php" class="btn btn-primary-luxury btn-lg">Explore Events</a>
@@ -83,7 +86,7 @@
                         </div>
                         <div class="event-content p-4">
                             <h3 class="event-title">Gala Evening</h3>
-                            <p class="event-date">December 15, 2024</p>
+
                             <p class="event-description">An elegant evening of fine dining and entertainment in an exclusive setting.</p>
                             <?php $link = isset($_SESSION['user_id']) ? 'reservation.php?eventId=1' : 'login.php?redirect=' . urlencode('reservation.php?eventId=1'); ?>
                             <a href="<?php echo $link; ?>" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
@@ -99,7 +102,7 @@
                         </div>
                         <div class="event-content p-4">
                             <h3 class="event-title">Wine Tasting</h3>
-                            <p class="event-date">December 20, 2024</p>
+
                             <p class="event-description">Discover rare vintages in an intimate tasting experience.</p>
                             <?php $link = isset($_SESSION['user_id']) ? 'reservation.php?eventId=2' : 'login.php?redirect=' . urlencode('reservation.php?eventId=2'); ?>
                             <a href="<?php echo $link; ?>" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
@@ -115,7 +118,7 @@
                         </div>
                         <div class="event-content p-4">
                             <h3 class="event-title">Art Exhibition</h3>
-                            <p class="event-date">January 5, 2025</p>
+
                             <p class="event-description">Private viewing of contemporary masterpieces.</p>
                             <?php $link = isset($_SESSION['user_id']) ? 'reservation.php?eventId=3' : 'login.php?redirect=' . urlencode('reservation.php?eventId=3'); ?>
                             <a href="<?php echo $link; ?>" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>

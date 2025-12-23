@@ -79,8 +79,8 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php">EVENZA</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <a class="navbar-brand luxury-logo" href="index.php"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -143,17 +143,7 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                         <hr class="my-4">
 
                         <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <div class="detail-item">
-                                    <div class="detail-icon">
-                                    </div>
-                                    <div class="detail-content">
-                                        <h6 class="detail-label">Date & Time</h6>
-                                        <p class="detail-value"><?php echo htmlspecialchars($event['date']); ?></p>
-                                        <p class="detail-value text-muted"><?php echo htmlspecialchars($event['time']); ?></p>
-                                    </div>
-                                </div>
-                            </div>
+
                             <div class="col-md-6">
                                 <div class="detail-item">
                                     <div class="detail-icon">
@@ -167,54 +157,15 @@ $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
                             </div>
                         </div>
 
-                        <hr class="my-4">
 
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-6">
-                                <div class="detail-item">
-                                    <div class="detail-icon">
-                                    </div>
-                                    <div class="detail-content">
-                                        <h6 class="detail-label">Ticket Price</h6>
-                                        <p class="detail-value price-large">$<?php echo number_format($event['price']); ?></p>
-                                        <p class="detail-value text-muted"><?php echo htmlspecialchars($event['priceType']); ?></p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="detail-item">
-                                    <div class="detail-icon">
-                                    </div>
-                                    <div class="detail-content">
-                                        <h6 class="detail-label">Available Slots</h6>
-                                        <p class="detail-value"><?php echo htmlspecialchars($event['slots']); ?> available</p>
-                                        <p class="detail-value text-muted small">Out of <?php echo htmlspecialchars($event['totalCapacity']); ?> total capacity</p>
-                                    </div>
-                                </div>
+
+                        <div class="reservation-section inquiry-section p-4 text-center mt-4">
+                            <?php $link = isset($_SESSION['user_id']) ? 'reservation.php?eventId=' . $eventId : 'login.php?redirect=' . urlencode('reservation.php?eventId=' . $eventId); ?>
+                            <div class="d-flex justify-content-center">
+                                <a href="<?php echo $link; ?>" class="btn btn-primary-luxury w-100">Inquire Reservation</a>
                             </div>
                         </div>
-
-                        <div class="reservation-section luxury-card p-4">
-                            <h4 class="mb-4">Reserve Your Tickets</h4>
-                            <div class="row align-items-end">
-                                <div class="col-md-6 mb-3 mb-md-0">
-                                    <label for="ticketQuantity" class="form-label">Number of Tickets</label>
-                                    <div class="quantity-selector">
-                                        <button type="button" class="quantity-btn" onclick="decreaseQuantity()">-</button>
-                                        <input type="number" class="form-control luxury-input quantity-input" id="ticketQuantity" value="1" min="1" max="<?php echo htmlspecialchars($event['slots']); ?>">
-                                        <button type="button" class="quantity-btn" onclick="increaseQuantity()">+</button>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="total-price mb-3">
-                                        <span class="total-label">Total:</span>
-                                        <span class="total-amount" id="totalPrice">$<?php echo number_format($event['price']); ?></span>
-                                    </div>
-                                    <button type="button" class="btn btn-primary-luxury w-100 btn-lg" onclick="reserveTickets()">Reserve Ticket</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </div> <!-- end .luxury-card -->
                 </div>
 
                 <div class="col-lg-4">
