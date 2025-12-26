@@ -276,10 +276,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .event-image {
-    height: 220px;
+    height: 250px;
     background: linear-gradient(135deg, var(--accent-olive) 0%, var(--accent-muted-gold) 100%);
     position: relative;
     overflow: hidden;
+}
+
+.featured-event-image {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
 .image-placeholder {
@@ -914,6 +922,14 @@ html {
     align-items: center;
     justify-content: center;
     position: relative;
+}
+
+.event-hero-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    object-position: center;
+    display: block;
 }
 
 .event-detail-name {
@@ -1987,36 +2003,103 @@ html {
 }
 
 /* Admin Dashboard Styles */
+.admin-wrapper {
+    background-color: #F9F7F2;
+}
+
 .admin-sidebar {
     min-height: 100vh;
-    background: linear-gradient(180deg, rgba(253,252,249,0.9) 0%, rgba(245,241,235,0.95) 100%);
-    border-right: 1px solid rgba(107,127,90,0.06);
+    background-color: #F9F7F2;
+    border-right: 1px solid rgba(74, 93, 74, 0.08);
 }
+
 .admin-sidebar .nav-link {
     color: var(--text-dark-gray) !important;
-    padding: 0.6rem 0.5rem;
+    padding: 0.75rem 1rem;
     border-radius: 8px;
     transition: all 0.2s ease;
+    font-weight: 500;
+    font-size: 0.95rem;
 }
-.admin-sidebar .nav-link.active, .admin-sidebar .nav-link:hover {
-    background: rgba(107,127,90,0.06);
-    color: var(--accent-olive) !important;
+
+.admin-sidebar .nav-link.active, 
+.admin-sidebar .nav-link:hover {
+    background-color: rgba(74, 93, 74, 0.1);
+    color: #4A5D4A !important;
     transform: translateX(4px);
 }
-.luxury-card.p-3 { padding: 1.1rem; }
+
+.admin-card {
+    background-color: #FFFFFF;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: none;
+}
 
 /* Stat Cards */
-.stat-number { color: var(--text-charcoal); font-family: 'Playfair Display', serif; }
-.stat-label { color: rgba(26,26,26,0.6); }
+.stat-number { 
+    color: var(--text-charcoal); 
+    font-family: 'Playfair Display', serif; 
+}
+
+.stat-label { 
+    color: rgba(26, 26, 26, 0.7); 
+    font-weight: 500;
+}
 
 /* Tables */
-.table thead th { border-bottom: 0; color: var(--text-charcoal); }
-.table tbody tr:hover { background: rgba(107,127,90,0.03); }
-.table .capacity-bar { height: 8px; background: linear-gradient(90deg, var(--accent-olive), var(--accent-muted-gold)); border-radius: 6px; }
+.table thead th { 
+    border-bottom: 2px solid rgba(74, 93, 74, 0.1); 
+    color: var(--text-charcoal); 
+    font-weight: 600;
+    font-family: 'Playfair Display', serif;
+}
+
+.table tbody tr:hover { 
+    background-color: rgba(74, 93, 74, 0.04); 
+}
+
+.table .capacity-bar { 
+    height: 8px; 
+    background: linear-gradient(90deg, #4A5D4A, #5a6f5a); 
+    border-radius: 6px; 
+}
 
 /* Recent Activity */
-.activity-item { padding: 0.6rem 0.8rem; border-radius: 8px; background: linear-gradient(180deg, rgba(253,252,249,0.6), rgba(253,252,249,0.4)); }
-.activity-item + .activity-item { margin-top: 0.6rem; }
+.activity-item { 
+    padding: 0.75rem 1rem; 
+    border-radius: 8px; 
+    background-color: rgba(249, 247, 242, 0.5);
+    border-left: 3px solid rgba(74, 93, 74, 0.2);
+}
+
+.activity-item + .activity-item { 
+    margin-top: 0.75rem; 
+}
+
+/* Admin Buttons */
+.btn-admin-primary,
+.btn-success {
+    background-color: #4A5D4A;
+    border-color: #4A5D4A;
+    color: #FFFFFF;
+    font-weight: 500;
+}
+
+.btn-admin-primary:hover,
+.btn-success:hover {
+    background-color: #3a4a3a;
+    border-color: #3a4a3a;
+    color: #FFFFFF;
+}
+
+.btn-admin-primary:focus,
+.btn-success:focus {
+    background-color: #4A5D4A;
+    border-color: #4A5D4A;
+    color: #FFFFFF;
+    box-shadow: 0 0 0 0.2rem rgba(74, 93, 74, 0.25);
+}
 
 /* Package selection */
 .package-tile {

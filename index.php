@@ -79,10 +79,9 @@
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="luxury-card event-card">
-                        <div class="event-image">
-                            <div class="image-placeholder">
-                                <span class="event-badge">Premium</span>
-                            </div>
+                        <div class="event-image position-relative">
+                            <img src="assets/images/event_images/galaEvening.jpg" class="card-img-top featured-event-image" alt="Gala Evening">
+                            <span class="event-badge">Premium</span>
                         </div>
                         <div class="event-content p-4">
                             <h3 class="event-title">Gala Evening</h3>
@@ -95,10 +94,9 @@
                 </div>
                 <div class="col-md-4">
                     <div class="luxury-card event-card">
-                        <div class="event-image">
-                            <div class="image-placeholder">
-                                <span class="event-badge">Premium</span>
-                            </div>
+                        <div class="event-image position-relative">
+                            <img src="assets/images/event_images/wineCellar.jpg" class="card-img-top featured-event-image" alt="Wine Tasting">
+                            <span class="event-badge">Premium</span>
                         </div>
                         <div class="event-content p-4">
                             <h3 class="event-title">Wine Tasting</h3>
@@ -111,10 +109,9 @@
                 </div>
                 <div class="col-md-4">
                     <div class="luxury-card event-card">
-                        <div class="event-image">
-                            <div class="image-placeholder">
-                                <span class="event-badge">Premium</span>
-                            </div>
+                        <div class="event-image position-relative">
+                            <img src="assets/images/event_images/artExhibition.jpg" class="card-img-top featured-event-image" alt="Art Exhibition">
+                            <span class="event-badge">Premium</span>
                         </div>
                         <div class="event-content p-4">
                             <h3 class="event-title">Art Exhibition</h3>

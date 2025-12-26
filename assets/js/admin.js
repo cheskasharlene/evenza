@@ -20,19 +20,26 @@ function formatCurrency(n) { return n.toLocaleString('en-PH'); }
 function populateDashboard() {
     const topEventsBody = document.getElementById('topEventsBody');
     if (topEventsBody) {
-        topEventsBody.innerHTML = sampleTopEvents.map(ev => `
+        topEventsBody.innerHTML = sampleTopEvents.map(ev => {
+            const capacityPercent = Math.round((ev.tickets/ev.capacity)*100);
+            return `
             <tr>
                 <td>
                     <div class="d-flex flex-column">
-                        <div class="fw-semibold">${ev.title}</div>
-                        <div class="text-muted small">${Math.round((ev.tickets/ev.capacity)*100)}% capacity</div>
+                        <div class="fw-semibold" style="font-family: 'Playfair Display', serif;">${ev.title}</div>
                     </div>
                 </td>
                 <td>${ev.tickets}</td>
-                <td>${ev.capacity}</td>
+                <td>
+                    <div class="d-flex flex-column">
+                        <div class="mb-1">${capacityPercent}%</div>
+                        <div class="capacity-bar" style="width: ${capacityPercent}%;"></div>
+                    </div>
+                </td>
                 <td>₱ ${formatCurrency(ev.revenue)}</td>
             </tr>
-        `).join('');
+        `;
+        }).join('');
     }
 
     const recent = document.getElementById('recentActivity');
