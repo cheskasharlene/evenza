@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/database.php';
 
 $error = '';
 $success = '';
@@ -25,56 +26,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Passwords do not match.';
     } elseif (strlen($password) < 6) {
         $error = 'Password must be at least 6 characters long.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Please enter a valid email address.';
     } else {
-        // Create data directory if it doesn't exist
-        if (!is_dir('data')) {
-            mkdir('data', 0755, true);
-        }
-
-        $usersFile = 'data/users.json';
-        $users = [];
-        
-        // Read existing users
-        if (file_exists($usersFile)) {
-            $users = json_decode(file_get_contents($usersFile), true) ?? [];
-        }
-
-        // Check if email already exists
-        $emailExists = false;
-        foreach ($users as $user) {
-            if ($user['email'] === $email) {
-                $emailExists = true;
-                break;
-            }
-        }
-
-        if ($emailExists) {
-            $error = 'Email already registered. Please login or use a different email.';
-        } else {
-            // Create new user
-            $newUser = [
-                'id' => uniqid(),
-                'fullName' => $fullName,
-                'email' => $email,
-                'mobile' => $mobile,
-                'password' => password_hash($password, PASSWORD_BCRYPT),
-                'createdAt' => date('Y-m-d H:i:s')
-            ];
-
-            $users[] = $newUser;
-
-            // Save users to JSON file
-            if (file_put_contents($usersFile, json_encode($users, JSON_PRETTY_PRINT))) {
-                // Auto login after registration
-                $_SESSION['user_id'] = $newUser['id'];
-                $_SESSION['user_name'] = $newUser['fullName'];
-                $_SESSION['user_email'] = $newUser['email'];
-                $_SESSION['user_mobile'] = $newUser['mobile'];
-                header('Location: profile.php');
-                exit;
+        try {
+            $conn = getDBConnection();
+            
+            // Check if email already exists
+            $stmt = $conn->prepare("SELECT userId FROM users WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows > 0) {
+                $error = 'Email already registered. Please login or use a different email.';
+                $stmt->close();
             } else {
-                $error = 'Failed to create account. Please try again.';
+                // Hash password securely
+                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+                
+                // Default role is 'user' (Guideline 5: Automatic Fill)
+                $role = 'user';
+                
+                // Insert new user into database
+                $stmt = $conn->prepare("INSERT INTO users (fullName, email, password, role) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("ssss", $fullName, $email, $hashedPassword, $role);
+                
+                if ($stmt->execute()) {
+                    $userId = $conn->insert_id;
+                    $stmt->close();
+                    $conn->close();
+                    
+                    // Redirect to login with success message (Guideline 6: Feedback)
+                    $_SESSION['registration_success'] = 'Registration successful! Please login with your credentials.';
+                    header('Location: login.php?success=1');
+                    exit;
+                } else {
+                    $error = 'Failed to create account. Please try again.';
+                    $stmt->close();
+                }
             }
+            
+            $conn->close();
+        } catch (Exception $e) {
+            $error = 'An error occurred. Please try again later.';
+            error_log("Registration error: " . $e->getMessage());
         }
     }
 }

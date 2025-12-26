@@ -93,7 +93,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Gala Evening</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Crystal Ballroom</p>
-                            <a href="event-details.php?id=101" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=101" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Wine Tasting Experience</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Wine Cellar</p>
-                            <a href="event-details.php?id=102" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=102" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -123,7 +123,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Art Exhibition Opening</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Art Gallery</p>
-                            <a href="event-details.php?id=103" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=103" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -137,7 +137,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Business Innovation Summit</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Grand Ballroom</p>
-                            <a href="event-details.php?id=1" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=1" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -151,7 +151,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Elegant Garden Wedding</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Garden Pavilion</p>
-                            <a href="event-details.php?id=2" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=2" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -165,7 +165,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Digital Marketing Masterclass</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Conference Hall A</p>
-                            <a href="event-details.php?id=3" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=3" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -179,7 +179,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">New Year's Eve Gala Dinner</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Crystal Ballroom</p>
-                            <a href="event-details.php?id=4" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=4" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -193,7 +193,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Tech Leaders Forum</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Innovation Center</p>
-                            <a href="event-details.php?id=5" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=5" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -207,7 +207,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Luxury Beach Wedding</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Oceanview Terrace</p>
-                            <a href="event-details.php?id=6" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=6" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -221,7 +221,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Corporate Team Building Retreat</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Mountain Resort Wing</p>
-                            <a href="event-details.php?id=7" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=7" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -235,7 +235,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Spring Wedding Collection</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Grand Ballroom</p>
-                            <a href="event-details.php?id=8" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=8" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -249,7 +249,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Professional Development Workshop</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Conference Hall B</p>
-                            <a href="event-details.php?id=9" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=9" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -263,7 +263,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Exclusive Members Gala</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - VIP Lounge</p>
-                            <a href="event-details.php?id=10" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=10" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -277,7 +277,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Leadership Summit</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Executive Center</p>
-                            <a href="event-details.php?id=11" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=11" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>
@@ -291,7 +291,7 @@
                         <div class="card-body">
                             <h3 class="card-title event-title">Advanced Skills Training</h3>
                             <p class="card-text event-venue-text">Grand Luxe Hotel - Training Center</p>
-                            <a href="event-details.php?id=12" class="btn btn-event-view w-100">View Details</a>
+                            <a href="eventDetails.php?id=12" class="btn btn-event-view w-100">View Details</a>
                         </div>
                     </div>
                 </div>

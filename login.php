@@ -1,7 +1,20 @@
 <?php
 session_start();
+require_once 'config/database.php';
 
 $error = '';
+$success = '';
+
+// Check for registration success message
+if (isset($_SESSION['registration_success'])) {
+    $success = $_SESSION['registration_success'];
+    unset($_SESSION['registration_success']);
+}
+
+// Check for success parameter from registration redirect
+if (isset($_GET['success']) && $_GET['success'] == '1') {
+    $success = 'Registration successful! Please login with your credentials.';
+}
 
 // preserve a redirect target so we can send the user back after login
 $redirect = '';
@@ -29,33 +42,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required.';
     } else {
-        $usersFile = 'data/users.json';
-        $users = [];
-        
-        if (file_exists($usersFile)) {
-            $users = json_decode(file_get_contents($usersFile), true) ?? [];
-        }
-
-        $userFound = false;
-        foreach ($users as $user) {
-                if ($user['email'] === $email && password_verify($password, $user['password'])) {
-                $userFound = true;
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['fullName'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_mobile'] = $user['mobile'];
-                    // after successful login, redirect to requested page if safe
+        try {
+            $conn = getDBConnection();
+            
+            // Check users table (includes both regular users and admins)
+            $stmt = $conn->prepare("SELECT userId, fullName, email, password, role FROM users WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $user = $result->fetch_assoc();
+            $stmt->close();
+            
+            if ($user && password_verify($password, $user['password'])) {
+                // Password verified - check role and redirect accordingly
+                if ($user['role'] === 'admin') {
+                    // Admin login - redirect to admin dashboard
+                    $_SESSION['admin_id'] = $user['userId'];
+                    $_SESSION['admin_name'] = $user['fullName'];
+                    $_SESSION['admin_email'] = $user['email'];
+                    $conn->close();
+                    header('Location: admin.php');
+                    exit;
+                } else {
+                    // Regular user login - redirect to profile or requested page
+                    $_SESSION['user_id'] = $user['userId'];
+                    $_SESSION['user_name'] = $user['fullName'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['user_role'] = $user['role'];
+                    
+                    $conn->close();
+                    
+                    // Redirect to requested page if safe, otherwise profile
                     $target = 'profile.php';
                     if (!empty($redirect) && strpos($redirect, 'http') === false && strpos($redirect, '//') === false) {
                         $target = $redirect;
                     }
                     header('Location: ' . $target);
                     exit;
+                }
+            } else {
+                // Invalid credentials
+                $conn->close();
+                $error = 'Invalid email or password.';
             }
-        }
-
-        if (!$userFound) {
-            $error = 'Invalid email or password.';
+        } catch (Exception $e) {
+            $error = 'An error occurred. Please try again later.';
+            error_log("Login error: " . $e->getMessage());
         }
     }
 }
@@ -118,6 +150,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="row justify-content-center">
                 <div class="col-lg-5">
                     <div class="luxury-card p-5">
+                        <?php if ($success): ?>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <?php echo htmlspecialchars($success); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
                         <?php if ($error): ?>
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <?php echo htmlspecialchars($error); ?>

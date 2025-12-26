@@ -13,14 +13,49 @@ $userData = [
     'mobile' => $_SESSION['user_mobile'] ?? ''
 ];
 
-// Load reservations for this user from data/reservations.json
-$reservationsFile = __DIR__ . '/data/reservations.json';
+// Check for success/error messages from reservation
+$reservationSuccess = isset($_SESSION['reservation_success']) ? $_SESSION['reservation_success'] : '';
+$reservationError = isset($_SESSION['reservation_error']) ? $_SESSION['reservation_error'] : '';
+unset($_SESSION['reservation_success']);
+unset($_SESSION['reservation_error']);
+
+// Load reservations for this user from database
+require_once 'config/database.php';
 $reservations = [];
-if (file_exists($reservationsFile)) {
-    $all = json_decode(file_get_contents($reservationsFile), true) ?? [];
-    foreach ($all as $r) {
-        if (isset($r['userId']) && $r['userId'] === $_SESSION['user_id']) {
-            $reservations[] = $r;
+
+try {
+    $conn = getDBConnection();
+    $userId = $_SESSION['user_id'];
+    
+    $stmt = $conn->prepare("
+        SELECT r.reservationId, r.reservationDate, r.startTime, r.endTime, r.totalAmount, r.status,
+               e.title as eventTitle, e.venue,
+               p.packageName
+        FROM reservations r
+        INNER JOIN events e ON r.eventId = e.eventId
+        LEFT JOIN packages p ON r.packageId = p.packageId
+        WHERE r.userId = ?
+        ORDER BY r.reservationDate DESC, r.createdAt DESC
+    ");
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    while ($row = $result->fetch_assoc()) {
+        $reservations[] = $row;
+    }
+    
+    $stmt->close();
+    $conn->close();
+} catch (Exception $e) {
+    // Fallback to JSON if database fails
+    $reservationsFile = __DIR__ . '/data/reservations.json';
+    if (file_exists($reservationsFile)) {
+        $all = json_decode(file_get_contents($reservationsFile), true) ?? [];
+        foreach ($all as $r) {
+            if (isset($r['userId']) && $r['userId'] === $_SESSION['user_id']) {
+                $reservations[] = $r;
+            }
         }
     }
 }
@@ -83,6 +118,20 @@ if (file_exists($reservationsFile)) {
                 <p class="page-subtitle">Manage your account and view your reservations</p>
             </div>
 
+            <?php if ($reservationSuccess): ?>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <strong>Success!</strong> <?php echo htmlspecialchars($reservationSuccess); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($reservationError): ?>
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <strong>Error!</strong> <?php echo htmlspecialchars($reservationError); ?>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            <?php endif; ?>
+
             <div class="row">
                 <div class="col-lg-4 mb-4">
                     <div class="luxury-card p-4">
@@ -126,17 +175,21 @@ if (file_exists($reservationsFile)) {
                             </div>
                         <?php else: ?>
                             <div class="reservations-list">
-                                <?php foreach ($reservations as $reservation): ?>
+                                <?php foreach ($reservations as $reservation): 
+                                    // Format date and time from database
+                                    $resDate = date('F j, Y', strtotime($reservation['reservationDate']));
+                                    $startTime = date('g:i A', strtotime($reservation['startTime']));
+                                    $endTime = date('g:i A', strtotime($reservation['endTime']));
+                                    $timeRange = $startTime . ' - ' . $endTime;
+                                ?>
                                     <div class="reservation-item luxury-card p-4 mb-3">
                                         <div class="row align-items-center">
                                             <div class="col-md-6 mb-3 mb-md-0">
-                                                <h5 class="reservation-event-name mb-2"><?php echo htmlspecialchars($reservation['eventName']); ?></h5>
-                                                
-                                                <!-- category removed -->
+                                                <h5 class="reservation-event-name mb-2"><?php echo htmlspecialchars($reservation['eventTitle'] ?? $reservation['eventName'] ?? 'Event'); ?></h5>
                                                 
                                                 <div class="reservation-date mb-2">
-                                                    <span><?php echo htmlspecialchars($reservation['date']); ?></span>
-                                                    <span class="text-muted ms-2"><?php echo htmlspecialchars($reservation['time']); ?></span>
+                                                    <span><?php echo $resDate; ?></span>
+                                                    <span class="text-muted ms-2"><?php echo $timeRange; ?></span>
                                                 </div>
                                                 
                                                 <div class="reservation-venue text-muted small">
@@ -146,9 +199,13 @@ if (file_exists($reservationsFile)) {
                                             
                                             <div class="col-md-3 text-center mb-3 mb-md-0">
                                                 <div class="ticket-status mb-2">
-                                                    <?php if ($reservation['status'] === 'confirmed'): ?>
+                                                    <?php if (($reservation['status'] ?? 'pending') === 'confirmed'): ?>
                                                         <span class="status-badge status-confirmed">
                                                             Confirmed
+                                                        </span>
+                                                    <?php elseif (($reservation['status'] ?? 'pending') === 'cancelled'): ?>
+                                                        <span class="status-badge" style="background-color: #dc3545; color: white;">
+                                                            Cancelled
                                                         </span>
                                                     <?php else: ?>
                                                         <span class="status-badge status-pending">
@@ -158,19 +215,15 @@ if (file_exists($reservationsFile)) {
                                                 </div>
                                                 
                                                 <div class="ticket-details small text-muted">
-                                                    <?php if (isset($reservation['packageName'])): ?>
+                                                    <?php if (!empty($reservation['packageName'])): ?>
                                                         <div>Package: <?php echo htmlspecialchars($reservation['packageName']); ?></div>
-                                                    <?php else: ?>
-                                                        <div>Qty: <?php echo htmlspecialchars($reservation['quantity'] ?? 1); ?></div>
                                                     <?php endif; ?>
-                                                    <div>Total: ₱ <?php echo number_format($reservation['totalAmount'], 2); ?></div>
+                                                    <div>Total: ₱ <?php echo number_format($reservation['totalAmount'] ?? 0, 2); ?></div>
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-3 text-center">
-                                                <a href="confirmation.php?eventId=<?php echo $reservation['eventId']; ?><?php echo isset($reservation['packageName']) ? '&packageName=' . urlencode($reservation['packageName']) . '&packagePrice=' . urlencode($reservation['totalAmount']) : '&quantity=' . urlencode($reservation['quantity']); ?>&ticketId=<?php echo htmlspecialchars($reservation['ticketId']); ?>" class="btn btn-primary-luxury w-100">
-                                                    View Ticket
-                                                </a>
+                                                <div class="small text-muted mb-2">ID: #<?php echo $reservation['reservationId'] ?? 'N/A'; ?></div>
                                             </div>
                                         </div>
                                     </div>

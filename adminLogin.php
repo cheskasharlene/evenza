@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'config/database.php';
 
 $error = '';
 
@@ -16,27 +17,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required.';
     } else {
-        $adminsFile = 'data/admins.json';
-        $admins = [];
-        
-        if (file_exists($adminsFile)) {
-            $admins = json_decode(file_get_contents($adminsFile), true) ?? [];
-        }
-
-        $adminFound = false;
-        foreach ($admins as $admin) {
-            if ($admin['email'] === $email && password_verify($password, $admin['password'])) {
-                $adminFound = true;
-                $_SESSION['admin_id'] = $admin['id'];
-                $_SESSION['admin_name'] = $admin['name'];
+        try {
+            $conn = getDBConnection();
+            
+            // Check users table for admin role
+            $stmt = $conn->prepare("SELECT userId, fullName, email, password, role FROM users WHERE email = ? AND role = 'admin'");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $admin = $result->fetch_assoc();
+            $stmt->close();
+            
+            if ($admin && password_verify($password, $admin['password'])) {
+                // Admin login successful
+                $_SESSION['admin_id'] = $admin['userId'];
+                $_SESSION['admin_name'] = $admin['fullName'];
                 $_SESSION['admin_email'] = $admin['email'];
+                $conn->close();
                 header('Location: admin.php');
                 exit;
+            } else {
+                $error = 'Invalid email or password.';
             }
-        }
-
-        if (!$adminFound) {
-            $error = 'Invalid email or password.';
+            
+            $conn->close();
+        } catch (Exception $e) {
+            $error = 'An error occurred. Please try again later.';
+            error_log("Admin login error: " . $e->getMessage());
         }
     }
 }

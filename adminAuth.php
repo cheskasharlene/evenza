@@ -3,9 +3,9 @@
  * Admin Authentication Guard
  * 
  * Place this file at the very top of all admin pages (before any HTML output).
- * It checks if an admin session exists and redirects to admin_login.php if not.
+ * It checks if an admin session exists and redirects to adminLogin.php if not.
  * 
- * Usage: require_once 'admin_auth.php';
+ * Usage: require_once 'adminAuth.php';
  */
 
 session_start();
@@ -13,7 +13,7 @@ session_start();
 // Check if admin is logged in
 if (!isset($_SESSION['admin_id'])) {
     // Redirect to admin login page
-    header('Location: admin_login.php');
+    header('Location: adminLogin.php');
     exit;
 }
 
