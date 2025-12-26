@@ -160,7 +160,7 @@
                 <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="workshops" data-name="Digital Marketing Masterclass">
                     <div class="card event-card h-100">
                         <div class="event-card-image">
-                            <div class="image-placeholder workshop-bg"></div>
+                            <img src="assets/images/event_images/marketingClass.jpg" class="card-img-top" alt="Digital Marketing Masterclass">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title event-title">Digital Marketing Masterclass</h3>
@@ -188,7 +188,7 @@
                 <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Tech Leaders Forum 2025">
                     <div class="card event-card h-100">
                         <div class="event-card-image">
-                            <div class="image-placeholder business-bg"></div>
+                            <img src="assets/images/event_images/techForum.jpg" class="card-img-top" alt="Tech Leaders Forum">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title event-title">Tech Leaders Forum</h3>
@@ -202,7 +202,7 @@
                 <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="weddings" data-name="Luxury Beach Wedding">
                     <div class="card event-card h-100">
                         <div class="event-card-image">
-                            <div class="image-placeholder wedding-bg"></div>
+                            <img src="assets/images/event_images/beachWedding.jpg" class="card-img-top" alt="Luxury Beach Wedding">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title event-title">Luxury Beach Wedding</h3>
@@ -216,7 +216,7 @@
                 <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Corporate Team Building Retreat">
                     <div class="card event-card h-100">
                         <div class="event-card-image">
-                            <div class="image-placeholder business-bg"></div>
+                            <img src="assets/images/event_images/corporateTbuilding.jpg" class="card-img-top" alt="Corporate Team Building Retreat">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title event-title">Corporate Team Building Retreat</h3>
@@ -230,7 +230,7 @@
                 <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="weddings" data-name="Spring Wedding Collection">
                     <div class="card event-card h-100">
                         <div class="event-card-image">
-                            <div class="image-placeholder wedding-bg"></div>
+                            <img src="assets/images/event_images/springWedding.jpg" class="card-img-top" alt="Spring Wedding Collection">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title event-title">Spring Wedding Collection</h3>
@@ -244,7 +244,7 @@
                 <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="workshops" data-name="Professional Development Workshop">
                     <div class="card event-card h-100">
                         <div class="event-card-image">
-                            <div class="image-placeholder workshop-bg"></div>
+                            <img src="assets/images/event_images/pdWorkshop.jpg" class="card-img-top" alt="Professional Development Workshop">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title event-title">Professional Development Workshop</h3>
@@ -258,7 +258,7 @@
                 <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="socials" data-name="Exclusive Members Gala">
                     <div class="card event-card h-100">
                         <div class="event-card-image">
-                            <div class="image-placeholder gala-bg"></div>
+                            <img src="assets/images/event_images/exclusiveGala.jpg" class="card-img-top" alt="Exclusive Members Gala">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title event-title">Exclusive Members Gala</h3>
@@ -272,7 +272,7 @@
                 <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Leadership Summit 2025">
                     <div class="card event-card h-100">
                         <div class="event-card-image">
-                            <div class="image-placeholder business-bg"></div>
+                            <img src="assets/images/event_images/leadershipSummit.jpg" class="card-img-top" alt="Leadership Summit 2025">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title event-title">Leadership Summit</h3>
@@ -286,7 +286,7 @@
                 <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="workshops" data-name="Advanced Skills Training">
                     <div class="card event-card h-100">
                         <div class="event-card-image">
-                            <div class="image-placeholder workshop-bg"></div>
+                            <img src="assets/images/event_images/skillsTraining.jpg" class="card-img-top" alt="Advanced Skills Training">
                         </div>
                         <div class="card-body">
                             <h3 class="card-title event-title">Advanced Skills Training</h3>
