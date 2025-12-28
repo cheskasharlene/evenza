@@ -9,7 +9,7 @@ session_destroy();
 
 // Redirect based on user type
 if ($isAdmin) {
-    header('Location: admin_login.php');
+    header('Location: adminLogin.php');
 } else {
     header('Location: login.php');
 }

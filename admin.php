@@ -1,6 +1,6 @@
 <?php
 // Admin Authentication Guard - Must be at the very top
-require_once 'admin_auth.php';
+require_once 'adminAuth.php';
 ?>
 <!doctype html>
 <html lang="en">

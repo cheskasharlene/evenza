@@ -212,7 +212,7 @@ $totalAmount = $selectedPackage['price'];
                             </div>
 
                             <div class="d-flex gap-3 mt-4">
-                                <a href="event-details.php?id=<?php echo $eventId; ?>" class="btn btn-outline-luxury flex-fill">Back to Event</a>
+                                <a href="eventDetails.php?id=<?php echo $eventId; ?>" class="btn btn-outline-luxury flex-fill">Back to Event</a>
                                 <button type="submit" class="btn btn-primary-luxury flex-fill">Proceed to Payment</button>
                             </div>
                         </form>
