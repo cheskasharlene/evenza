@@ -1,4 +1,6 @@
 <?php
+session_start();
+require_once 'connect.php';
 
 $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 1;
 // Package-based confirmation
@@ -8,94 +10,81 @@ $fullName = isset($_GET['fullName']) ? htmlspecialchars($_GET['fullName']) : 'Gu
 $email = isset($_GET['email']) ? htmlspecialchars($_GET['email']) : '';
 $ticketId = 'EVZ-' . strtoupper(substr(md5($eventId . $fullName . time()), 0, 8));
 
-$eventsData = [
-    1 => [
-        'name' => 'Business Innovation Summit 2024',
-        'category' => 'Conference',
-        'date' => 'December 25, 2024',
-        'time' => '9:00 AM - 6:00 PM',
-        'venue' => 'Grand Luxe Hotel - Grand Ballroom',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 299,
-        'priceType' => 'per person'
-    ],
-    2 => [
-        'name' => 'Elegant Garden Wedding',
-        'category' => 'Wedding',
-        'date' => 'January 10, 2025',
-        'time' => '4:00 PM - 11:00 PM',
-        'venue' => 'Grand Luxe Hotel - Garden Pavilion',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 5500,
-        'priceType' => 'package'
-    ],
-    3 => [
-        'name' => 'Digital Marketing Masterclass',
-        'category' => 'Seminar',
-        'date' => 'December 30, 2024',
-        'time' => '10:00 AM - 5:00 PM',
-        'venue' => 'Grand Luxe Hotel - Conference Hall A',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 149,
-        'priceType' => 'per person'
-    ],
-    4 => [
-        'name' => 'New Year\'s Eve Gala Dinner',
-        'category' => 'Hotel-Hosted Events',
-        'date' => 'December 31, 2024',
-        'time' => '7:00 PM - 1:00 AM',
-        'venue' => 'Grand Luxe Hotel - Crystal Ballroom',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 450,
-        'priceType' => 'per person'
-    ]
-];
+// Fetch event data from database
+$event = null;
+try {
+    $stmt = $pdo->prepare("SELECT * FROM events WHERE eventId = ?");
+    $stmt->execute([$eventId]);
+    $event = $stmt->fetch();
+} catch(PDOException $e) {
+    // Log error in production: error_log($e->getMessage());
+}
 
-session_start();
+// Fallback if event not found
+if (!$event) {
+    $event = [
+        'title' => 'Event Not Found',
+        'venue' => 'N/A',
+        'eventDate' => date('Y-m-d'),
+        'eventTime' => 'N/A'
+    ];
+}
 
-$event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 // Use package price if provided
 $totalAmount = $packagePrice;
 
-// Persist reservation for logged-in users
-$reservationsFile = __DIR__ . '/data/reservations.json';
-if (!is_dir(__DIR__ . '/data')) {
-    mkdir(__DIR__ . '/data', 0755, true);
+// Get packageId from packageName
+$packageId = null;
+if (!empty($packageName) && $packageName !== 'Package') {
+    try {
+        $stmt = $pdo->prepare("SELECT packageId FROM packages WHERE packageName = ?");
+        $stmt->execute([$packageName]);
+        $package = $stmt->fetch();
+        if ($package) {
+            $packageId = $package['packageId'];
+        }
+    } catch(PDOException $e) {
+        // Log error in production: error_log($e->getMessage());
+    }
 }
 
-$reservationRecord = [
-    'id' => uniqid('res_'),
-    'userId' => isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null,
-    'eventId' => $eventId,
-    'eventName' => $event['name'],
-    'date' => $event['date'],
-    'time' => $event['time'],
-    'venue' => $event['venue'],
-    'ticketId' => $ticketId,
-    'packageName' => $packageName,
-    'totalAmount' => $totalAmount,
-    'status' => 'confirmed',
-    'createdAt' => date('c')
-];
-
-// Only save if we have a logged-in user and this ticket doesn't already exist
-if (!empty($reservationRecord['userId'])) {
-    $existing = [];
-    if (file_exists($reservationsFile)) {
-        $existing = json_decode(file_get_contents($reservationsFile), true) ?? [];
+// Parse event time for startTime and endTime
+$startTime = null;
+$endTime = null;
+if (isset($event['eventTime']) && !empty($event['eventTime'])) {
+    // Parse time string like "9:00 AM - 6:00 PM"
+    if (preg_match('/(\d{1,2}:\d{2}\s*(?:AM|PM))\s*-\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/i', $event['eventTime'], $matches)) {
+        $startTime = date('H:i:s', strtotime($matches[1]));
+        $endTime = date('H:i:s', strtotime($matches[2]));
     }
+}
 
-    $found = false;
-    foreach ($existing as $r) {
-        if (isset($r['ticketId']) && $r['ticketId'] === $ticketId) {
-            $found = true;
-            break;
+// Persist reservation for logged-in users
+if (!empty($_SESSION['user_id'])) {
+    try {
+        // Check if ticket already exists
+        $stmt = $pdo->prepare("SELECT reservationId FROM reservations WHERE ticketId = ?");
+        $stmt->execute([$ticketId]);
+        if (!$stmt->fetch()) {
+            // Insert new reservation
+            $stmt = $pdo->prepare("
+                INSERT INTO reservations (userId, eventId, packageId, reservationDate, startTime, endTime, totalAmount, status, ticketId)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'Confirmed', ?)
+            ");
+            $reservationDate = isset($event['eventDate']) ? $event['eventDate'] : date('Y-m-d');
+            $stmt->execute([
+                $_SESSION['user_id'],
+                $eventId,
+                $packageId,
+                $reservationDate,
+                $startTime,
+                $endTime,
+                $totalAmount,
+                $ticketId
+            ]);
         }
-    }
-
-    if (!$found) {
-        $existing[] = $reservationRecord;
-        file_put_contents($reservationsFile, json_encode($existing, JSON_PRETTY_PRINT));
+    } catch(PDOException $e) {
+        // Log error in production: error_log($e->getMessage());
     }
 }
 ?>
@@ -169,7 +158,7 @@ if (!empty($reservationRecord['userId'])) {
                         <div class="confirmation-content">
                             <div class="confirmation-item mb-4">
                                 <div class="confirmation-label">Event Name</div>
-                                <div class="confirmation-value"><?php echo htmlspecialchars($event['name']); ?></div>
+                                <div class="confirmation-value"><?php echo htmlspecialchars($event['title']); ?></div>
                             </div>
 
                             <!-- category removed -->
@@ -192,12 +181,12 @@ if (!empty($reservationRecord['userId'])) {
                                 <div class="confirmation-value">
                                     <div class="event-date-venue">
                                         <div class="mb-2">
-                                            <strong><?php echo htmlspecialchars($event['date']); ?></strong>
-                                            <span class="text-muted ms-2"><?php echo htmlspecialchars($event['time']); ?></span>
+                                            <strong><?php echo isset($event['eventDate']) ? date('F j, Y', strtotime($event['eventDate'])) : 'N/A'; ?></strong>
+                                            <span class="text-muted ms-2"><?php echo htmlspecialchars($event['eventTime'] ?? 'N/A'); ?></span>
                                         </div>
                                         <div>
                                             <?php echo htmlspecialchars($event['venue']); ?>
-                                            <div class="text-muted small ms-6"><?php echo htmlspecialchars($event['venueAddress']); ?></div>
+                                            <div class="text-muted small ms-6">123 Luxury Avenue, Suite 100, City, State 12345</div>
                                         </div>
                                     </div>
                                 </div>

@@ -1,16 +1,15 @@
 <?php
 session_start();
+require_once 'connect.php';
 
 $error = '';
 $success = '';
 
-// If already logged in, redirect to profile
 if (isset($_SESSION['user_id'])) {
     header('Location: profile.php');
     exit;
 }
 
-// Handle registration form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $fullName = isset($_POST['fullName']) ? trim($_POST['fullName']) : '';
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
@@ -18,7 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
     $confirmPassword = isset($_POST['confirmPassword']) ? trim($_POST['confirmPassword']) : '';
 
-    // Validation
     if (empty($fullName) || empty($email) || empty($mobile) || empty($password)) {
         $error = 'All fields are required.';
     } elseif ($password !== $confirmPassword) {
@@ -26,55 +24,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($password) < 6) {
         $error = 'Password must be at least 6 characters long.';
     } else {
-        // Create data directory if it doesn't exist
-        if (!is_dir('data')) {
-            mkdir('data', 0755, true);
-        }
+        try {
+            $nameParts = explode(' ', $fullName, 2);
+            $firstName = $nameParts[0];
+            $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
 
-        $usersFile = 'data/users.json';
-        $users = [];
-        
-        // Read existing users
-        if (file_exists($usersFile)) {
-            $users = json_decode(file_get_contents($usersFile), true) ?? [];
-        }
-
-        // Check if email already exists
-        $emailExists = false;
-        foreach ($users as $user) {
-            if ($user['email'] === $email) {
-                $emailExists = true;
-                break;
-            }
-        }
-
-        if ($emailExists) {
-            $error = 'Email already registered. Please login or use a different email.';
-        } else {
-            // Create new user
-            $newUser = [
-                'id' => uniqid(),
-                'fullName' => $fullName,
-                'email' => $email,
-                'mobile' => $mobile,
-                'password' => password_hash($password, PASSWORD_BCRYPT),
-                'createdAt' => date('Y-m-d H:i:s')
-            ];
-
-            $users[] = $newUser;
-
-            // Save users to JSON file
-            if (file_put_contents($usersFile, json_encode($users, JSON_PRETTY_PRINT))) {
-                // Auto login after registration
-                $_SESSION['user_id'] = $newUser['id'];
-                $_SESSION['user_name'] = $newUser['fullName'];
-                $_SESSION['user_email'] = $newUser['email'];
-                $_SESSION['user_mobile'] = $newUser['mobile'];
-                header('Location: profile.php');
-                exit;
+            $stmt = $pdo->prepare("SELECT userId FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            if ($stmt->fetch()) {
+                $error = 'Email already registered. Please login or use a different email.';
             } else {
-                $error = 'Failed to create account. Please try again.';
+                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
+                $stmt = $pdo->prepare("INSERT INTO users (firstName, lastName, fullName, email, phone, password, role) VALUES (?, ?, ?, ?, ?, ?, 'Client')");
+                if ($stmt->execute([$firstName, $lastName, $fullName, $email, $mobile, $hashedPassword])) {
+                    $userId = $pdo->lastInsertId();
+                    $_SESSION['user_id'] = $userId;
+                    $_SESSION['user_name'] = $fullName;
+                    $_SESSION['user_email'] = $email;
+                    $_SESSION['user_mobile'] = $mobile;
+                    $_SESSION['user_role'] = 'Client';
+                    
+                    header('Location: profile.php');
+                    exit;
+                } else {
+                    $error = 'Failed to create account. Please try again.';
+                }
             }
+        } catch(PDOException $e) {
+            $error = 'Database error. Please try again later.';
         }
     }
 }

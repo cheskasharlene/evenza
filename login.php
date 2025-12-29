@@ -1,9 +1,8 @@
 <?php
 session_start();
+require_once 'connect.php';
 
 $error = '';
-
-// preserve a redirect target so we can send the user back after login
 $redirect = '';
 if (isset($_GET['redirect'])) {
     $redirect = $_GET['redirect'];
@@ -13,7 +12,6 @@ if (isset($_POST['redirect'])) {
 }
 
 if (isset($_SESSION['user_id'])) {
-    // already logged in: send to redirect target if valid, otherwise profile
     if (!empty($redirect) && strpos($redirect, 'http') === false && strpos($redirect, '//') === false) {
         header('Location: ' . $redirect);
     } else {
@@ -29,33 +27,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required.';
     } else {
-        $usersFile = 'data/users.json';
-        $users = [];
-        
-        if (file_exists($usersFile)) {
-            $users = json_decode(file_get_contents($usersFile), true) ?? [];
-        }
+        try {
+            $stmt = $pdo->prepare("SELECT userId, firstName, lastName, fullName, email, phone, password, role FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
 
-        $userFound = false;
-        foreach ($users as $user) {
-                if ($user['email'] === $email && password_verify($password, $user['password'])) {
-                $userFound = true;
-                $_SESSION['user_id'] = $user['id'];
+            if ($user && password_verify($password, $user['password'])) {
+                $_SESSION['user_id'] = $user['userId'];
                 $_SESSION['user_name'] = $user['fullName'];
                 $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_mobile'] = $user['mobile'];
-                    // after successful login, redirect to requested page if safe
+                $_SESSION['user_mobile'] = $user['phone'];
+                $_SESSION['user_role'] = $user['role'];
+
+                if ($user['role'] === 'Admin') {
+                    header('Location: admin.php');
+                } else {
                     $target = 'profile.php';
                     if (!empty($redirect) && strpos($redirect, 'http') === false && strpos($redirect, '//') === false) {
                         $target = $redirect;
                     }
                     header('Location: ' . $target);
-                    exit;
+                }
+                exit;
+            } else {
+                $error = 'Invalid email or password.';
             }
-        }
-
-        if (!$userFound) {
-            $error = 'Invalid email or password.';
+        } catch(PDOException $e) {
+            $error = 'Database error. Please try again later.';
         }
     }
 }

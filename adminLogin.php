@@ -1,9 +1,9 @@
 <?php
 session_start();
+require_once 'connect.php';
 
 $error = '';
 
-// If already logged in as admin, redirect to dashboard
 if (isset($_SESSION['admin_id'])) {
     header('Location: admin.php');
     exit;
@@ -16,27 +16,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required.';
     } else {
-        $adminsFile = 'data/admins.json';
-        $admins = [];
-        
-        if (file_exists($adminsFile)) {
-            $admins = json_decode(file_get_contents($adminsFile), true) ?? [];
-        }
+        try {
+            $stmt = $pdo->prepare("SELECT userId, fullName, email, password, role FROM users WHERE email = ? AND role = 'Admin'");
+            $stmt->execute([$email]);
+            $admin = $stmt->fetch();
 
-        $adminFound = false;
-        foreach ($admins as $admin) {
-            if ($admin['email'] === $email && password_verify($password, $admin['password'])) {
-                $adminFound = true;
-                $_SESSION['admin_id'] = $admin['id'];
-                $_SESSION['admin_name'] = $admin['name'];
+            if ($admin && password_verify($password, $admin['password'])) {
+                $_SESSION['admin_id'] = $admin['userId'];
+                $_SESSION['admin_name'] = $admin['fullName'];
                 $_SESSION['admin_email'] = $admin['email'];
+                $_SESSION['user_role'] = 'Admin';
                 header('Location: admin.php');
                 exit;
+            } else {
+                $error = 'Invalid email or password.';
             }
-        }
-
-        if (!$adminFound) {
-            $error = 'Invalid email or password.';
+        } catch(PDOException $e) {
+            $error = 'Database error. Please try again later.';
         }
     }
 }

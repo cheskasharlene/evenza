@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once 'connect.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -7,22 +8,29 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+// Fetch user data from database
 $userData = [
     'name' => $_SESSION['user_name'] ?? 'User',
     'email' => $_SESSION['user_email'] ?? '',
     'mobile' => $_SESSION['user_mobile'] ?? ''
 ];
 
-// Load reservations for this user from data/reservations.json
-$reservationsFile = __DIR__ . '/data/reservations.json';
+// Load reservations for this user from database
 $reservations = [];
-if (file_exists($reservationsFile)) {
-    $all = json_decode(file_get_contents($reservationsFile), true) ?? [];
-    foreach ($all as $r) {
-        if (isset($r['userId']) && $r['userId'] === $_SESSION['user_id']) {
-            $reservations[] = $r;
-        }
-    }
+try {
+    $stmt = $pdo->prepare("
+        SELECT r.*, e.title as eventName, e.venue, e.eventDate, e.eventTime, p.packageName 
+        FROM reservations r
+        LEFT JOIN events e ON r.eventId = e.eventId
+        LEFT JOIN packages p ON r.packageId = p.packageId
+        WHERE r.userId = ?
+        ORDER BY r.reservationDate DESC, r.createdAt DESC
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $reservations = $stmt->fetchAll();
+} catch(PDOException $e) {
+    // Log error in production: error_log($e->getMessage());
+    $reservations = [];
 }
 ?>
 <!DOCTYPE html>

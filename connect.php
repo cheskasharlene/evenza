@@ -2,18 +2,24 @@
 $dbhost = "localhost";
 $dbuser = "root";
 $dbpass = "";
-$db = "sis";
+$dbname = "evenza";
 
-$conn = new mysqli($dbhost, $dbuser, $dbpass, $db) or die("Connect failed: %s\n" . $conn->error);
+try {
+    $pdo = new PDO("mysql:host=$dbhost;dbname=$dbname;charset=utf8mb4", $dbuser, $dbpass);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+} catch(PDOException $e) {
+    die("Connection Failed: " . $e->getMessage());
+}
 
-if (!$conn) {
-	die("Connection Failed. " . mysqli_connect_error());
-	echo "can't connect to database";
+$conn = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
+if ($conn->connect_error) {
+    die("Connection Failed: " . $conn->connect_error);
 }
 
 function executeQuery($query)
 {
-	$conn = $GLOBALS['conn'];
-	return mysqli_query($conn, $query);
+    $conn = $GLOBALS['conn'];
+    return mysqli_query($conn, $query);
 }
 ?>

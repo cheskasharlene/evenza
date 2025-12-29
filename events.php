@@ -1,4 +1,33 @@
-<?php session_start(); ?>
+<?php 
+session_start();
+require_once 'connect.php';
+
+$events = [];
+try {
+    $stmt = $pdo->query("SELECT eventId, title, venue, category, imagePath, status FROM events ORDER BY eventId");
+    $allEvents = $stmt->fetchAll();
+    $events = array_filter($allEvents, function($event) {
+        return isset($event['status']) && strtolower($event['status']) === 'active';
+    });
+    $events = array_values($events);
+} catch(PDOException $e) {
+    $events = [];
+}
+
+function getCategoryFilter($category) {
+    $categoryMap = [
+        'Premium' => 'premium',
+        'Conference' => 'business',
+        'Business' => 'business',
+        'Wedding' => 'weddings',
+        'Seminar' => 'workshops',
+        'Workshop' => 'workshops',
+        'Social' => 'socials',
+        'Hotel-Hosted Events' => 'socials'
+    ];
+    return isset($categoryMap[$category]) ? $categoryMap[$category] : 'all';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,218 +112,39 @@
     <div class="events-grid-section py-5">
         <div class="container">
             <div class="row g-4" id="eventsGrid">
-                <!-- Premium Event Card 1: Gala Evening -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="premium" data-name="Gala Evening">
-                    <div class="card event-card h-100">
-                                <div class="event-card-image position-relative">
-                                    <img src="assets/images/event_images/galaEvening.jpg" class="card-img-top" alt="Gala Evening">
-                                    <span class="badge rounded-pill position-absolute top-0 end-0 m-3">Premium</span>
+                <?php if (empty($events)): ?>
+                    <div class="col-12">
+                        <div class="alert alert-info text-center">
+                            <p>No events available at this time.</p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($events as $event): 
+                        $categoryFilter = getCategoryFilter($event['category']);
+                        $isPremium = ($event['category'] === 'Premium');
+                    ?>
+                        <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" 
+                             data-category="<?php echo htmlspecialchars($categoryFilter); ?>" 
+                             data-name="<?php echo htmlspecialchars($event['title']); ?>">
+                            <div class="card event-card h-100">
+                                <div class="event-card-image <?php echo $isPremium ? 'position-relative' : ''; ?>">
+                                    <img src="<?php echo htmlspecialchars($event['imagePath']); ?>" 
+                                         class="card-img-top" 
+                                         alt="<?php echo htmlspecialchars($event['title']); ?>"
+                                         onerror="this.src='assets/images/event_images/businessInnovation.jpg'">
+                                    <?php if ($isPremium): ?>
+                                        <span class="badge rounded-pill position-absolute top-0 end-0 m-3">Premium</span>
+                                    <?php endif; ?>
                                 </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Gala Evening</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Crystal Ballroom</p>
-                            <a href="eventDetails.php?id=101" class="btn btn-event-view w-100">View Details</a>
+                                <div class="card-body">
+                                    <h3 class="card-title event-title"><?php echo htmlspecialchars($event['title']); ?></h3>
+                                    <p class="card-text event-venue-text"><?php echo htmlspecialchars($event['venue']); ?></p>
+                                    <a href="eventDetails.php?id=<?php echo $event['eventId']; ?>" class="btn btn-event-view w-100">View Details</a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Premium Event Card 2: Wine Tasting Experience -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="premium" data-name="Wine Tasting Experience">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image position-relative">
-                            <img src="assets/images/event_images/wineCellar.jpg" class="card-img-top" alt="Wine Tasting Experience">
-                            <span class="badge rounded-pill position-absolute top-0 end-0 m-3">Premium</span>
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Wine Tasting Experience</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Wine Cellar</p>
-                            <a href="eventDetails.php?id=102" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Premium Event Card 3: Art Exhibition Opening -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="premium" data-name="Art Exhibition Opening">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image position-relative">
-                            <img src="assets/images/event_images/artExhibition.jpg" class="card-img-top" alt="Art Exhibition Opening">
-                            <span class="badge rounded-pill position-absolute top-0 end-0 m-3">Premium</span>
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Art Exhibition Opening</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Art Gallery</p>
-                            <a href="eventDetails.php?id=103" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 1: Business Innovation Summit 2024 -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Business Innovation Summit 2024">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/businessInnovation.jpg" class="card-img-top" alt="Business Innovation Summit">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Business Innovation Summit</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Grand Ballroom</p>
-                            <a href="eventDetails.php?id=1" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 2: Elegant Garden Wedding -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="weddings" data-name="Elegant Garden Wedding">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/gardenWedding.jpg" class="card-img-top" alt="Elegant Garden Wedding">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Elegant Garden Wedding</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Garden Pavilion</p>
-                            <a href="eventDetails.php?id=2" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 3: Digital Marketing Masterclass -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="workshops" data-name="Digital Marketing Masterclass">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/marketingClass.jpg" class="card-img-top" alt="Digital Marketing Masterclass">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Digital Marketing Masterclass</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Conference Hall A</p>
-                            <a href="eventDetails.php?id=3" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 4: New Year's Eve Gala Dinner -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="socials" data-name="New Year's Eve Gala Dinner">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/nyGala.jpg" class="card-img-top" alt="New Year's Eve Gala Dinner">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">New Year's Eve Gala Dinner</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Crystal Ballroom</p>
-                            <a href="eventDetails.php?id=4" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 5: Tech Leaders Forum 2025 -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Tech Leaders Forum 2025">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/techForum.jpg" class="card-img-top" alt="Tech Leaders Forum">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Tech Leaders Forum</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Innovation Center</p>
-                            <a href="eventDetails.php?id=5" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 6: Luxury Beach Wedding -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="weddings" data-name="Luxury Beach Wedding">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/beachWedding.jpg" class="card-img-top" alt="Luxury Beach Wedding">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Luxury Beach Wedding</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Oceanview Terrace</p>
-                            <a href="eventDetails.php?id=6" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 7: Corporate Team Building Retreat -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Corporate Team Building Retreat">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/corporateTbuilding.jpg" class="card-img-top" alt="Corporate Team Building Retreat">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Corporate Team Building Retreat</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Mountain Resort Wing</p>
-                            <a href="eventDetails.php?id=7" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 8: Spring Wedding Collection -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="weddings" data-name="Spring Wedding Collection">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/springWedding.jpg" class="card-img-top" alt="Spring Wedding Collection">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Spring Wedding Collection</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Grand Ballroom</p>
-                            <a href="eventDetails.php?id=8" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 9: Professional Development Workshop -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="workshops" data-name="Professional Development Workshop">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/pdWorkshop.jpg" class="card-img-top" alt="Professional Development Workshop">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Professional Development Workshop</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Conference Hall B</p>
-                            <a href="eventDetails.php?id=9" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 10: Exclusive Members Gala -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="socials" data-name="Exclusive Members Gala">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/exclusiveGala.jpg" class="card-img-top" alt="Exclusive Members Gala">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Exclusive Members Gala</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - VIP Lounge</p>
-                            <a href="eventDetails.php?id=10" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 11: Leadership Summit 2025 -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="business" data-name="Leadership Summit 2025">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/leadershipSummit.jpg" class="card-img-top" alt="Leadership Summit 2025">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Leadership Summit</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Executive Center</p>
-                            <a href="eventDetails.php?id=11" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Event Card 12: Advanced Skills Training -->
-                <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" data-category="workshops" data-name="Advanced Skills Training">
-                    <div class="card event-card h-100">
-                        <div class="event-card-image">
-                            <img src="assets/images/event_images/skillsTraining.jpg" class="card-img-top" alt="Advanced Skills Training">
-                        </div>
-                        <div class="card-body">
-                            <h3 class="card-title event-title">Advanced Skills Training</h3>
-                            <p class="card-text event-venue-text">Grand Luxe Hotel - Training Center</p>
-                            <a href="eventDetails.php?id=12" class="btn btn-event-view w-100">View Details</a>
-                        </div>
-                    </div>
-                </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>

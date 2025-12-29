@@ -26,7 +26,7 @@ foreach ($admins as $admin) {
 foreach ($users as &$user) {
     $user['role'] = isset($adminEmails[$user['email']]) ? 'Admin' : 'Client';
 }
-unset($user); // Break reference
+unset($user);
 ?>
 <!doctype html>
 <html lang="en">

@@ -1,48 +1,41 @@
 <?php
-// Admin Authentication Guard - Must be at the very top
 require_once 'adminAuth.php';
+require_once 'connect.php';
 
-// Load events data
-$eventImageMap = [
-    101 => 'galaEvening.jpg',
-    102 => 'wineCellar.jpg',
-    103 => 'artExhibition.jpg',
-    1 => 'businessInnovation.jpg',
-    2 => 'gardenWedding.jpg',
-    3 => 'marketingClass.jpg',
-    4 => 'nyGala.jpg',
-    5 => 'techForum.jpg',
-    6 => 'beachWedding.jpg',
-    7 => 'corporateTbuilding.jpg',
-    8 => 'springWedding.jpg',
-    9 => 'pdWorkshop.jpg',
-    10 => 'exclusiveGala.jpg',
-    11 => 'leadershipSummit.jpg',
-    12 => 'skillsTraining.jpg'
-];
+$eventsData = [];
+try {
+    $stmt = $pdo->query("SELECT eventId, title, venue, category, imagePath, status FROM events ORDER BY eventId");
+    $eventsData = $stmt->fetchAll();
+    
+    $eventsDataAssoc = [];
+    foreach ($eventsData as $event) {
+        $imagePath = $event['imagePath'];
+        $imageName = basename($imagePath);
+        
+        $eventsDataAssoc[$event['eventId']] = [
+            'eventId' => $event['eventId'],
+            'name' => $event['title'],
+            'title' => $event['title'],
+            'category' => $event['category'],
+            'status' => $event['status'],
+            'image' => $imageName,
+            'imagePath' => $imagePath,
+            'venue' => $event['venue']
+        ];
+    }
+    $eventsData = $eventsDataAssoc;
+} catch(PDOException $e) {
+    $eventsData = [];
+}
 
-$eventsData = [
-    1 => ['name' => 'Business Innovation Summit', 'category' => 'Conference', 'status' => 'Active', 'image' => 'businessInnovation.jpg'],
-    2 => ['name' => 'Elegant Garden Wedding', 'category' => 'Wedding', 'status' => 'Active', 'image' => 'gardenWedding.jpg'],
-    3 => ['name' => 'Digital Marketing Masterclass', 'category' => 'Seminar', 'status' => 'Active', 'image' => 'marketingClass.jpg'],
-    4 => ['name' => 'New Year\'s Eve Gala Dinner', 'category' => 'Hotel-Hosted Events', 'status' => 'Active', 'image' => 'nyGala.jpg'],
-    5 => ['name' => 'Tech Leaders Forum', 'category' => 'Conference', 'status' => 'Active', 'image' => 'techForum.jpg'],
-    6 => ['name' => 'Luxury Beach Wedding', 'category' => 'Wedding', 'status' => 'Active', 'image' => 'beachWedding.jpg'],
-    7 => ['name' => 'Corporate Team Building Retreat', 'category' => 'Business', 'status' => 'Active', 'image' => 'corporateTbuilding.jpg'],
-    8 => ['name' => 'Spring Wedding Collection', 'category' => 'Wedding', 'status' => 'Active', 'image' => 'springWedding.jpg'],
-    9 => ['name' => 'Professional Development Workshop', 'category' => 'Workshop', 'status' => 'Active', 'image' => 'pdWorkshop.jpg'],
-    10 => ['name' => 'Exclusive Members Gala', 'category' => 'Social', 'status' => 'Active', 'image' => 'exclusiveGala.jpg'],
-    11 => ['name' => 'Leadership Summit', 'category' => 'Conference', 'status' => 'Active', 'image' => 'leadershipSummit.jpg'],
-    12 => ['name' => 'Advanced Skills Training', 'category' => 'Workshop', 'status' => 'Active', 'image' => 'skillsTraining.jpg']
-];
-
-// Handle search
 $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
 $filteredEvents = $eventsData;
 if (!empty($searchQuery)) {
     $filteredEvents = array_filter($eventsData, function($event) use ($searchQuery) {
         return stripos($event['name'], $searchQuery) !== false || 
-               stripos($event['category'], $searchQuery) !== false;
+               stripos($event['title'], $searchQuery) !== false ||
+               stripos($event['category'], $searchQuery) !== false ||
+               stripos($event['venue'], $searchQuery) !== false;
     });
 }
 ?>
@@ -254,16 +247,21 @@ if (!empty($searchQuery)) {
                                     </td>
                                 </tr>
                                 <?php else: ?>
-                                <?php foreach ($filteredEvents as $id => $event): ?>
+                                <?php foreach ($filteredEvents as $id => $event): 
+                                    // Handle image path - use full path if available, otherwise construct from filename
+                                    $imageSrc = isset($event['imagePath']) && !empty($event['imagePath']) 
+                                        ? $event['imagePath'] 
+                                        : 'assets/images/event_images/' . (isset($event['image']) ? $event['image'] : 'businessInnovation.jpg');
+                                ?>
                                 <tr>
                                     <td>
-                                        <img src="assets/images/event_images/<?php echo htmlspecialchars($event['image']); ?>" 
-                                             alt="<?php echo htmlspecialchars($event['name']); ?>" 
+                                        <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
+                                             alt="<?php echo htmlspecialchars($event['name'] ?? $event['title']); ?>" 
                                              class="event-thumbnail"
                                              onerror="this.src='assets/images/event_images/businessInnovation.jpg'">
                                     </td>
                                     <td>
-                                        <div class="fw-semibold"><?php echo htmlspecialchars($event['name']); ?></div>
+                                        <div class="fw-semibold"><?php echo htmlspecialchars($event['name'] ?? $event['title']); ?></div>
                                     </td>
                                     <td>
                                         <span class="badge bg-light text-dark"><?php echo htmlspecialchars($event['category']); ?></span>
@@ -274,10 +272,10 @@ if (!empty($searchQuery)) {
                                         </span>
                                     </td>
                                     <td class="text-end">
-                                        <button class="action-btn" onclick="editEvent(<?php echo $id; ?>)" title="Edit">
+                                        <button class="action-btn" onclick="editEvent(<?php echo $event['eventId']; ?>)" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="action-btn text-danger" onclick="deleteEvent(<?php echo $id; ?>, '<?php echo htmlspecialchars($event['name'], ENT_QUOTES); ?>')" title="Delete">
+                                        <button class="action-btn text-danger" onclick="deleteEvent(<?php echo $event['eventId']; ?>, '<?php echo htmlspecialchars($event['name'] ?? $event['title'], ENT_QUOTES); ?>')" title="Delete">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>
