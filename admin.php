@@ -9,6 +9,7 @@ require_once 'adminAuth.php';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
     <title>EVENZA Admin Dashboard</title>
@@ -103,11 +104,11 @@ require_once 'adminAuth.php';
             <div class="mb-4">
                 <div class="admin-card p-3">
                     <div class="d-flex flex-column">
-                        <a href="#" class="nav-link active d-flex align-items-center py-2"><span class="me-2">🏠</span> Dashboard</a>
-                        <a href="#" class="nav-link d-flex align-items-center py-2"><span class="me-2">🎟️</span> Event Management</a>
-                        <a href="#" class="nav-link d-flex align-items-center py-2"><span class="me-2">📋</span> Reservations</a>
-                        <a href="#" class="nav-link d-flex align-items-center py-2"><span class="me-2">👥</span> User Management</a>
-                        <a href="#" class="nav-link d-flex align-items-center py-2"><span class="me-2">⚙️</span> Settings</a>
+                        <a href="admin.php" class="nav-link active d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-home"></i></span> Dashboard</a>
+                        <a href="eventManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-calendar-alt"></i></span> Event Management</a>
+                        <a href="reservationsManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-clipboard-list"></i></span> Reservations</a>
+                        <a href="userManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-users"></i></span> User Management</a>
+                        <a href="#" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-cog"></i></span> Settings</a>
                     </div>
                 </div>
             </div>

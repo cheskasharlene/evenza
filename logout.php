@@ -7,7 +7,7 @@ $isAdmin = isset($_SESSION['admin_id']);
 // Destroy the session
 session_destroy();
 
-// Redirect based on user type
+//Redirect based on user type
 if ($isAdmin) {
     header('Location: adminLogin.php');
 } else {
