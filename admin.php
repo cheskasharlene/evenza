@@ -1,5 +1,4 @@
 <?php
-// Admin Authentication Guard - Must be at the very top
 require_once 'adminAuth.php';
 ?>
 <!doctype html>
@@ -14,7 +13,6 @@ require_once 'adminAuth.php';
     <link rel="stylesheet" href="assets/css/style.css">
     <title>EVENZA Admin Dashboard</title>
     <style>
-        /* Admin Dashboard Custom Styles */
         .admin-wrapper { 
             min-height: 100vh; 
             background-color: #F9F7F2;
