@@ -2,16 +2,74 @@
 session_start();
 require_once 'connect.php';
 
+// Helper function to validate and fix image paths with fallback to placeholder
+function getEventImagePath($imagePath) {
+    $imageDir = 'assets/images/event_images/';
+    $placeholder = $imageDir . 'placeholder.jpg';
+    
+    // If imagePath is empty or null, use placeholder
+    if (empty($imagePath)) {
+        return $placeholder;
+    }
+    
+    // If imagePath doesn't start with the directory, prepend it
+    if (strpos($imagePath, $imageDir) !== 0) {
+        // Extract just the filename if full path is provided
+        $filename = basename($imagePath);
+        $imagePath = $imageDir . $filename;
+    }
+    
+    // Check if file exists, otherwise use placeholder
+    if (file_exists($imagePath)) {
+        return $imagePath;
+    }
+    
+    // Return placeholder as fallback
+    return $placeholder;
+}
+
+// Fetch all active events from database
 $events = [];
+$errorMessage = '';
+
 try {
-    $stmt = $pdo->query("SELECT eventId, title, venue, category, imagePath, status FROM events ORDER BY eventId");
-    $allEvents = $stmt->fetchAll();
-    $events = array_filter($allEvents, function($event) {
-        return isset($event['status']) && strtolower($event['status']) === 'active';
-    });
-    $events = array_values($events);
+    // First, check if status column exists by trying to select it
+    // If it fails, we'll select without it
+    try {
+        $stmt = $pdo->query("SELECT eventId, title, venue, category, imagePath, status, description FROM events ORDER BY eventId");
+        $allEvents = $stmt->fetchAll();
+        
+        // Filter events by status (case-insensitive) - show active events, or all if none are marked active
+        $activeEvents = array_filter($allEvents, function($event) {
+            $status = isset($event['status']) ? strtolower(trim($event['status'])) : '';
+            return $status === 'active' || empty($status);
+        });
+        
+        // If we have active events, use them; otherwise show all events
+        if (!empty($activeEvents)) {
+            $events = array_values($activeEvents);
+        } else {
+            $events = $allEvents;
+        }
+    } catch(PDOException $e) {
+        // If status column doesn't exist, select without it
+        $stmt = $pdo->query("SELECT eventId, title, venue, category, imagePath, description FROM events ORDER BY eventId");
+        $events = $stmt->fetchAll();
+    }
+    
+    // Process image paths for each event
+    foreach ($events as &$event) {
+        $event['imagePath'] = getEventImagePath($event['imagePath'] ?? '');
+        // Ensure status is set for filtering (default to 'active' if column doesn't exist)
+        if (!isset($event['status']) || empty($event['status'])) {
+            $event['status'] = 'active';
+        }
+    }
+    unset($event); // Break reference
 } catch(PDOException $e) {
     $events = [];
+    $errorMessage = $e->getMessage();
+    // Log error in production: error_log($e->getMessage());
 }
 
 function getCategoryFilter($category) {
@@ -112,10 +170,18 @@ function getCategoryFilter($category) {
     <div class="events-grid-section py-5">
         <div class="container">
             <div class="row g-4" id="eventsGrid">
-                <?php if (empty($events)): ?>
+                <?php if (!empty($errorMessage)): ?>
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center">
+                            <p><strong>Database Error:</strong> <?php echo htmlspecialchars($errorMessage); ?></p>
+                            <p class="small">Please check your database connection and ensure the events table exists.</p>
+                        </div>
+                    </div>
+                <?php elseif (empty($events)): ?>
                     <div class="col-12">
                         <div class="alert alert-info text-center">
                             <p>No events available at this time.</p>
+                            <p class="small">Please add events through the admin dashboard.</p>
                         </div>
                     </div>
                 <?php else: ?>
@@ -131,7 +197,7 @@ function getCategoryFilter($category) {
                                     <img src="<?php echo htmlspecialchars($event['imagePath']); ?>" 
                                          class="card-img-top" 
                                          alt="<?php echo htmlspecialchars($event['title']); ?>"
-                                         onerror="this.src='assets/images/event_images/businessInnovation.jpg'">
+                                         onerror="this.src='assets/images/event_images/placeholder.jpg'">
                                     <?php if ($isPremium): ?>
                                         <span class="badge rounded-pill position-absolute top-0 end-0 m-3">Premium</span>
                                     <?php endif; ?>

@@ -1,273 +1,81 @@
 <?php
 session_start();
+require_once 'connect.php';
 
-$eventId = isset($_GET['id']) ? intval($_GET['id']) : 1;
+// Get event ID from URL parameter
+$eventId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Mapping of event IDs to image filenames
-$eventImageMap = [
-    101 => 'galaEvening.jpg',
-    102 => 'wineCellar.jpg',
-    103 => 'artExhibition.jpg',
-    1 => 'businessInnovation.jpg',
-    2 => 'gardenWedding.jpg',
-    3 => 'marketingClass.jpg',
-    4 => 'nyGala.jpg',
-    5 => 'techForum.jpg',
-    6 => 'beachWedding.jpg',
-    7 => 'corporateTbuilding.jpg',
-    8 => 'springWedding.jpg',
-    9 => 'pdWorkshop.jpg',
-    10 => 'exclusiveGala.jpg',
-    11 => 'leadershipSummit.jpg',
-    12 => 'skillsTraining.jpg'
-];
-
-// Function to get event image path with fallback
-function getEventImagePath($eventId, $imageMap) {
+// Helper function to validate and fix image paths with fallback to placeholder
+function getEventImagePath($imagePath) {
     $imageDir = 'assets/images/event_images/';
-    $defaultImage = 'placeholder.jpg';
+    $placeholder = $imageDir . 'placeholder.jpg';
     
-    // Get the image filename for this event ID
-    $imageFile = isset($imageMap[$eventId]) ? $imageMap[$eventId] : null;
-    
-    if ($imageFile) {
-        $imagePath = $imageDir . $imageFile;
-        // Check if file exists, otherwise use default
-        if (file_exists($imagePath)) {
-            return $imagePath;
-        }
+    // If imagePath is empty or null, use placeholder
+    if (empty($imagePath)) {
+        return $placeholder;
     }
     
-    // Fallback to default placeholder
-    $defaultPath = $imageDir . $defaultImage;
-    // If placeholder doesn't exist, still return the path (browser will handle 404 gracefully)
-    return file_exists($defaultPath) ? $defaultPath : $imageDir . $defaultImage;
+    // If imagePath doesn't start with the directory, prepend it
+    if (strpos($imagePath, $imageDir) !== 0) {
+        // Extract just the filename if full path is provided
+        $filename = basename($imagePath);
+        $imagePath = $imageDir . $filename;
+    }
+    
+    // Check if file exists, otherwise use placeholder
+    if (file_exists($imagePath)) {
+        return $imagePath;
+    }
+    
+    // Return placeholder as fallback
+    return $placeholder;
 }
 
-$eventsData = [
-    // Premium Events
-    101 => [
-        'name' => 'Gala Evening',
-        'category' => 'Premium',
-        'description' => 'An exquisite night of sophistication featuring a gourmet multi-course dinner, live orchestral performances, and elite networking in our most prestigious ballroom.',
-        'date' => 'February 14, 2025',
-        'time' => '7:00 PM - 11:00 PM',
-        'venue' => 'Grand Luxe Hotel - Crystal Ballroom',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 500,
-        'priceType' => 'per person',
-        'slots' => 80,
-        'totalCapacity' => 150,
-        'imageClass' => ''
-    ],
-    102 => [
-        'name' => 'Wine Tasting Experience',
-        'category' => 'Premium',
-        'description' => 'Embark on a sensory journey through world-class vineyards. Sample rare vintages guided by master sommelier-led insights in an intimate, cellar-inspired atmosphere.',
-        'date' => 'March 20, 2025',
-        'time' => '6:00 PM - 9:00 PM',
-        'venue' => 'Grand Luxe Hotel - Wine Cellar',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 350,
-        'priceType' => 'per person',
-        'slots' => 45,
-        'totalCapacity' => 60,
-        'imageClass' => ''
-    ],
-    103 => [
-        'name' => 'Art Exhibition Opening',
-        'category' => 'Premium',
-        'description' => 'Experience a curated showcase of contemporary masterpieces. This exclusive gallery opening features artist talks and a private viewing of groundbreaking visual narratives.',
-        'date' => 'April 15, 2025',
-        'time' => '5:00 PM - 9:00 PM',
-        'venue' => 'Grand Luxe Hotel - Art Gallery',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 200,
-        'priceType' => 'per person',
-        'slots' => 120,
-        'totalCapacity' => 200,
-        'imageClass' => ''
-    ],
-    // Regular Events
-    1 => [
-        'name' => 'Business Innovation Summit',
-        'category' => 'Conference',
-        'description' => 'Join industry leaders and innovators for a comprehensive exploration of cutting-edge business strategies, emerging technologies, and transformative ideas. This exclusive summit brings together thought leaders, entrepreneurs, and executives for a day of inspiring keynotes, interactive workshops, and networking opportunities.',
-        'date' => 'December 25, 2024',
-        'time' => '9:00 AM - 6:00 PM',
-        'venue' => 'Grand Luxe Hotel - Grand Ballroom',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 4000,
-        'priceType' => 'package',
-        'slots' => 45,
-        'totalCapacity' => 200,
-        'imageClass' => ''
-    ],
-    2 => [
-        'name' => 'Elegant Garden Wedding',
-        'category' => 'Wedding',
-        'description' => 'Experience the perfect blend of elegance and natural beauty in our stunning garden pavilion. This intimate wedding package includes full venue access, professional catering, floral arrangements, and dedicated event coordination. Create unforgettable memories in a setting designed for romance and sophistication.',
-        'date' => 'January 10, 2025',
-        'time' => '4:00 PM - 11:00 PM',
-        'venue' => 'Grand Luxe Hotel - Garden Pavilion',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 5500,
-        'priceType' => 'package',
-        'slots' => 12,
-        'totalCapacity' => 150,
-        'imageClass' => ''
-    ],
-    3 => [
-        'name' => 'Digital Marketing Masterclass',
-        'category' => 'Seminar',
-        'description' => 'Master the art of modern branding and digital growth. Learn data-driven strategies from top industry experts to elevate your brand\'s market presence.',
-        'date' => 'December 30, 2024',
-        'time' => '10:00 AM - 5:00 PM',
-        'venue' => 'Grand Luxe Hotel - Conference Hall A',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 149,
-        'priceType' => 'per person',
-        'slots' => 78,
-        'totalCapacity' => 100,
-        'imageClass' => ''
-    ],
-    4 => [
-        'name' => 'New Year\'s Eve Gala Dinner',
-        'category' => 'Hotel-Hosted Events',
-        'description' => 'Ring in the new year in style with our exclusive gala dinner. Enjoy a multi-course gourmet meal prepared by our award-winning chefs, premium bar service, live entertainment, and a spectacular midnight celebration. This elegant evening promises to be an unforgettable start to the new year.',
-        'date' => 'December 31, 2024',
-        'time' => '7:00 PM - 1:00 AM',
-        'venue' => 'Grand Luxe Hotel - Crystal Ballroom',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 450,
-        'priceType' => 'per person',
-        'slots' => 23,
-        'totalCapacity' => 120,
-        'imageClass' => ''
-    ],
-    5 => [
-        'name' => 'Tech Leaders Forum',
-        'category' => 'Conference',
-        'description' => 'Join industry titans and visionaries at the Innovation Center for high-level discussions on emerging tech trends, AI integration, and the future of digital transformation.',
-        'date' => 'January 25, 2025',
-        'time' => '9:00 AM - 5:00 PM',
-        'venue' => 'Grand Luxe Hotel - Innovation Center',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 299,
-        'priceType' => 'per person',
-        'slots' => 95,
-        'totalCapacity' => 150,
-        'imageClass' => ''
-    ],
-    6 => [
-        'name' => 'Luxury Beach Wedding',
-        'category' => 'Wedding',
-        'description' => 'Exchange vows against the backdrop of a sunset-kissed ocean. An ultra-premium seaside celebration featuring floral elegance and a private reception on the Oceanview Terrace.',
-        'date' => 'February 20, 2025',
-        'time' => '4:00 PM - 11:00 PM',
-        'venue' => 'Grand Luxe Hotel - Oceanview Terrace',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 7500,
-        'priceType' => 'package',
-        'slots' => 8,
-        'totalCapacity' => 100,
-        'imageClass' => ''
-    ],
-    7 => [
-        'name' => 'Corporate Team Building Retreat',
-        'category' => 'Business',
-        'description' => 'Rejuvenate your team\'s spirit at our Mountain Resort. A strategic blend of outdoor adventure and collaborative workshops designed to strengthen leadership and communication.',
-        'date' => 'March 5, 2025',
-        'time' => '8:00 AM - 6:00 PM',
-        'venue' => 'Grand Luxe Hotel - Mountain Resort Wing',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 3500,
-        'priceType' => 'package',
-        'slots' => 25,
-        'totalCapacity' => 80,
-        'imageClass' => ''
-    ],
-    8 => [
-        'name' => 'Spring Wedding Collection',
-        'category' => 'Wedding',
-        'description' => 'Discover the season\'s most breathtaking bridal trends. A grand showcase in the Ballroom featuring runway shows and consultations with premier wedding artisans.',
-        'date' => 'April 10, 2025',
-        'time' => '2:00 PM - 6:00 PM',
-        'venue' => 'Grand Luxe Hotel - Grand Ballroom',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 150,
-        'priceType' => 'per person',
-        'slots' => 180,
-        'totalCapacity' => 250,
-        'imageClass' => ''
-    ],
-    9 => [
-        'name' => 'Professional Development Workshop',
-        'category' => 'Workshop',
-        'description' => 'Enhance your career trajectory with hands-on training in Conference Hall B. This workshop focuses on high-impact soft skills and modern management methodologies.',
-        'date' => 'February 8, 2025',
-        'time' => '9:00 AM - 4:00 PM',
-        'venue' => 'Grand Luxe Hotel - Conference Hall B',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 199,
-        'priceType' => 'per person',
-        'slots' => 65,
-        'totalCapacity' => 90,
-        'imageClass' => ''
-    ],
-    10 => [
-        'name' => 'Exclusive Members Gala',
-        'category' => 'Social',
-        'description' => 'A night of unparalleled luxury reserved for our VIP members. Enjoy private lounge access, bespoke cocktails, and a first-hand look at Evenza\'s upcoming flagship events.',
-        'date' => 'March 15, 2025',
-        'time' => '7:00 PM - 11:00 PM',
-        'venue' => 'Grand Luxe Hotel - VIP Lounge',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 400,
-        'priceType' => 'per person',
-        'slots' => 50,
-        'totalCapacity' => 75,
-        'imageClass' => ''
-    ],
-    11 => [
-        'name' => 'Leadership Summit',
-        'category' => 'Conference',
-        'description' => 'An elite gathering for executive-level strategy. Focus on visionary leadership, organizational resilience, and global market navigation in the Executive Center.',
-        'date' => 'April 5, 2025',
-        'time' => '8:00 AM - 6:00 PM',
-        'venue' => 'Grand Luxe Hotel - Executive Center',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 450,
-        'priceType' => 'per person',
-        'slots' => 70,
-        'totalCapacity' => 120,
-        'imageClass' => ''
-    ],
-    12 => [
-        'name' => 'Advanced Skills Training',
-        'category' => 'Workshop',
-        'description' => 'Deep-dive into technical excellence at our state-of-the-art Training Center. Intensive modules designed for professionals seeking to master complex industry tools.',
-        'date' => 'May 12, 2025',
-        'time' => '9:00 AM - 5:00 PM',
-        'venue' => 'Grand Luxe Hotel - Training Center',
-        'venueAddress' => '123 Luxury Avenue, Suite 100, City, State 12345',
-        'price' => 249,
-        'priceType' => 'per person',
-        'slots' => 55,
-        'totalCapacity' => 80,
-        'imageClass' => ''
-    ]
-];
+// Fetch event data from database using eventId
+$event = null;
+$eventImagePath = 'assets/images/event_images/placeholder.jpg';
 
-$event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
-$eventImagePath = getEventImagePath($eventId, $eventImageMap);
+if ($eventId > 0) {
+    try {
+        $stmt = $pdo->prepare("SELECT * FROM events WHERE eventId = ?");
+        $stmt->execute([$eventId]);
+        $event = $stmt->fetch();
+        
+        if ($event) {
+            // Process image path with fallback
+            $eventImagePath = getEventImagePath($event['imagePath']);
+            
+            // Format event date for display if it exists
+            if (isset($event['eventDate']) && !empty($event['eventDate'])) {
+                $eventDate = new DateTime($event['eventDate']);
+                $event['formattedDate'] = $eventDate->format('F j, Y');
+            } else {
+                $event['formattedDate'] = 'Date TBA';
+            }
+            
+            // Set default venue address if not in database
+            if (empty($event['venueAddress'])) {
+                $event['venueAddress'] = '123 Luxury Avenue, Suite 100, City, State 12345';
+            }
+        }
+    } catch(PDOException $e) {
+        // Log error in production: error_log($e->getMessage());
+        $event = null;
+    }
+}
+
+// If event not found, redirect to events page
+if (!$event) {
+    header('Location: events.php');
+    exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($event['name']); ?> - EVENZA</title>
+    <title><?php echo htmlspecialchars($event['title']); ?> - EVENZA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -319,7 +127,7 @@ $eventImagePath = getEventImagePath($eventId, $eventImageMap);
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.php">Home</a></li>
                     <li class="breadcrumb-item"><a href="events.php">Events</a></li>
-                    <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($event['name']); ?></li>
+                    <li class="breadcrumb-item active" aria-current="page"><?php echo htmlspecialchars($event['title']); ?></li>
                 </ol>
             </div>
 
@@ -328,16 +136,16 @@ $eventImagePath = getEventImagePath($eventId, $eventImageMap);
                 <div class="event-main-content">
                     <div class="event-detail-image mb-4">
                         <img src="<?php echo htmlspecialchars($eventImagePath); ?>" 
-                             alt="<?php echo htmlspecialchars($event['name']); ?>" 
-                             class="event-hero-image rounded">
+                             alt="<?php echo htmlspecialchars($event['title']); ?>" 
+                             class="event-hero-image rounded"
+                             onerror="this.src='assets/images/event_images/placeholder.jpg'">
                     </div>
 
                     <div class="luxury-card p-4 mb-4">
-                        <h1 class="event-detail-name mb-3"><?php echo htmlspecialchars($event['name']); ?></h1>
-                        <!-- category removed -->
+                        <h1 class="event-detail-name mb-3"><?php echo htmlspecialchars($event['title']); ?></h1>
                         
                         <div class="event-detail-description mb-4">
-                            <p><?php echo htmlspecialchars($event['description']); ?></p>
+                            <p><?php echo !empty($event['description']) ? nl2br(htmlspecialchars($event['description'])) : 'No description available for this event.'; ?></p>
                         </div>
 
                         <hr class="my-4">
@@ -354,6 +162,21 @@ $eventImagePath = getEventImagePath($eventId, $eventImageMap);
                                     </div>
                                 </div>
                             </div>
+                            <?php if (isset($event['eventDate']) && !empty($event['eventDate'])): ?>
+                            <div class="col-md-6">
+                                <div class="detail-item">
+                                    <div class="detail-icon">
+                                    </div>
+                                    <div class="detail-content">
+                                        <h6 class="detail-label">Date</h6>
+                                        <p class="detail-value"><?php echo htmlspecialchars($event['formattedDate']); ?></p>
+                                        <?php if (isset($event['eventTime']) && !empty($event['eventTime'])): ?>
+                                            <p class="detail-value text-muted small"><?php echo htmlspecialchars($event['eventTime']); ?></p>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="reservation-section inquiry-section p-4 text-center mt-4">
