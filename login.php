@@ -11,6 +11,12 @@ if (isset($_POST['redirect'])) {
     $redirect = $_POST['redirect'];
 }
 
+// Check for error from loginProcess.php
+if (isset($_SESSION['login_error'])) {
+    $error = $_SESSION['login_error'];
+    unset($_SESSION['login_error']);
+}
+
 if (isset($_SESSION['user_id'])) {
     if (!empty($redirect) && strpos($redirect, 'http') === false && strpos($redirect, '//') === false) {
         header('Location: ' . $redirect);
@@ -28,32 +34,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Email and password are required.';
     } else {
         try {
-            $stmt = $pdo->prepare("SELECT userId, firstName, lastName, fullName, email, phone, password, role FROM users WHERE email = ?");
+            // Query users table by email
+            $stmt = $pdo->prepare("SELECT userId, firstName, lastName, fullName, email, phoneNumber, password, role FROM users WHERE email = ?");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
+            // Use password_verify() to check the password
             if ($user && password_verify($password, $user['password'])) {
+                // Start session with userId, firstName, and role
+                $_SESSION['userId'] = $user['userId'];
+                $_SESSION['firstName'] = $user['firstName'];
+                $_SESSION['role'] = $user['role'];
+                
+                // Also set additional session variables for compatibility
                 $_SESSION['user_id'] = $user['userId'];
                 $_SESSION['user_name'] = $user['fullName'];
                 $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_mobile'] = $user['phone'];
+                $_SESSION['user_mobile'] = $user['phoneNumber'];
                 $_SESSION['user_role'] = $user['role'];
 
-                if ($user['role'] === 'Admin') {
+                // Redirect 'admin' roles to dashboard and 'user' roles to homepage
+                if ($user['role'] === 'admin' || $user['role'] === 'Admin') {
                     header('Location: admin.php');
                 } else {
-                    $target = 'profile.php';
-                    if (!empty($redirect) && strpos($redirect, 'http') === false && strpos($redirect, '//') === false) {
-                        $target = $redirect;
-                    }
-                    header('Location: ' . $target);
+                    header('Location: index.php');
                 }
                 exit;
             } else {
-                $error = 'Invalid email or password.';
+                // Generic error message for security
+                $error = 'Invalid email or password';
             }
         } catch(PDOException $e) {
-            $error = 'Database error. Please try again later.';
+            // Generic error message for security
+            $error = 'Invalid email or password';
         }
     }
 }

@@ -11,13 +11,14 @@ if (isset($_SESSION['user_id'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $fullName = isset($_POST['fullName']) ? trim($_POST['fullName']) : '';
+    $firstName = isset($_POST['firstName']) ? trim($_POST['firstName']) : '';
+    $lastName = isset($_POST['lastName']) ? trim($_POST['lastName']) : '';
     $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $mobile = isset($_POST['mobile']) ? trim($_POST['mobile']) : '';
+    $phoneNumber = isset($_POST['phoneNumber']) ? trim($_POST['phoneNumber']) : '';
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
     $confirmPassword = isset($_POST['confirmPassword']) ? trim($_POST['confirmPassword']) : '';
 
-    if (empty($fullName) || empty($email) || empty($mobile) || empty($password)) {
+    if (empty($firstName) || empty($lastName) || empty($email) || empty($phoneNumber) || empty($password)) {
         $error = 'All fields are required.';
     } elseif ($password !== $confirmPassword) {
         $error = 'Passwords do not match.';
@@ -25,24 +26,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Password must be at least 6 characters long.';
     } else {
         try {
-            $nameParts = explode(' ', $fullName, 2);
-            $firstName = $nameParts[0];
-            $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
-
+            // Check if email already exists
             $stmt = $pdo->prepare("SELECT userId FROM users WHERE email = ?");
             $stmt->execute([$email]);
             if ($stmt->fetch()) {
-                $error = 'Email already registered. Please login or use a different email.';
+                $error = 'Email already registered';
             } else {
-                $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-                $stmt = $pdo->prepare("INSERT INTO users (firstName, lastName, fullName, email, phone, password, role) VALUES (?, ?, ?, ?, ?, ?, 'Client')");
-                if ($stmt->execute([$firstName, $lastName, $fullName, $email, $mobile, $hashedPassword])) {
+                // Calculate fullName from firstName and lastName
+                $fullName = trim($firstName . ' ' . $lastName);
+                
+                // Hash the password
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                
+                // Insert user with default role 'user'
+                $stmt = $pdo->prepare("INSERT INTO users (firstName, lastName, fullName, email, phoneNumber, password, role) VALUES (?, ?, ?, ?, ?, ?, 'user')");
+                if ($stmt->execute([$firstName, $lastName, $fullName, $email, $phoneNumber, $hashedPassword])) {
                     $userId = $pdo->lastInsertId();
                     $_SESSION['user_id'] = $userId;
                     $_SESSION['user_name'] = $fullName;
                     $_SESSION['user_email'] = $email;
-                    $_SESSION['user_mobile'] = $mobile;
-                    $_SESSION['user_role'] = 'Client';
+                    $_SESSION['user_mobile'] = $phoneNumber;
+                    $_SESSION['user_role'] = 'user';
                     
                     header('Location: profile.php');
                     exit;
@@ -125,8 +129,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endif; ?>
                         <form id="registerForm" method="post" action="" novalidate>
                             <div class="form-group mb-4">
-                                <label for="fullName" class="form-label">Full Name</label>
-                                <input id="fullName" name="fullName" type="text" class="form-control luxury-input" required placeholder="Enter your full name">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input id="firstName" name="firstName" type="text" class="form-control luxury-input" required placeholder="Enter your first name">
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input id="lastName" name="lastName" type="text" class="form-control luxury-input" required placeholder="Enter your last name">
                             </div>
 
                             <div class="form-group mb-4">
@@ -135,8 +144,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
 
                             <div class="form-group mb-4">
-                                <label for="mobile" class="form-label">Mobile Number</label>
-                                <input id="mobile" name="mobile" type="tel" class="form-control luxury-input" required placeholder="+1 (555) 123-4567">
+                                <label for="phoneNumber" class="form-label">Phone Number</label>
+                                <input id="phoneNumber" name="phoneNumber" type="tel" class="form-control luxury-input" required placeholder="+1 (555) 123-4567">
                             </div>
 
                             <div class="form-group mb-4">
