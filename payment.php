@@ -2,7 +2,6 @@
 session_start();
 
 $eventId = isset($_POST['eventId']) ? intval($_POST['eventId']) : (isset($_GET['eventId']) ? intval($_GET['eventId']) : 1);
-// Package-based inputs
 $packageName = isset($_POST['packageName']) ? htmlspecialchars($_POST['packageName']) : (isset($_GET['packageName']) ? htmlspecialchars($_GET['packageName']) : '');
 $packagePrice = isset($_POST['packagePrice']) ? floatval($_POST['packagePrice']) : (isset($_GET['packagePrice']) ? floatval($_GET['packagePrice']) : 0.0);
 $fullName = isset($_POST['fullName']) ? htmlspecialchars($_POST['fullName']) : '';
@@ -50,7 +49,6 @@ $eventsData = [
 
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 
-// Use package price as the total amount (flat rate)
 $totalAmount = $packagePrice;
 
 $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
@@ -114,7 +112,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="index.php">Home</a></li>
                             <li class="breadcrumb-item"><a href="events.php">Events</a></li>
-                            <li class="breadcrumb-item"><a href="event-details.php?id=<?php echo $eventId; ?>">Event Details</a></li>
+                            <li class="breadcrumb-item"><a href="eventDetails.php?id=<?php echo $eventId; ?>">Event Details</a></li>
                             <li class="breadcrumb-item"><a href="reservation.php?eventId=<?php echo $eventId; ?>&package=<?php echo urlencode($packageName); ?>">Reservation</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Payment</li>
                         </ol>

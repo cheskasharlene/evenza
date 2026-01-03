@@ -2,29 +2,54 @@
 require_once 'adminAuth.php';
 require_once 'connect.php';
 
-$eventsData = [];
-try {
-    $stmt = $pdo->query("SELECT eventId, title, venue, category, imagePath, status FROM events ORDER BY eventId");
-    $eventsData = $stmt->fetchAll();
+function getEventImagePath($imagePath) {
+    $imageDir = 'assets/images/event_images/';
+    $placeholder = $imageDir . 'placeholder.jpg';
     
-    $eventsDataAssoc = [];
-    foreach ($eventsData as $event) {
-        $imagePath = $event['imagePath'];
-        $imageName = basename($imagePath);
+    if (empty($imagePath)) {
+        return $placeholder;
+    }
+    
+    $imagePath = ltrim($imagePath, '/\\');
+    
+    if (strpos($imagePath, $imageDir) !== 0) {
+        $filename = basename($imagePath);
+        $filename = str_replace(['/', '\\'], '', $filename);
+        $imagePath = $imageDir . $filename;
+    }
+    
+    if (file_exists($imagePath)) {
+        return $imagePath;
+    }
+    
+    return $placeholder;
+}
+
+$eventsData = [];
+$query = "SELECT * FROM events ORDER BY eventId DESC";
+$result = mysqli_query($conn, $query);
+
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $imagePath = isset($row['imagePath']) ? $row['imagePath'] : '';
+        $imageName = !empty($imagePath) ? basename($imagePath) : '';
         
-        $eventsDataAssoc[$event['eventId']] = [
-            'eventId' => $event['eventId'],
-            'name' => $event['title'],
-            'title' => $event['title'],
-            'category' => $event['category'],
-            'status' => $event['status'],
+        $eventId = isset($row['eventId']) ? $row['eventId'] : 0;
+        
+        $eventsData[$eventId] = [
+            'eventId' => $eventId,
+            'id' => $eventId,
+            'name' => isset($row['title']) ? $row['title'] : '',
+            'title' => isset($row['title']) ? $row['title'] : '',
+            'category' => isset($row['category']) ? $row['category'] : '',
+            'status' => 'Active', 
             'image' => $imageName,
             'imagePath' => $imagePath,
-            'venue' => $event['venue']
+            'venue' => isset($row['venue']) ? $row['venue'] : ''
         ];
     }
-    $eventsData = $eventsDataAssoc;
-} catch(PDOException $e) {
+    mysqli_free_result($result);
+} else {
     $eventsData = [];
 }
 
@@ -164,7 +189,6 @@ if (!empty($searchQuery)) {
                         <a href="eventManagement.php" class="nav-link active d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-calendar-alt"></i></span> Event Management</a>
                         <a href="reservationsManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-clipboard-list"></i></span> Reservations</a>
                         <a href="userManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-users"></i></span> User Management</a>
-                        <a href="#" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-cog"></i></span> Settings</a>
                     </div>
                 </div>
             </div>
@@ -231,9 +255,11 @@ if (!empty($searchQuery)) {
                         <table class="table table-hover align-middle">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
                                     <th>Image</th>
-                                    <th>Event Name</th>
+                                    <th>Title</th>
                                     <th>Category</th>
+                                    <th>Venue</th>
                                     <th>Status</th>
                                     <th class="text-end">Actions</th>
                                 </tr>
@@ -241,19 +267,27 @@ if (!empty($searchQuery)) {
                             <tbody>
                                 <?php if (empty($filteredEvents)): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-5">
+                                    <td colspan="7" class="text-center text-muted py-5">
                                         <i class="fas fa-search fa-2x mb-3 d-block"></i>
                                         No events found matching your search.
                                     </td>
                                 </tr>
                                 <?php else: ?>
                                 <?php foreach ($filteredEvents as $id => $event): 
-                                    // Handle image path - use full path if available, otherwise construct from filename
-                                    $imageSrc = isset($event['imagePath']) && !empty($event['imagePath']) 
-                                        ? $event['imagePath'] 
-                                        : 'assets/images/event_images/' . (isset($event['image']) ? $event['image'] : 'businessInnovation.jpg');
+                                    // Handle image path with proper processing
+                                    $imageSrc = getEventImagePath($event['imagePath']);
+                                    
+                                    // Special handling for Wine Tasting - ensure correct image
+                                    if (stripos($event['title'], 'wine') !== false || stripos($event['name'], 'wine') !== false) {
+                                        if (file_exists('assets/images/event_images/wineCellar.jpg')) {
+                                            $imageSrc = 'assets/images/event_images/wineCellar.jpg';
+                                        }
+                                    }
                                 ?>
                                 <tr>
+                                    <td>
+                                        <strong><?php echo htmlspecialchars($event['id'] ?? $event['eventId']); ?></strong>
+                                    </td>
                                     <td>
                                         <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
                                              alt="<?php echo htmlspecialchars($event['name'] ?? $event['title']); ?>" 
@@ -267,15 +301,18 @@ if (!empty($searchQuery)) {
                                         <span class="badge bg-light text-dark"><?php echo htmlspecialchars($event['category']); ?></span>
                                     </td>
                                     <td>
+                                        <div class="text-muted small"><?php echo htmlspecialchars($event['venue']); ?></div>
+                                    </td>
+                                    <td>
                                         <span class="status-badge <?php echo strtolower($event['status']) === 'active' ? 'status-active' : 'status-inactive'; ?>">
                                             <?php echo htmlspecialchars($event['status']); ?>
                                         </span>
                                     </td>
                                     <td class="text-end">
-                                        <button class="action-btn" onclick="editEvent(<?php echo $event['eventId']; ?>)" title="Edit">
+                                        <button class="action-btn" onclick="editEvent(<?php echo $event['eventId'] ?? $event['id']; ?>)" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </button>
-                                        <button class="action-btn text-danger" onclick="deleteEvent(<?php echo $event['eventId']; ?>, '<?php echo htmlspecialchars($event['name'] ?? $event['title'], ENT_QUOTES); ?>')" title="Delete">
+                                        <button class="action-btn text-danger" onclick="deleteEvent(<?php echo $event['eventId'] ?? $event['id']; ?>, '<?php echo htmlspecialchars($event['name'] ?? $event['title'], ENT_QUOTES); ?>')" title="Delete">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                     </td>

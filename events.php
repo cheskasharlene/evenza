@@ -2,88 +2,110 @@
 session_start();
 require_once 'connect.php';
 
-// Helper function to validate and fix image paths with fallback to placeholder
 function getEventImagePath($imagePath) {
     $imageDir = 'assets/images/event_images/';
     $placeholder = $imageDir . 'placeholder.jpg';
     
-    // If imagePath is empty or null, use placeholder
     if (empty($imagePath)) {
         return $placeholder;
     }
     
-    // If imagePath doesn't start with the directory, prepend it
+    $imagePath = ltrim($imagePath, '/\\');
+    
     if (strpos($imagePath, $imageDir) !== 0) {
-        // Extract just the filename if full path is provided
         $filename = basename($imagePath);
+        $filename = str_replace(['/', '\\'], '', $filename);
         $imagePath = $imageDir . $filename;
     }
     
-    // Check if file exists, otherwise use placeholder
     if (file_exists($imagePath)) {
         return $imagePath;
     }
     
-    // Return placeholder as fallback
     return $placeholder;
 }
 
-// Fetch all active events from database
 $events = [];
 $errorMessage = '';
 
-try {
-    // First, check if status column exists by trying to select it
-    // If it fails, we'll select without it
-    try {
-        $stmt = $pdo->query("SELECT eventId, title, venue, category, imagePath, status, description FROM events ORDER BY eventId");
-        $allEvents = $stmt->fetchAll();
+$query = "SELECT eventId, title, venue, category, imagePath, description FROM events ORDER BY eventId DESC";
+$result = mysqli_query($conn, $query);
+
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $eventId = isset($row['eventId']) ? $row['eventId'] : 0;
         
-        // Filter events by status (case-insensitive) - show active events, or all if none are marked active
-        $activeEvents = array_filter($allEvents, function($event) {
-            $status = isset($event['status']) ? strtolower(trim($event['status'])) : '';
-            return $status === 'active' || empty($status);
-        });
+        $event = [
+            'eventId' => $eventId,
+            'id' => $eventId,
+            'title' => isset($row['title']) ? $row['title'] : '',
+            'venue' => isset($row['venue']) ? $row['venue'] : '',
+            'category' => isset($row['category']) ? $row['category'] : '',
+            'imagePath' => isset($row['imagePath']) ? $row['imagePath'] : '',
+            'status' => 'Active',
+            'description' => isset($row['description']) ? $row['description'] : ''
+        ];
         
-        // If we have active events, use them; otherwise show all events
-        if (!empty($activeEvents)) {
-            $events = array_values($activeEvents);
-        } else {
-            $events = $allEvents;
+        $originalImagePath = $event['imagePath'];
+        $event['imagePath'] = getEventImagePath($event['imagePath']);
+        
+        if (stripos($event['title'], 'wine') !== false && !file_exists($event['imagePath']) && $event['imagePath'] === 'assets/images/event_images/placeholder.jpg') {
+            // Try wineCellar.jpg if the original path doesn't work
+            if (file_exists('assets/images/event_images/wineCellar.jpg')) {
+                $event['imagePath'] = 'assets/images/event_images/wineCellar.jpg';
+            }
         }
-    } catch(PDOException $e) {
-        // If status column doesn't exist, select without it
-        $stmt = $pdo->query("SELECT eventId, title, venue, category, imagePath, description FROM events ORDER BY eventId");
-        $events = $stmt->fetchAll();
+        
+        $events[] = $event;
     }
-    
-    // Process image paths for each event
-    foreach ($events as &$event) {
-        $event['imagePath'] = getEventImagePath($event['imagePath'] ?? '');
-        // Ensure status is set for filtering (default to 'active' if column doesn't exist)
-        if (!isset($event['status']) || empty($event['status'])) {
-            $event['status'] = 'active';
-        }
-    }
-    unset($event); // Break reference
-} catch(PDOException $e) {
+    mysqli_free_result($result);
+} else {
     $events = [];
-    $errorMessage = $e->getMessage();
-    // Log error in production: error_log($e->getMessage());
+    $errorMessage = mysqli_error($conn);
 }
 
 function getCategoryFilter($category) {
+    $category = trim($category);
+    $categoryLower = strtolower($category);
+    
     $categoryMap = [
-        'Premium' => 'premium',
-        'Conference' => 'business',
-        'Business' => 'business',
-        'Wedding' => 'weddings',
-        'Seminar' => 'workshops',
-        'Workshop' => 'workshops',
-        'Social' => 'socials',
-        'Hotel-Hosted Events' => 'socials'
+        'premium' => 'premium',
+        'conference' => 'business',
+        'business' => 'business',
+        'wedding' => 'weddings',
+        'weddings' => 'weddings',
+        'seminar' => 'workshops',
+        'workshop' => 'workshops',
+        'workshops' => 'workshops',
+        'social' => 'socials',
+        'socials' => 'socials',
+        'hotel-hosted events' => 'socials',
+        'hotel-hosted' => 'socials'
     ];
-    return isset($categoryMap[$category]) ? $categoryMap[$category] : 'all';
+    
+    if (isset($categoryMap[$categoryLower])) {
+        return $categoryMap[$categoryLower];
+    }
+    
+    if (stripos($category, 'wedding') !== false) {
+        return 'weddings';
+    }
+    if (stripos($category, 'workshop') !== false || stripos($category, 'seminar') !== false || 
+        stripos($category, 'training') !== false || stripos($category, 'masterclass') !== false) {
+        return 'workshops';
+    }
+    if (stripos($category, 'social') !== false || stripos($category, 'gala') !== false) {
+        return 'socials';
+    }
+    if (stripos($category, 'premium') !== false || stripos($category, 'exhibition') !== false || 
+        stripos($category, 'tasting') !== false) {
+        return 'premium';
+    }
+    if (stripos($category, 'business') !== false || stripos($category, 'conference') !== false) {
+        return 'business';
+    }
+    
+    return 'all';
 }
 ?>
 <!DOCTYPE html>
@@ -185,9 +207,18 @@ function getCategoryFilter($category) {
                         </div>
                     </div>
                 <?php else: ?>
+                    <?php 
+                    // Debug output in HTML comments (view page source to see)
+                    echo "<!-- DEBUG: Total events fetched: " . count($events) . " -->\n";
+                    foreach ($events as $debugEvent) {
+                        echo "<!-- Event: " . htmlspecialchars($debugEvent['title']) . " | Category: " . htmlspecialchars($debugEvent['category'] ?? 'N/A') . " | Status: " . (isset($debugEvent['status']) ? htmlspecialchars($debugEvent['status']) : 'N/A') . " | Filter Category: " . getCategoryFilter($debugEvent['category'] ?? '') . " -->\n";
+                    }
+                    ?>
                     <?php foreach ($events as $event): 
                         $categoryFilter = getCategoryFilter($event['category']);
-                        $isPremium = ($event['category'] === 'Premium');
+                        // Check if event is premium (case-insensitive)
+                        $isPremium = (strtolower(trim($event['category'])) === 'premium') || 
+                                     (stripos($event['category'], 'premium') !== false);
                     ?>
                         <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" 
                              data-category="<?php echo htmlspecialchars($categoryFilter); ?>" 
@@ -205,7 +236,7 @@ function getCategoryFilter($category) {
                                 <div class="card-body">
                                     <h3 class="card-title event-title"><?php echo htmlspecialchars($event['title']); ?></h3>
                                     <p class="card-text event-venue-text"><?php echo htmlspecialchars($event['venue']); ?></p>
-                                    <a href="eventDetails.php?id=<?php echo $event['eventId']; ?>" class="btn btn-event-view w-100">View Details</a>
+                                    <a href="eventDetails.php?id=<?php echo $event['id'] ?? $event['eventId']; ?>" class="btn btn-event-view w-100">View Details</a>
                                 </div>
                             </div>
                         </div>
@@ -259,14 +290,14 @@ function getCategoryFilter($category) {
             const eventCards = document.querySelectorAll('.event-card-wrapper');
 
             function filterEvents() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const selectedCategory = categoryFilter.value;
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+                const selectedCategory = categoryFilter ? categoryFilter.value : 'all';
 
                 eventCards.forEach(card => {
                     const cardCategory = card.getAttribute('data-category');
-                    const cardName = card.getAttribute('data-name').toLowerCase();
+                    const cardName = card.getAttribute('data-name') ? card.getAttribute('data-name').toLowerCase() : '';
 
-                    const matchesSearch = cardName.includes(searchTerm);
+                    const matchesSearch = !searchTerm || cardName.includes(searchTerm);
                     const matchesCategory = selectedCategory === 'all' || cardCategory === selectedCategory;
 
                     if (matchesSearch && matchesCategory) {
@@ -277,9 +308,20 @@ function getCategoryFilter($category) {
                 });
             }
 
+            // Initialize: show all events on page load
+            if (eventCards.length > 0) {
+                eventCards.forEach(card => {
+                    card.style.display = '';
+                });
+            }
+
             // Event listeners for real-time filtering
-            searchInput.addEventListener('input', filterEvents);
-            categoryFilter.addEventListener('change', filterEvents);
+            if (searchInput) {
+                searchInput.addEventListener('input', filterEvents);
+            }
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', filterEvents);
+            }
         });
     </script>
 </body>

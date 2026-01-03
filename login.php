@@ -11,7 +11,6 @@ if (isset($_POST['redirect'])) {
     $redirect = $_POST['redirect'];
 }
 
-// Check for error from loginProcess.php
 if (isset($_SESSION['login_error'])) {
     $error = $_SESSION['login_error'];
     unset($_SESSION['login_error']);
@@ -33,40 +32,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required.';
     } else {
-        try {
-            // Query users table by email
-            $stmt = $pdo->prepare("SELECT userId, firstName, lastName, fullName, email, phoneNumber, password, role FROM users WHERE email = ?");
-            $stmt->execute([$email]);
-            $user = $stmt->fetch();
+        // Use MySQLi prepared statement - make email comparison case-insensitive
+        $query = "SELECT userId, firstName, lastName, fullName, email, phoneNumber, password, role FROM users WHERE LOWER(email) = LOWER(?)";
+        $stmt = mysqli_prepare($conn, $query);
+        
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "s", $email);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            $user = mysqli_fetch_assoc($result);
+            mysqli_stmt_close($stmt);
 
-            // Use password_verify() to check the password
-            if ($user && password_verify($password, $user['password'])) {
-                // Start session with userId, firstName, and role
-                $_SESSION['userId'] = $user['userId'];
-                $_SESSION['firstName'] = $user['firstName'];
-                $_SESSION['role'] = $user['role'];
-                
-                // Also set additional session variables for compatibility
-                $_SESSION['user_id'] = $user['userId'];
-                $_SESSION['user_name'] = $user['fullName'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_mobile'] = $user['phoneNumber'];
-                $_SESSION['user_role'] = $user['role'];
+            // Debug: Check if user was found and password verification
+            if ($user) {
+                // User found, verify password
+                if (password_verify($password, $user['password'])) {
+                    $_SESSION['userId'] = $user['userId'];
+                    $_SESSION['firstName'] = $user['firstName'];
+                    $_SESSION['role'] = $user['role'];
+                    
+                    $_SESSION['user_id'] = $user['userId'];
+                    $_SESSION['user_name'] = $user['fullName'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['user_mobile'] = $user['phoneNumber'];
+                    $_SESSION['user_role'] = $user['role'];
 
-                // Redirect 'admin' roles to dashboard and 'user' roles to homepage
-                if ($user['role'] === 'admin' || $user['role'] === 'Admin') {
-                    header('Location: admin.php');
+                    if ($user['role'] === 'admin' || $user['role'] === 'Admin') {
+                        header('Location: admin.php');
+                    } else {
+                        if (!empty($redirect) && strpos($redirect, 'http') === false && strpos($redirect, '//') === false) {
+                            header('Location: ' . $redirect);
+                        } else {
+                            header('Location: index.php');
+                        }
+                    }
+                    exit;
                 } else {
-                    header('Location: index.php');
+                    // Password verification failed
+                    $error = 'Invalid email or password';
                 }
-                exit;
             } else {
-                // Generic error message for security
+                // User not found
                 $error = 'Invalid email or password';
             }
-        } catch(PDOException $e) {
-            // Generic error message for security
-            $error = 'Invalid email or password';
+        } else {
+            // Query preparation failed - log the error for debugging
+            $error = 'Database connection error. Please try again.';
+            // Uncomment the line below for debugging (remove in production)
+            // $error = 'Database error: ' . mysqli_error($conn);
         }
     }
 }

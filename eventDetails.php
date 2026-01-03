@@ -1,51 +1,56 @@
 <?php
 session_start();
-require_once 'connect.php';
-
-// Get event ID from URL parameter
+require_once 'connect.php'; 
 $eventId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Helper function to validate and fix image paths with fallback to placeholder
 function getEventImagePath($imagePath) {
     $imageDir = 'assets/images/event_images/';
     $placeholder = $imageDir . 'placeholder.jpg';
     
-    // If imagePath is empty or null, use placeholder
     if (empty($imagePath)) {
         return $placeholder;
     }
     
-    // If imagePath doesn't start with the directory, prepend it
+    $imagePath = ltrim($imagePath, '/\\');
+    
     if (strpos($imagePath, $imageDir) !== 0) {
-        // Extract just the filename if full path is provided
+        
         $filename = basename($imagePath);
+        
+        $filename = str_replace(['/', '\\'], '', $filename);
         $imagePath = $imageDir . $filename;
     }
     
-    // Check if file exists, otherwise use placeholder
     if (file_exists($imagePath)) {
         return $imagePath;
     }
     
-    // Return placeholder as fallback
     return $placeholder;
 }
 
-// Fetch event data from database using eventId
 $event = null;
 $eventImagePath = 'assets/images/event_images/placeholder.jpg';
 
 if ($eventId > 0) {
-    try {
-        $stmt = $pdo->prepare("SELECT * FROM events WHERE eventId = ?");
-        $stmt->execute([$eventId]);
-        $event = $stmt->fetch();
+    $query = "SELECT * FROM events WHERE eventId = ?";
+    $stmt = mysqli_prepare($conn, $query);
+    
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "i", $eventId);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        $event = mysqli_fetch_assoc($result);
+        mysqli_stmt_close($stmt);
         
         if ($event) {
-            // Process image path with fallback
             $eventImagePath = getEventImagePath($event['imagePath']);
             
-            // Format event date for display if it exists
+            if (stripos($event['title'], 'wine') !== false || stripos($event['title'], 'tasting') !== false) {
+                if (file_exists('assets/images/event_images/wineCellar.jpg')) {
+                    $eventImagePath = 'assets/images/event_images/wineCellar.jpg';
+                }
+            }
+            
             if (isset($event['eventDate']) && !empty($event['eventDate'])) {
                 $eventDate = new DateTime($event['eventDate']);
                 $event['formattedDate'] = $eventDate->format('F j, Y');
@@ -53,18 +58,15 @@ if ($eventId > 0) {
                 $event['formattedDate'] = 'Date TBA';
             }
             
-            // Set default venue address if not in database
             if (empty($event['venueAddress'])) {
                 $event['venueAddress'] = '123 Luxury Avenue, Suite 100, City, State 12345';
             }
         }
-    } catch(PDOException $e) {
-        // Log error in production: error_log($e->getMessage());
+    } else {
         $event = null;
     }
 }
 
-// If event not found, redirect to events page
 if (!$event) {
     header('Location: events.php');
     exit;
