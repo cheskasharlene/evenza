@@ -1,7 +1,6 @@
 (function() {
     'use strict';
 
-    // Ollama AI Chatbot Integration
     const ollamaConfig = {
         baseUrl: 'http://localhost:11434',
         model: 'qwen3:0.6b',
@@ -11,7 +10,6 @@
     let eventContext = {};
     let conversationHistory = [];
 
-    // Initialize event context from PHP
     function initializeEventContext() {
         const eventDataElement = document.getElementById('eventData');
         if (eventDataElement) {
@@ -23,7 +21,6 @@
         }
     }
 
-    // Build context prompt with event information
     function buildContextPrompt() {
         let context = 'You are a helpful and friendly AI assistant for an event reservation platform called EVENZA. ';
         context += 'Your role is to answer questions about events and help users with their inquiries.\n\n';
@@ -57,7 +54,6 @@
             context += 'All packages are flat rates for the entire event.\n';
         }
         
-        // Add FAQ information
         if (eventContext.faqs && eventContext.faqs.length > 0) {
             context += '\n=== FREQUENTLY ASKED QUESTIONS ===\n';
             eventContext.faqs.forEach((faq, index) => {
@@ -89,7 +85,6 @@
         return context;
     }
 
-    // Add user message to chat
     function addUserMessage(message) {
         const chatBox = document.querySelector('.ai-chat-box');
         if (!chatBox) return;
@@ -101,7 +96,6 @@
         chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    // Add AI message to chat
     function addAiMessage(message, isLoading = false) {
         const chatBox = document.querySelector('.ai-chat-box');
         if (!chatBox) return;
@@ -119,7 +113,6 @@
         return aiMessage;
     }
 
-    // Remove loading indicator
     function removeLoadingIndicator() {
         const loadingIndicator = document.getElementById('aiLoadingIndicator');
         if (loadingIndicator) {
@@ -127,18 +120,15 @@
         }
     }
 
-    // Escape HTML to prevent XSS
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
 
-    // Enhance user question with context detection
     function enhanceUserQuestion(question) {
         const lowerQuestion = question.toLowerCase().trim();
         
-        // Detect question type for better context
         let questionContext = '';
         
         if (lowerQuestion.match(/^(hi|hello|hey|greetings|how are you|good morning|good afternoon|good evening|what's up|sup)/)) {
@@ -160,7 +150,6 @@
         return questionContext + question;
     }
 
-    // Call Ollama API
     async function callOllamaApi(userQuestion) {
         const enhancedQuestion = enhanceUserQuestion(userQuestion);
         const fullPrompt = buildContextPrompt() + 'User Question: ' + enhancedQuestion + '\n\nAI Response:';
@@ -190,7 +179,6 @@
         }
     }
 
-    // Main function to handle AI question
     window.askAI = async function() {
         const questionInput = document.getElementById('aiQuestion');
         const sendButton = document.getElementById('aiSendButton');
@@ -200,50 +188,38 @@
         const question = questionInput.value.trim();
         if (!question) return;
 
-        // Disable input and button
         questionInput.disabled = true;
         if (sendButton) sendButton.disabled = true;
 
-        // Add user message
         addUserMessage(question);
         
-        // Clear input
         questionInput.value = '';
 
-        // Show loading indicator
         const loadingMessage = addAiMessage('', true);
 
         try {
-            // Call Ollama API
             const aiResponse = await callOllamaApi(question);
             
-            // Remove loading indicator
             removeLoadingIndicator();
             
-            // Add AI response
             addAiMessage(aiResponse);
             
-            // Update conversation history
             conversationHistory.push({
                 user: question,
                 ai: aiResponse
             });
         } catch (error) {
-            // Remove loading indicator
             removeLoadingIndicator();
             
-            // Show error message
             addAiMessage('Sorry, I encountered an error connecting to the AI service. Please make sure Ollama is running on localhost:11434 and try again later.');
             console.error('Error calling Ollama:', error);
         } finally {
-            // Re-enable input and button
             questionInput.disabled = false;
             if (sendButton) sendButton.disabled = false;
             questionInput.focus();
         }
     };
 
-    // Initialize on DOM load
     document.addEventListener('DOMContentLoaded', function() {
         initializeEventContext();
         
@@ -251,7 +227,6 @@
         const sendButton = document.getElementById('aiSendButton');
         
         if (aiQuestionInput) {
-            // Handle Enter key
             aiQuestionInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();

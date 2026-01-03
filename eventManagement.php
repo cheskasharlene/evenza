@@ -343,7 +343,7 @@ if (!empty($searchQuery)) {
 
     <!-- Add Event Modal -->
     <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" style="font-family: 'Playfair Display', serif;" id="addEventModalLabel">Add New Event</h5>
@@ -352,11 +352,11 @@ if (!empty($searchQuery)) {
                 <div class="modal-body">
                     <form id="addEventForm">
                         <div class="mb-3">
-                            <label for="eventName" class="form-label">Event Name</label>
+                            <label for="eventName" class="form-label">Event Title <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="eventName" required>
                         </div>
                         <div class="mb-3">
-                            <label for="eventCategory" class="form-label">Category</label>
+                            <label for="eventCategory" class="form-label">Category <span class="text-danger">*</span></label>
                             <select class="form-select" id="eventCategory" required>
                                 <option value="">Select Category</option>
                                 <option value="Conference">Conference</option>
@@ -364,16 +364,9 @@ if (!empty($searchQuery)) {
                                 <option value="Seminar">Seminar</option>
                                 <option value="Workshop">Workshop</option>
                                 <option value="Business">Business</option>
-                                <option value="Social">Social</option>
+                                <option value="Socials">Socials</option>
                                 <option value="Hotel-Hosted Events">Hotel-Hosted Events</option>
                                 <option value="Premium">Premium</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="eventStatus" class="form-label">Status</label>
-                            <select class="form-select" id="eventStatus" required>
-                                <option value="Active">Active</option>
-                                <option value="Inactive">Inactive</option>
                             </select>
                         </div>
                     </form>
@@ -381,6 +374,57 @@ if (!empty($searchQuery)) {
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-admin-primary" onclick="saveNewEvent()">Save Event</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Event Modal -->
+    <div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" style="font-family: 'Playfair Display', serif;" id="editEventModalLabel">Edit Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editEventForm">
+                        <input type="hidden" id="editEventId" name="eventId">
+                        <div class="mb-3">
+                            <label for="editEventTitle" class="form-label">Event Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editEventTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEventCategory" class="form-label">Category <span class="text-danger">*</span></label>
+                            <select class="form-select" id="editEventCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="Conference">Conference</option>
+                                <option value="Wedding">Wedding</option>
+                                <option value="Seminar">Seminar</option>
+                                <option value="Workshop">Workshop</option>
+                                <option value="Business">Business</option>
+                                <option value="Socials">Socials</option>
+                                <option value="Hotel-Hosted Events">Hotel-Hosted Events</option>
+                                <option value="Premium">Premium</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEventVenue" class="form-label">Venue</label>
+                            <input type="text" class="form-control" id="editEventVenue">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEventDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="editEventDescription" rows="4"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editEventImagePath" class="form-label">Image Path</label>
+                            <input type="text" class="form-control" id="editEventImagePath" placeholder="assets/images/event_images/filename.jpg">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-admin-primary" onclick="saveEditedEvent()">Update Event</button>
                 </div>
             </div>
         </div>
@@ -425,45 +469,188 @@ if (!empty($searchQuery)) {
             bsToast.show();
         }
 
+        let isEditEventMode = false;
+        let currentEventId = null;
+
         // Edit event function
         function editEvent(eventId) {
-            showFeedback('Edit functionality will open the event editor for Event ID: ' + eventId, 'info');
-            // In a real implementation, this would open an edit modal or navigate to an edit page
+            isEditEventMode = true;
+            currentEventId = eventId;
+            
+            fetch('api/getEvent.php?eventId=' + eventId)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok: ' + response.status);
+                    }
+                    // Check if response is actually JSON
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        return response.text().then(text => {
+                            throw new Error('Invalid response format. Expected JSON but got: ' + text.substring(0, 100));
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const event = data.data;
+                        document.getElementById('editEventModalLabel').textContent = 'Edit Event';
+                        document.getElementById('editEventId').value = event.eventId || eventId;
+                        document.getElementById('editEventTitle').value = event.title || '';
+                        document.getElementById('editEventCategory').value = event.category || '';
+                        document.getElementById('editEventVenue').value = event.venue || '';
+                        document.getElementById('editEventDescription').value = event.description || '';
+                        document.getElementById('editEventImagePath').value = event.imagePath || '';
+                        
+                        const modal = new bootstrap.Modal(document.getElementById('editEventModal'));
+                        modal.show();
+                    } else {
+                        showFeedback(data.message || 'Failed to load event data.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching event:', error);
+                    showFeedback('An error occurred while loading event data: ' + error.message, 'error');
+                });
         }
 
         // Delete event function
         function deleteEvent(eventId, eventName) {
             if (confirm('Are you sure you want to delete "' + eventName + '"? This action cannot be undone.')) {
-                // In a real implementation, this would make an AJAX call to delete the event
-                showFeedback('Event "' + eventName + '" has been deleted successfully.', 'success');
-                // Reload page after a short delay to show the feedback
-                setTimeout(function() {
-                    location.reload();
-                }, 1500);
+                const formData = new FormData();
+                formData.append('eventId', eventId);
+                
+                fetch('api/deleteEvent.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showFeedback('Event "' + eventName + '" has been deleted successfully.', 'success');
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        showFeedback(data.message || 'An error occurred while deleting the event.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showFeedback('An error occurred while deleting the event. Please check the console for details.', 'error');
+                });
             }
         }
 
         // Save new event
         function saveNewEvent() {
-            const eventName = document.getElementById('eventName').value;
-            const eventCategory = document.getElementById('eventCategory').value;
-            const eventStatus = document.getElementById('eventStatus').value;
+            const title = document.getElementById('eventName').value.trim();
+            const category = document.getElementById('eventCategory').value;
             
-            if (!eventName || !eventCategory) {
+            if (!title || !category) {
                 showFeedback('Please fill in all required fields.', 'error');
                 return;
             }
             
-            // In a real implementation, this would make an AJAX call to save the event
-            showFeedback('Event "' + eventName + '" has been added successfully.', 'success');
+            const formData = new FormData();
+            formData.append('eventId', '0');
+            formData.append('title', title);
+            formData.append('category', category);
+            formData.append('venue', '');
+            formData.append('venueAddress', '');
+            formData.append('description', '');
+            formData.append('eventDate', '');
+            formData.append('eventTime', '');
+            formData.append('imagePath', '');
             
-            // Close modal and reload after a short delay
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addEventModal'));
-            modal.hide();
+            fetch('api/updateEvent.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showFeedback('Event "' + title + '" has been added successfully.', 'success');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addEventModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showFeedback(data.message || 'An error occurred while saving the event.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFeedback('An error occurred while saving the event. Please check the console for details.', 'error');
+            });
+        }
+
+        // Save edited event
+        function saveEditedEvent() {
+            const eventId = document.getElementById('editEventId').value;
+            const title = document.getElementById('editEventTitle').value.trim();
+            const category = document.getElementById('editEventCategory').value;
+            const venue = document.getElementById('editEventVenue').value.trim();
+            const description = document.getElementById('editEventDescription').value.trim();
+            const imagePath = document.getElementById('editEventImagePath').value.trim();
             
-            setTimeout(function() {
-                location.reload();
-            }, 1500);
+            if (!title || !category) {
+                showFeedback('Please fill in all required fields.', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('eventId', eventId);
+            formData.append('title', title);
+            formData.append('category', category);
+            formData.append('venue', venue);
+            formData.append('venueAddress', ''); // Preserve existing venue address by sending empty
+            formData.append('description', description);
+            formData.append('eventDate', ''); // Preserve existing date by sending empty
+            formData.append('eventTime', ''); // Preserve existing time by sending empty
+            formData.append('imagePath', imagePath);
+            
+            fetch('api/updateEvent.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    showFeedback('Event "' + title + '" has been updated successfully.', 'success');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editEventModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showFeedback(data.message || 'An error occurred while updating the event.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFeedback('An error occurred while updating the event. Please check the console for details.', 'error');
+            });
         }
 
         // Show feedback on page load if there's a message in URL

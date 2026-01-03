@@ -1,16 +1,13 @@
 <?php
-// Admin Authentication Guard - Must be at the very top
 require_once 'adminAuth.php';
 require_once 'connect.php';
 
-// Fetch users from database using SQL query
 $users = [];
 $query = "SELECT userid, firstName, lastName, fullName, email, phone, role FROM users ORDER BY userid ASC";
 $result = mysqli_query($conn, $query);
 
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
-        // Map database columns to display format
         $users[] = [
             'id' => $row['userid'],
             'firstName' => $row['firstName'],
@@ -23,7 +20,6 @@ if ($result) {
     }
     mysqli_free_result($result);
 } else {
-    // Handle query error
     $error = mysqli_error($conn);
     error_log("User Management Query Error: " . $error);
 }
@@ -389,18 +385,58 @@ if ($result) {
         function editUser(userId, fullName, email, mobile, role) {
             isEditMode = true;
             currentUserId = userId;
-            document.getElementById('userModalLabel').textContent = 'Edit User';
-            document.getElementById('userId').value = userId;
-            document.getElementById('userFullName').value = fullName;
-            document.getElementById('userEmail').value = email;
-            document.getElementById('userMobile').value = mobile;
-            document.getElementById('isAdmin').checked = (role === 'Admin');
-            document.getElementById('passwordField').style.display = 'block';
-            document.getElementById('userPassword').required = false;
-            document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
             
-            const modal = new bootstrap.Modal(document.getElementById('userModal'));
-            modal.show();
+            // Fetch latest user data from database
+            fetch('api/getUser.php?userId=' + userId)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const user = data.data;
+                        document.getElementById('userModalLabel').textContent = 'Edit User';
+                        document.getElementById('userId').value = user.userid;
+                        document.getElementById('userFullName').value = user.fullName || '';
+                        document.getElementById('userEmail').value = user.email || '';
+                        document.getElementById('userMobile').value = user.phone || '';
+                        document.getElementById('isAdmin').checked = (user.role.toLowerCase() === 'admin');
+                        document.getElementById('passwordField').style.display = 'block';
+                        document.getElementById('userPassword').required = false;
+                        document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
+                        document.getElementById('userPassword').value = '';
+                        
+                        const modal = new bootstrap.Modal(document.getElementById('userModal'));
+                        modal.show();
+                    } else {
+                        // Fallback to passed parameters if fetch fails
+                        document.getElementById('userModalLabel').textContent = 'Edit User';
+                        document.getElementById('userId').value = userId;
+                        document.getElementById('userFullName').value = fullName;
+                        document.getElementById('userEmail').value = email;
+                        document.getElementById('userMobile').value = mobile;
+                        document.getElementById('isAdmin').checked = (role === 'Admin' || role === 'admin');
+                        document.getElementById('passwordField').style.display = 'block';
+                        document.getElementById('userPassword').required = false;
+                        document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
+                        
+                        const modal = new bootstrap.Modal(document.getElementById('userModal'));
+                        modal.show();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Fallback to passed parameters
+                    document.getElementById('userModalLabel').textContent = 'Edit User';
+                    document.getElementById('userId').value = userId;
+                    document.getElementById('userFullName').value = fullName;
+                    document.getElementById('userEmail').value = email;
+                    document.getElementById('userMobile').value = mobile;
+                    document.getElementById('isAdmin').checked = (role === 'Admin' || role === 'admin');
+                    document.getElementById('passwordField').style.display = 'block';
+                    document.getElementById('userPassword').required = false;
+                    document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
+                    
+                    const modal = new bootstrap.Modal(document.getElementById('userModal'));
+                    modal.show();
+                });
         }
 
         // Save user function
@@ -410,6 +446,7 @@ if ($result) {
             const mobile = document.getElementById('userMobile').value.trim();
             const password = document.getElementById('userPassword').value;
             const isAdmin = document.getElementById('isAdmin').checked;
+            const userId = document.getElementById('userId').value;
             
             if (!fullName || !email) {
                 showFeedback('Please fill in all required fields.', 'error');
@@ -421,28 +458,78 @@ if ($result) {
                 return;
             }
             
-            // In a real implementation, this would make an AJAX call to save the user
-            const action = isEditMode ? 'updated' : 'added';
-            showFeedback('User "' + fullName + '" has been ' + action + ' successfully.', 'success');
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('fullName', fullName);
+            formData.append('email', email);
+            formData.append('mobile', mobile);
+            formData.append('password', password);
+            formData.append('isAdmin', isAdmin ? 'true' : 'false');
             
-            // Close modal and reload after a short delay
-            const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
-            modal.hide();
-            
-            setTimeout(function() {
-                location.reload();
-            }, 1500);
+            fetch('api/updateUser.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const action = isEditMode ? 'updated' : 'added';
+                    showFeedback('User "' + fullName + '" has been ' + action + ' successfully.', 'success');
+                    
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
+                    // Reload immediately to show updated data
+                    setTimeout(function() {
+                        window.location.reload();
+                    }, 1000);
+                } else {
+                    showFeedback(data.message || 'An error occurred while saving the user.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFeedback('An error occurred while saving the user. Please check the console for details.', 'error');
+            });
         }
 
         // Delete user function
         function deleteUser(userId, userName) {
             if (confirm('Are you sure you want to delete user "' + userName + '"? This action cannot be undone.')) {
-                // In a real implementation, this would make an AJAX call to delete the user
-                showFeedback('User "' + userName + '" has been deleted successfully.', 'success');
-                // Reload page after a short delay to show the feedback
-                setTimeout(function() {
-                    location.reload();
-                }, 1500);
+                const formData = new FormData();
+                formData.append('userId', userId);
+                
+                fetch('api/deleteUser.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        showFeedback('User "' + userName + '" has been deleted successfully.', 'success');
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 1000);
+                    } else {
+                        showFeedback(data.message || 'An error occurred while deleting the user.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showFeedback('An error occurred while deleting the user. Please check the console for details.', 'error');
+                });
             }
         }
 
