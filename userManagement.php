@@ -1,32 +1,32 @@
 <?php
 // Admin Authentication Guard - Must be at the very top
 require_once 'adminAuth.php';
+require_once 'connect.php';
 
-// Load users data
-$usersFile = __DIR__ . '/data/users.json';
+// Fetch users from database using SQL query
 $users = [];
-if (file_exists($usersFile)) {
-    $users = json_decode(file_get_contents($usersFile), true) ?? [];
-}
+$query = "SELECT userid, firstName, lastName, fullName, email, phone, role FROM users ORDER BY userid ASC";
+$result = mysqli_query($conn, $query);
 
-// Load admins data to check admin status
-$adminsFile = __DIR__ . '/data/admins.json';
-$admins = [];
-if (file_exists($adminsFile)) {
-    $admins = json_decode(file_get_contents($adminsFile), true) ?? [];
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        // Map database columns to display format
+        $users[] = [
+            'id' => $row['userid'],
+            'firstName' => $row['firstName'],
+            'lastName' => $row['lastName'],
+            'fullName' => $row['fullName'],
+            'email' => $row['email'],
+            'mobile' => $row['phone'] ?? 'N/A',
+            'role' => ucfirst(strtolower($row['role'])) // Normalize role to Admin/User
+        ];
+    }
+    mysqli_free_result($result);
+} else {
+    // Handle query error
+    $error = mysqli_error($conn);
+    error_log("User Management Query Error: " . $error);
 }
-
-// Create a map of admin emails for quick lookup
-$adminEmails = [];
-foreach ($admins as $admin) {
-    $adminEmails[$admin['email']] = true;
-}
-
-// Add role information to users
-foreach ($users as &$user) {
-    $user['role'] = isset($adminEmails[$user['email']]) ? 'Admin' : 'Client';
-}
-unset($user);
 ?>
 <!doctype html>
 <html lang="en">
@@ -163,7 +163,6 @@ unset($user);
                         <a href="eventManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-calendar-alt"></i></span> Event Management</a>
                         <a href="reservationsManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-clipboard-list"></i></span> Reservations</a>
                         <a href="userManagement.php" class="nav-link active d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-users"></i></span> User Management</a>
-                        <a href="#" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-cog"></i></span> Settings</a>
                     </div>
                 </div>
             </div>
@@ -233,10 +232,10 @@ unset($user);
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="user-avatar me-3">
-                                                <?php echo strtoupper(substr($user['fullName'], 0, 1)); ?>
+                                                <?php echo strtoupper(substr($user['fullName'] ?? ($user['firstName'] . ' ' . $user['lastName']), 0, 1)); ?>
                                             </div>
                                             <div>
-                                                <div class="fw-semibold"><?php echo htmlspecialchars($user['fullName']); ?></div>
+                                                <div class="fw-semibold"><?php echo htmlspecialchars($user['fullName'] ?? ($user['firstName'] . ' ' . $user['lastName'])); ?></div>
                                                 <div class="text-muted small">ID: <?php echo htmlspecialchars($user['id']); ?></div>
                                             </div>
                                         </div>
@@ -248,8 +247,8 @@ unset($user);
                                         <div><?php echo htmlspecialchars($user['mobile'] ?? 'N/A'); ?></div>
                                     </td>
                                     <td>
-                                        <span class="role-badge <?php echo strtolower($user['role']) === 'admin' ? 'role-admin' : 'role-client'; ?>">
-                                            <i class="fas <?php echo strtolower($user['role']) === 'admin' ? 'fa-shield-alt' : 'fa-user'; ?> me-1"></i>
+                                        <span class="role-badge <?php echo (strtolower($user['role']) === 'admin') ? 'role-admin' : 'role-client'; ?>">
+                                            <i class="fas <?php echo (strtolower($user['role']) === 'admin') ? 'fa-shield-alt' : 'fa-user'; ?> me-1"></i>
                                             <?php echo htmlspecialchars($user['role']); ?>
                                         </span>
                                     </td>

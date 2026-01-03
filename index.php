@@ -148,16 +148,16 @@
                 <div class="col-md-6 mb-4 mb-md-0">
                     <div class="hotel-image-container">
                         <div class="hotel-image-placeholder">
-                            <div class="hotel-image-icon">🏨</div>
+                            <img src="assets/images/travelmatesPhoto.jpg" alt="TravelMates Hotel" class="hotel-image">
                         </div>
                     </div>
                 </div>
                 
                 <div class="col-md-6">
                     <div class="luxury-card hotel-card p-5">
-                        <h3 class="hotel-name mb-3">Grand Luxe Hotels</h3>
+                        <h3 class="hotel-name mb-3">TravelMates Hotel</h3>
                         <p class="hotel-description mb-4">
-                            Experience the epitome of luxury and sophistication at Grand Luxe Hotels. Our premium facilities provide the perfect backdrop for unforgettable events, from intimate gatherings to grand celebrations. With world-class service, exquisite dining, and elegantly appointed venues, we are committed to creating exceptional experiences for every occasion.
+                            TravelMates is a web-based booking system designed to automate and simplify hotel operations, particularly room reservations. The system allows customers to view available rooms, make bookings online, and receive booking confirmations, while enabling hotel staff and administrators to manage reservations efficiently.
                         </p>
                         <div class="hotel-highlights mb-4">
                             <span class="highlight-badge">5-Star Luxury</span>
@@ -191,7 +191,7 @@
                 <div class="col-md-4 mb-4">
                     <h6 class="footer-heading mb-3">Hotel Partner</h6>
                     <p class="footer-text">
-                        <strong>Grand Luxe Hotels</strong><br>
+                        <strong>TravelMates Hotel</strong><br>
                         Your trusted partner for premium event hosting
                     </p>
                 </div>

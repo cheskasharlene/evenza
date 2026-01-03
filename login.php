@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Email and password are required.';
     } else {
         // Use MySQLi prepared statement - make email comparison case-insensitive
-        $query = "SELECT userId, firstName, lastName, fullName, email, phoneNumber, password, role FROM users WHERE LOWER(email) = LOWER(?)";
+        $query = "SELECT userId, firstName, lastName, fullName, email, phone, password, role FROM users WHERE LOWER(email) = LOWER(?)";
         $stmt = mysqli_prepare($conn, $query);
         
         if ($stmt) {

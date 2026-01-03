@@ -207,7 +207,10 @@ if (!$event) {
                         </div>
                         <div class="input-group">
                             <input type="text" class="form-control luxury-input" id="aiQuestion" placeholder="Ask a question...">
-                            <button class="btn btn-primary-luxury" type="button" onclick="askAI()">
+                            <button class="btn btn-primary-luxury" type="button" id="aiSendButton" onclick="askAI()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm-1.138-1.138L13.229 1.5 4.577 8.932l.921.001Z"/>
+                                </svg>
                             </button>
                         </div>
                     </div>
@@ -295,6 +298,41 @@ if (!$event) {
             </div>
         </div>
     </div>
+
+    <!-- Pass event data to JavaScript -->
+    <script type="application/json" id="eventData">
+    {
+        "title": <?php echo json_encode($event['title']); ?>,
+        "description": <?php echo json_encode($event['description'] ?? ''); ?>,
+        "venue": <?php echo json_encode($event['venue'] ?? ''); ?>,
+        "venueAddress": <?php echo json_encode($event['venueAddress'] ?? ''); ?>,
+        "formattedDate": <?php echo json_encode($event['formattedDate'] ?? ''); ?>,
+        "eventTime": <?php echo json_encode($event['eventTime'] ?? ''); ?>,
+        "packages": [
+            {"name": "Bronze Package", "price": 7000},
+            {"name": "Silver Package", "price": 10000},
+            {"name": "Gold Package", "price": 15000}
+        ],
+        "faqs": [
+            {
+                "question": "What is included in the ticket price?",
+                "answer": "The ticket price includes full access to the event, all sessions and workshops, refreshments, and networking opportunities. Additional services may be available at extra cost."
+            },
+            {
+                "question": "Can I cancel or refund my reservation?",
+                "answer": "Cancellations made 48 hours before the event will receive a full refund. Cancellations made within 48 hours are non-refundable but may be transferable."
+            },
+            {
+                "question": "Is parking available at the venue?",
+                "answer": "Yes, complimentary valet parking is available for all event attendees. Please arrive 15 minutes early to allow time for parking."
+            },
+            {
+                "question": "What should I bring to the event?",
+                "answer": "Please bring a valid ID, your confirmation email or ticket, and any materials specified in the event details. Notepads and pens will be provided."
+            }
+        ]
+    }
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
     <script src="assets/js/main.js"></script>
