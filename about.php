@@ -58,18 +58,12 @@
             </div>
 
             <div class="luxury-card p-5 mb-5">
-                <div class="row align-items-center">
-                    <div class="col-lg-6 mb-4 mb-lg-0">
-                        <h2 class="section-title mb-4">What is EVENZA</h2>
-                        <p class="lead">EVENZA is a premium event reservation and ticketing platform designed to connect discerning guests with exclusive hotel-hosted events.</p>
-                        <p>We specialize in curating exceptional experiences, from elegant conferences and intimate seminars to luxurious weddings and exclusive gala dinners. Our platform brings together the finest venues, world-class hospitality, and seamless reservation technology to create unforgettable moments.</p>
-                        <p>At EVENZA, we believe that every event should be extraordinary. That's why we partner exclusively with luxury hotels and premium venues to offer you access to the most sought-after gatherings in the industry.</p>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="about-image-placeholder">
-                            <div class="image-placeholder-about">
-                            </div>
-                        </div>
+                <div class="what-is-evenza-content">
+                    <h2 class="section-title text-center mb-5">What is EVENZA</h2>
+                    <div class="what-is-evenza-text">
+                        <p>EVENZA is a premium event reservation and ticketing platform designed to connect guests with exceptional, hotel-hosted experiences. We bring together elegant venues, seamless technology, and world-class hospitality to make every event easy to discover, reserve, and enjoy.</p>
+                        <p>From conferences and seminars to weddings, galas, and exclusive social gatherings, EVENZA simplifies the entire reservation process—allowing users to explore curated events, select tailored packages, and secure tickets with confidence. Our platform is built to support both guests and event organizers, ensuring smooth management, accurate bookings, and memorable experiences from start to finish.</p>
+                        <p>At EVENZA, we believe every event should feel effortless and extraordinary. We're here to transform how people experience events—where convenience meets luxury, and every moment is worth celebrating.</p>
                     </div>
                 </div>
             </div>
@@ -176,9 +170,11 @@
                 <div class="luxury-card cta-card p-5">
                     <h2 class="cta-title mb-3">Ready to Experience EVENZA?</h2>
                     <p class="cta-subtitle mb-4">Join our community and discover extraordinary events at luxury hotels worldwide.</p>
-                    <div class="cta-buttons">
-                        <a href="events.php" class="btn btn-primary-luxury btn-lg me-3">Browse Events</a>
-                        <a href="register.php" class="btn btn-outline-luxury btn-lg">Create Account</a>
+                    <div class="cta-buttons<?php echo !isset($_SESSION['user_id']) ? '' : ' cta-buttons-single'; ?>">
+                        <a href="events.php" class="btn btn-primary-luxury btn-lg<?php echo !isset($_SESSION['user_id']) ? ' me-3' : ''; ?>">Browse Events</a>
+                        <?php if (!isset($_SESSION['user_id'])): ?>
+                            <a href="register.php" class="btn btn-outline-luxury btn-lg">Create Account</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>

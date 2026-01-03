@@ -116,7 +116,7 @@ $totalAmount = $selectedPackage['price'];
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="index.php">Home</a></li>
                     <li class="breadcrumb-item"><a href="events.php">Events</a></li>
-                    <li class="breadcrumb-item"><a href="event-details.php?id=<?php echo $eventId; ?>">Event Details</a></li>
+                    <li class="breadcrumb-item"><a href="eventDetails.php?id=<?php echo $eventId; ?>">Event Details</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Reservation</li>
                 </ol>
             </div>

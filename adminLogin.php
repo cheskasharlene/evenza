@@ -16,10 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required.';
     } else {
-        try {
-            $stmt = $pdo->prepare("SELECT userId, fullName, email, password, role FROM users WHERE email = ? AND role = 'Admin'");
-            $stmt->execute([$email]);
-            $admin = $stmt->fetch();
+        // Use MySQLi prepared statement - make email comparison case-insensitive
+        $query = "SELECT userId, fullName, email, password, role FROM users WHERE LOWER(email) = LOWER(?) AND role = 'Admin'";
+        $stmt = mysqli_prepare($conn, $query);
+        
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "s", $email);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+            $admin = mysqli_fetch_assoc($result);
+            mysqli_stmt_close($stmt);
 
             if ($admin && password_verify($password, $admin['password'])) {
                 $_SESSION['admin_id'] = $admin['userId'];
@@ -31,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $error = 'Invalid email or password.';
             }
-        } catch(PDOException $e) {
+        } else {
             $error = 'Database error. Please try again later.';
         }
     }

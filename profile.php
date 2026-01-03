@@ -2,35 +2,39 @@
 session_start();
 require_once 'connect.php';
 
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
 
-// Fetch user data from database
 $userData = [
     'name' => $_SESSION['user_name'] ?? 'User',
     'email' => $_SESSION['user_email'] ?? '',
     'mobile' => $_SESSION['user_mobile'] ?? ''
 ];
 
-// Load reservations for this user from database
 $reservations = [];
-try {
-    $stmt = $pdo->prepare("
-        SELECT r.*, e.title as eventName, e.venue, e.eventDate, e.eventTime, p.packageName 
-        FROM reservations r
-        LEFT JOIN events e ON r.eventId = e.eventId
-        LEFT JOIN packages p ON r.packageId = p.packageId
-        WHERE r.userId = ?
-        ORDER BY r.reservationDate DESC, r.createdAt DESC
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    $reservations = $stmt->fetchAll();
-} catch(PDOException $e) {
-    // Log error in production: error_log($e->getMessage());
-    $reservations = [];
+$userId = $_SESSION['user_id'];
+$query = "
+    SELECT r.*, e.title as eventName, e.venue, p.packageName 
+    FROM reservations r
+    LEFT JOIN events e ON r.eventId = e.eventId
+    LEFT JOIN packages p ON r.packageId = p.packageId
+    WHERE r.userId = ?
+    ORDER BY r.reservationDate DESC, r.createdAt DESC
+";
+$stmt = mysqli_prepare($conn, $query);
+
+if ($stmt) {
+    mysqli_stmt_bind_param($stmt, "i", $userId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    while ($row = mysqli_fetch_assoc($result)) {
+        $reservations[] = $row;
+    }
+    
+    mysqli_stmt_close($stmt);
 }
 ?>
 <!DOCTYPE html>

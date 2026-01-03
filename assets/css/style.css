@@ -382,6 +382,18 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0.8;
 }
 
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.cta-buttons-single {
+    justify-content: center;
+}
+
 /* Hotel Partners Section Styles */
 .hotel-partners-section {
     background: linear-gradient(135deg, var(--bg-warm-beige) 0%, var(--bg-off-white) 100%);
@@ -1845,11 +1857,24 @@ html {
     min-height: 100vh;
 }
 
-.about-image-placeholder {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.what-is-evenza-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.what-is-evenza-text {
+    text-align: left;
+}
+
+.what-is-evenza-text p {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+    color: var(--text-dark-gray);
+    font-size: 1.05rem;
+}
+
+.what-is-evenza-text p:last-child {
+    margin-bottom: 0;
 }
 
 .image-placeholder-about {
@@ -1943,15 +1968,10 @@ html {
     gap: 1rem;
     padding: 1.25rem 0;
     border-bottom: 1px solid rgba(107, 127, 90, 0.1);
-    transition: all 0.3s ease;
 }
 
 .benefits-list li:last-child {
     border-bottom: none;
-}
-
-.benefits-list li:hover {
-    padding-left: 0.5rem;
 }
 
 .benefits-list li svg {
@@ -1984,6 +2004,20 @@ html {
     
     .benefits-title {
         font-size: 1.6rem;
+    }
+    
+    .what-is-evenza-content {
+        max-width: 100%;
+        padding: 0 1rem;
+    }
+    
+    .what-is-evenza-text {
+        text-align: left;
+    }
+    
+    .what-is-evenza-text p {
+        font-size: 1rem;
+        margin-bottom: 1.25rem;
     }
     
     .image-placeholder-about {
