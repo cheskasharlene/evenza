@@ -175,7 +175,6 @@ function getCategoryFilter($category) {
                             <div class="col-md-4">
                                 <select class="form-select luxury-input" id="categoryFilter">
                                     <option value="all">All Categories</option>
-                                    <option value="premium">Premium</option>
                                     <option value="business">Business</option>
                                     <option value="weddings">Weddings</option>
                                     <option value="socials">Socials</option>
@@ -216,22 +215,16 @@ function getCategoryFilter($category) {
                     ?>
                     <?php foreach ($events as $event): 
                         $categoryFilter = getCategoryFilter($event['category']);
-                        // Check if event is premium (case-insensitive)
-                        $isPremium = (strtolower(trim($event['category'])) === 'premium') || 
-                                     (stripos($event['category'], 'premium') !== false);
                     ?>
                         <div class="col-lg-4 col-md-6 mb-4 event-card-wrapper" 
                              data-category="<?php echo htmlspecialchars($categoryFilter); ?>" 
                              data-name="<?php echo htmlspecialchars($event['title']); ?>">
                             <div class="card event-card h-100">
-                                <div class="event-card-image <?php echo $isPremium ? 'position-relative' : ''; ?>">
+                                <div class="event-card-image">
                                     <img src="<?php echo htmlspecialchars($event['imagePath']); ?>" 
                                          class="card-img-top" 
                                          alt="<?php echo htmlspecialchars($event['title']); ?>"
                                          onerror="this.src='assets/images/event_images/placeholder.jpg'">
-                                    <?php if ($isPremium): ?>
-                                        <span class="badge rounded-pill position-absolute top-0 end-0 m-3">Premium</span>
-                                    <?php endif; ?>
                                 </div>
                                 <div class="card-body">
                                     <h3 class="card-title event-title"><?php echo htmlspecialchars($event['title']); ?></h3>
