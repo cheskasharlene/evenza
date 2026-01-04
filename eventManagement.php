@@ -1,4 +1,9 @@
 <?php
+// Prevent caching to ensure fresh data
+header("Cache-Control: no-cache, no-store, must-revalidate");
+header("Pragma: no-cache");
+header("Expires: 0");
+
 require_once 'adminAuth.php';
 require_once 'connect.php';
 
@@ -41,7 +46,7 @@ if ($result) {
             'id' => $eventId,
             'name' => isset($row['title']) ? $row['title'] : '',
             'title' => isset($row['title']) ? $row['title'] : '',
-            'category' => isset($row['category']) ? $row['category'] : '',
+            'category' => (isset($row['category']) && $row['category'] !== null && trim($row['category']) !== '') ? trim($row['category']) : '',
             'status' => 'Active', 
             'image' => $imageName,
             'imagePath' => $imagePath,
@@ -298,7 +303,7 @@ if (!empty($searchQuery)) {
                                         <div class="fw-semibold"><?php echo htmlspecialchars($event['name'] ?? $event['title']); ?></div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-light text-dark"><?php echo htmlspecialchars($event['category']); ?></span>
+                                        <span class="badge bg-light text-dark"><?php echo htmlspecialchars(!empty($event['category']) ? $event['category'] : 'Uncategorized'); ?></span>
                                     </td>
                                     <td>
                                         <div class="text-muted small"><?php echo htmlspecialchars($event['venue']); ?></div>
@@ -497,7 +502,21 @@ if (!empty($searchQuery)) {
                         document.getElementById('editEventModalLabel').textContent = 'Edit Event';
                         document.getElementById('editEventId').value = event.eventId || eventId;
                         document.getElementById('editEventTitle').value = event.title || '';
-                        document.getElementById('editEventCategory').value = event.category || '';
+                        // Set category - handle case where category might not match dropdown options
+                        const categoryValue = (event.category || '').trim();
+                        const categorySelect = document.getElementById('editEventCategory');
+                        
+                        // Try to set the value first
+                        categorySelect.value = categoryValue;
+                        
+                        // If category doesn't match any option, add it as a temporary option
+                        if (categoryValue && !Array.from(categorySelect.options).some(opt => opt.value === categoryValue)) {
+                            const option = document.createElement('option');
+                            option.value = categoryValue;
+                            option.textContent = categoryValue;
+                            option.selected = true;
+                            categorySelect.insertBefore(option, categorySelect.firstChild.nextSibling); // Insert after "Select Category"
+                        }
                         document.getElementById('editEventVenue').value = event.venue || '';
                         document.getElementById('editEventDescription').value = event.description || '';
                         document.getElementById('editEventImagePath').value = event.imagePath || '';
@@ -562,10 +581,7 @@ if (!empty($searchQuery)) {
             formData.append('title', title);
             formData.append('category', category);
             formData.append('venue', '');
-            formData.append('venueAddress', '');
             formData.append('description', '');
-            formData.append('eventDate', '');
-            formData.append('eventTime', '');
             formData.append('imagePath', '');
             
             fetch('api/updateEvent.php', {
@@ -612,15 +628,20 @@ if (!empty($searchQuery)) {
                 return;
             }
             
+            // Debug: Log all values being sent
+            console.log('Updating event:', {
+                eventId: eventId,
+                title: title,
+                category: category,
+                venue: venue
+            });
+            
             const formData = new FormData();
             formData.append('eventId', eventId);
             formData.append('title', title);
             formData.append('category', category);
             formData.append('venue', venue);
-            formData.append('venueAddress', ''); // Preserve existing venue address by sending empty
             formData.append('description', description);
-            formData.append('eventDate', ''); // Preserve existing date by sending empty
-            formData.append('eventTime', ''); // Preserve existing time by sending empty
             formData.append('imagePath', imagePath);
             
             fetch('api/updateEvent.php', {
@@ -628,28 +649,60 @@ if (!empty($searchQuery)) {
                 body: formData
             })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
+                // First, get the response text to debug
+                return response.text().then(text => {
+                    console.log('Raw response:', text);
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers);
+                    
+                    // Check if response is empty
+                    if (!text || text.trim() === '') {
+                        console.error('Empty response from server');
+                        throw new Error('Empty response from server. Please check the server logs.');
+                    }
+                    
+                    try {
+                        const data = JSON.parse(text);
+                        if (!response.ok) {
+                            throw new Error(data.message || 'Network response was not ok');
+                        }
+                        return data;
+                    } catch (e) {
+                        console.error('JSON Parse Error. Response text:', text);
+                        console.error('Parse error:', e);
+                        throw new Error('Invalid JSON response. Server returned: ' + (text.substring(0, 200) || '(empty)'));
+                    }
+                });
             })
             .then(data => {
+                console.log('Update response:', data);
                 if (data.success) {
+                    // Log the category that was updated
+                    if (data.category) {
+                        console.log('Category updated to:', data.category);
+                    }
                     showFeedback('Event "' + title + '" has been updated successfully.', 'success');
                     const modal = bootstrap.Modal.getInstance(document.getElementById('editEventModal'));
                     if (modal) {
                         modal.hide();
                     }
+                    // Force a hard reload to ensure fresh data from server
+                    // Use location.reload() with forceReload flag for better cache clearing
                     setTimeout(function() {
-                        window.location.reload();
-                    }, 1000);
+                        // Clear any cache and reload with timestamp
+                        if (window.location.search) {
+                            window.location.href = window.location.pathname + '?t=' + new Date().getTime();
+                        } else {
+                            window.location.href = window.location.pathname + '?t=' + new Date().getTime();
+                        }
+                    }, 500);
                 } else {
                     showFeedback(data.message || 'An error occurred while updating the event.', 'error');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                showFeedback('An error occurred while updating the event. Please check the console for details.', 'error');
+                showFeedback('An error occurred while updating the event: ' + error.message, 'error');
             });
         }
 

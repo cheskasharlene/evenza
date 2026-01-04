@@ -1,23 +1,29 @@
 <?php
+// Start output buffering FIRST to catch any output
+ob_start();
+
 // Suppress any output before JSON
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
+// Set JSON header early
+header('Content-Type: application/json');
+
 session_start();
 require_once '../connect.php';
 
-// Set JSON header early and prevent any output
-header('Content-Type: application/json');
-ob_start(); // Start output buffering to catch any accidental output
-
 // Check admin authentication manually to avoid redirect
 if (!isset($_SESSION['admin_id']) && !(isset($_SESSION['user_id']) && isset($_SESSION['role']) && (strtolower($_SESSION['role']) === 'admin'))) {
+    ob_clean();
     echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+    ob_end_flush();
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    ob_clean();
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+    ob_end_flush();
     exit;
 }
 
@@ -31,7 +37,9 @@ $isAdminValue = isset($_POST['isAdmin']) ? $_POST['isAdmin'] : 'false';
 $role = ($isAdminValue === 'true' || $isAdminValue === true) ? 'admin' : 'user';
 
 if (empty($fullName) || empty($email)) {
+    ob_clean();
     echo json_encode(['success' => false, 'message' => 'Full name and email are required']);
+    ob_end_flush();
     exit;
 }
 
@@ -88,5 +96,3 @@ if ($stmt) {
 // End output buffering and send response
 ob_end_flush();
 exit;
-?>
-
