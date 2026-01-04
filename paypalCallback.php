@@ -1,75 +1,139 @@
 <?php
+/**
+ * PayPal Callback Handler
+ * 
+ * This page handles redirects from PayPal for cases where:
+ * 1. User is redirected back from PayPal (redirect flow instead of popup)
+ * 2. User lands here from an old bookmark or direct access
+ * 
+ * In the standard JavaScript SDK flow, payments are captured via API
+ * and users are redirected directly to confirmation.php
+ */
+
 session_start();
 require_once 'connect.php';
+require_once 'config/paypal.php';
 
-// PayPal callback handler - processes payment and redirects to confirmation
-// This simulates PayPal IPN/callback processing
+error_log('PayPal Callback reached - checking for pending payment');
 
-// Debug: Log that callback was reached
-error_log('PayPal Callback reached');
-
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     error_log('User not logged in, redirecting to login');
     header('Location: login.php');
     exit;
 }
 
-// Get payment parameters from PayPal return or POST
-$paymentStatus = isset($_GET['payment_status']) ? $_GET['payment_status'] : (isset($_POST['payment_status']) ? $_POST['payment_status'] : '');
-$transactionId = isset($_GET['tx']) ? $_GET['tx'] : (isset($_POST['tx']) ? $_POST['tx'] : '');
-$payerId = isset($_GET['PayerID']) ? $_GET['PayerID'] : (isset($_POST['PayerID']) ? $_POST['PayerID'] : '');
-
-// Get reservation data from session (stored before payment, NOT from database yet)
-$reservationData = isset($_SESSION['pending_reservation_data']) ? $_SESSION['pending_reservation_data'] : null;
-
-// Get data from session or URL (for compatibility)
-$reservationId = 0; // Will be created after payment confirmation
-$eventId = isset($_SESSION['pending_event_id']) ? $_SESSION['pending_event_id'] : (isset($_GET['eventId']) ? intval($_GET['eventId']) : ($reservationData ? $reservationData['eventId'] : 0));
-$packageId = isset($_SESSION['pending_package_id']) ? $_SESSION['pending_package_id'] : (isset($_GET['packageId']) ? intval($_GET['packageId']) : ($reservationData ? $reservationData['packageId'] : 0));
-$amount = isset($_SESSION['pending_amount']) ? $_SESSION['pending_amount'] : (isset($_GET['amount']) ? floatval($_GET['amount']) : ($reservationData ? $reservationData['totalAmount'] : 0));
-
-// Debug logging
-error_log('PayPal Callback - reservationId: ' . $reservationId . ', eventId: ' . $eventId . ', packageId: ' . $packageId . ', amount: ' . $amount);
-error_log('Session data: ' . print_r([
-    'pending_reservation_id' => $_SESSION['pending_reservation_id'] ?? 'not set',
-    'pending_event_id' => $_SESSION['pending_event_id'] ?? 'not set',
-    'pending_package_id' => $_SESSION['pending_package_id'] ?? 'not set',
-    'pending_amount' => $_SESSION['pending_amount'] ?? 'not set'
-], true));
-
-// Generate transaction ID if not provided (for testing/simulation)
-if (empty($transactionId)) {
-    $transactionId = 'PAYPAL-' . strtoupper(substr(md5(time() . $_SESSION['user_id'] . $reservationId), 0, 12));
-}
-
-// If payment is successful, generate success token and redirect
-if ($paymentStatus === 'Completed' || $paymentStatus === 'success' || !empty($payerId)) {
-    // Generate secure success token
-    $successToken = bin2hex(random_bytes(32));
+if (isset($_SESSION['payment_success_token']) && isset($_SESSION['payment_success_time'])) {
+    $successToken = $_SESSION['payment_success_token'];
+    $transactionId = $_SESSION['payment_transaction_id'] ?? '';
     
-    // Store token in session temporarily (expires in 5 minutes)
-    $_SESSION['payment_success_token'] = $successToken;
-    $_SESSION['payment_success_time'] = time();
-    $_SESSION['payment_transaction_id'] = $transactionId;
-    $_SESSION['payment_reservation_id'] = 0; // Will be created in confirmation.php
-    $_SESSION['payment_event_id'] = $eventId;
-    $_SESSION['payment_package_id'] = $packageId;
-    $_SESSION['payment_amount'] = $amount;
-    
-    // Ensure reservation data is available for confirmation.php
-    if ($reservationData) {
-        $_SESSION['pending_reservation_data'] = $reservationData;
-    }
-    
-    // Redirect to confirmation with success token
     header('Location: confirmation.php?success=' . urlencode($successToken) . '&tx=' . urlencode($transactionId));
     exit;
-} else {
-    // Payment failed or cancelled
-    $_SESSION['error_message'] = 'Payment was not completed. Please try again.';
-    header('Location: payment.php?eventId=' . $eventId . '&reservationId=' . $reservationId);
+}
+
+$token = isset($_GET['token']) ? trim($_GET['token']) : '';
+$payerId = isset($_GET['PayerID']) ? trim($_GET['PayerID']) : '';
+
+if (!empty($token) && !empty($payerId)) {
+    error_log('PayPal redirect flow detected - token: ' . $token . ', PayerID: ' . $payerId);
+    
+    
+    $eventId = $_SESSION['paypal_order_event_id'] ?? ($_SESSION['pending_event_id'] ?? 0);
+    $packageId = $_SESSION['paypal_order_package_id'] ?? ($_SESSION['pending_package_id'] ?? 0);
+    $amount = $_SESSION['paypal_order_amount'] ?? ($_SESSION['pending_amount'] ?? 0);
+    
+    $accessToken = getPayPalAccessToken();
+    
+    if ($accessToken) {
+        $ch = curl_init(getPayPalBaseUrl() . '/v2/checkout/orders/' . $token . '/capture');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, '');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Authorization: Bearer ' . $accessToken
+        ]);
+        
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        
+        $captureResult = json_decode($response, true);
+        
+        if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $captureResult['status'] === 'COMPLETED') {
+            $transactionId = '';
+            if (isset($captureResult['purchase_units'][0]['payments']['captures'][0])) {
+                $transactionId = $captureResult['purchase_units'][0]['payments']['captures'][0]['id'];
+            }
+            
+            $successToken = bin2hex(random_bytes(32));
+            
+            $_SESSION['payment_success_token'] = $successToken;
+            $_SESSION['payment_success_time'] = time();
+            $_SESSION['payment_transaction_id'] = $transactionId;
+            $_SESSION['payment_order_id'] = $token;
+            $_SESSION['payment_payer_id'] = $payerId;
+            $_SESSION['payment_reservation_id'] = 0;
+            $_SESSION['payment_event_id'] = $eventId;
+            $_SESSION['payment_package_id'] = $packageId;
+            $_SESSION['payment_amount'] = $amount;
+            
+            unset($_SESSION['paypal_order_id']);
+            unset($_SESSION['paypal_order_amount']);
+            unset($_SESSION['paypal_order_event_id']);
+            unset($_SESSION['paypal_order_package_id']);
+            
+            header('Location: confirmation.php?success=' . urlencode($successToken) . '&tx=' . urlencode($transactionId));
+            exit;
+        } else {
+            error_log('PayPal capture failed: ' . $response);
+            $_SESSION['error_message'] = 'Failed to complete payment. Please try again or contact support.';
+            header('Location: payment.php?eventId=' . $eventId . '&error=capture_failed');
+            exit;
+        }
+    } else {
+        error_log('Failed to get PayPal access token');
+        $_SESSION['error_message'] = 'Payment service unavailable. Please try again later.';
+        header('Location: payment.php?error=auth_failed');
+        exit;
+    }
+}
+
+if (isset($_GET['cancelled']) || isset($_GET['cancel'])) {
+    $eventId = $_SESSION['pending_event_id'] ?? 0;
+    $packageId = $_SESSION['pending_package_id'] ?? 0;
+    
+    $_SESSION['error_message'] = 'Payment was cancelled. You can try again when ready.';
+    header('Location: payment.php?eventId=' . $eventId . '&packageId=' . $packageId);
     exit;
 }
-?>
 
+$_SESSION['error_message'] = 'No payment in progress. Please start your reservation again.';
+header('Location: index.php');
+exit;
+
+function getPayPalAccessToken() {
+    $clientId = getPayPalClientId();
+    $secret = getPayPalSecret();
+    
+    $ch = curl_init(getPayPalBaseUrl() . '/v1/oauth2/token');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, 'grant_type=client_credentials');
+    curl_setopt($ch, CURLOPT_USERPWD, $clientId . ':' . $secret);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/x-www-form-urlencoded'
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        $data = json_decode($response, true);
+        return $data['access_token'] ?? null;
+    }
+    
+    error_log('PayPal Auth Error: ' . $response);
+    return null;
+}
+?>

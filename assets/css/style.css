@@ -1441,6 +1441,18 @@ html {
     margin-top: 2rem;
 }
 
+/* PayPal SDK Button Container */
+#paypal-button-container {
+    min-height: 55px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#paypal-button-container .paypal-buttons {
+    width: 100% !important;
+}
+
 .btn-paypal {
     background-color: #0070ba;
     color: white;
@@ -1502,6 +1514,17 @@ html {
 
 .status-success .status-icon {
     color: #28a745;
+    flex-shrink: 0;
+}
+
+.status-info {
+    background-color: rgba(23, 162, 184, 0.1);
+    border: 2px solid rgba(23, 162, 184, 0.3);
+}
+
+.status-info .status-icon,
+.status-info i {
+    color: #17a2b8;
     flex-shrink: 0;
 }
 

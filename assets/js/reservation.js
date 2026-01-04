@@ -1,7 +1,6 @@
 (function() {
     'use strict';
 
-    // Packages come from reservationData.packages injected by server-side PHP
     const packages = (typeof reservationData !== 'undefined' && Array.isArray(reservationData.packages)) ? reservationData.packages : [];
     const selectedPackageId = (typeof reservationData !== 'undefined' && reservationData.selectedPackageId) ? reservationData.selectedPackageId : (packages[0] && packages[0].id);
 
@@ -16,13 +15,11 @@
         optionEls.forEach(el => {
             if (el.getAttribute('data-id') === id) {
                 el.classList.add('package-selected');
-                // update hidden inputs
                 const name = el.getAttribute('data-name');
                 const price = parseFloat(el.getAttribute('data-price')) || 0;
                 document.getElementById('packageId').value = id;
                 document.getElementById('packageName').value = name;
                 document.getElementById('packagePrice').value = price;
-                // update summary UI
                 const summaryPkg = document.getElementById('summaryPackage');
                 if (summaryPkg) summaryPkg.textContent = name;
                 const summaryTotal = document.getElementById('summaryTotal');
@@ -35,12 +32,10 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Attach click and keyboard handlers to package cards
         const optionEls = document.querySelectorAll('.package-card');
         optionEls.forEach(el => {
             el.addEventListener('click', function() { selectPackageById(el.getAttribute('data-id'), true); });
             el.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectPackageById(el.getAttribute('data-id'), true); } });
-            // format prices inside the card using Intl
             const priceEl = el.querySelector('.package-price');
             if (priceEl) {
                 const price = parseFloat(el.getAttribute('data-price')) || 0;
@@ -48,10 +43,8 @@
             }
         });
 
-        // set default selected package
         if (selectedPackageId) selectPackageById(selectedPackageId);
 
-        // Form validation (ensure package selected)
         const reservationForm = document.getElementById('reservationForm');
         if (reservationForm) {
             reservationForm.addEventListener('submit', function(e) {
@@ -65,7 +58,6 @@
                     alert('Please fill in all required fields.');
                     return false;
                 }
-                // Email validation
                 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRegex.test(email)) {
                     e.preventDefault();

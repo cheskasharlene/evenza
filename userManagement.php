@@ -15,7 +15,7 @@ if ($result) {
             'fullName' => $row['fullName'],
             'email' => $row['email'],
             'mobile' => $row['phone'] ?? 'N/A',
-            'role' => ucfirst(strtolower($row['role'])) // Normalize role to Admin/User
+            'role' => ucfirst(strtolower($row['role'])) 
         ];
     }
     mysqli_free_result($result);
@@ -147,7 +147,6 @@ if ($result) {
 
 <body>
     <div class="d-flex admin-wrapper">
-        <!-- Sidebar -->
         <div class="d-flex flex-column admin-sidebar p-4" style="background-color: #F9F7F2;">
             <div class="d-flex align-items-center mb-4">
                 <div class="luxury-logo"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></div>
@@ -164,9 +163,7 @@ if ($result) {
             </div>
         </div>
 
-        <!-- Content -->
         <div class="flex-fill admin-content">
-            <!-- Top Navigation Bar -->
             <div class="admin-top-nav d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <div class="me-3 d-lg-none">
@@ -188,7 +185,6 @@ if ($result) {
             </div>
 
             <div class="p-4">
-                <!-- Controls Section -->
                 <div class="admin-card p-4 mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -201,7 +197,6 @@ if ($result) {
                     </div>
                 </div>
 
-                <!-- Users Table -->
                 <div class="admin-card p-4">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
@@ -267,7 +262,6 @@ if ($result) {
         </div>
     </div>
 
-    <!-- Toast Container for Feedback Messages -->
     <div class="toast-container">
         <div id="feedbackToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -281,7 +275,6 @@ if ($result) {
         </div>
     </div>
 
-    <!-- User Modal (Add/Edit) -->
     <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

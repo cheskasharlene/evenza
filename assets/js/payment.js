@@ -1,111 +1,219 @@
-// Make processPayment globally accessible immediately
-window.processPayment = function() {
-    console.log('processPayment called'); // Debug
-    
-    const payButton = document.querySelector('.btn-paypal');
-    const statusMessages = document.getElementById('statusMessages');
-    
-    if (!payButton) {
-        console.error('PayPal button not found');
-        alert('Payment button not found. Please refresh the page.');
-        return;
-    }
-    
-    if (!statusMessages) {
-        console.error('Status messages container not found');
-        // Create status messages container if it doesn't exist
-        const paymentSection = payButton.closest('.payment-button-section');
-        if (paymentSection) {
-            const newStatusDiv = document.createElement('div');
-            newStatusDiv.id = 'statusMessages';
-            newStatusDiv.className = 'mt-4';
-            paymentSection.parentNode.insertBefore(newStatusDiv, paymentSection.nextSibling);
-        }
-    }
-    
-    payButton.disabled = true;
-    payButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
-    
-    const statusContainer = document.getElementById('statusMessages');
-    if (statusContainer) {
-        statusContainer.innerHTML = `
-            <div class="status-message status-processing">
-                <div class="status-icon">
-                </div>
-                <div class="status-content">
-                    <h5>Payment Processing</h5>
-                    <p>Redirecting to PayPal to complete your payment securely...</p>
-                </div>
-            </div>
-        `;
-    }
-    
-    // Get URL parameters for PayPal redirect
-    const urlParams = new URLSearchParams(window.location.search);
-    const eventId = urlParams.get('eventId') || 1;
-    const packageId = urlParams.get('packageId') || 0;
-    const packagePrice = urlParams.get('packagePrice') || 0;
-    
-    console.log('Payment params:', { eventId, packageId, packagePrice }); // Debug
-    
-    // In production, this would redirect to actual PayPal gateway
-    // PayPal sandbox URL format: https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout&token=...
-    
-    // Simulate PayPal redirect (in production, use actual PayPal API)
-    setTimeout(function() {
-        // Build callback URL - use relative path to ensure it works
-        let callbackUrl = 'paypalCallback.php';
-        const params = new URLSearchParams();
-        params.set('eventId', eventId);
-        params.set('packageId', packageId);
-        params.set('amount', packagePrice);
-        params.set('payment_status', 'Completed');
-        params.set('PayerID', 'PAYER' + Date.now());
-        
-        callbackUrl += '?' + params.toString();
-        
-        console.log('Redirecting to:', callbackUrl); // Debug
-        
-        // Redirect to PayPal callback handler (simulating PayPal return)
-        window.location.href = callbackUrl;
-    }, 1500); // Reduced to 1.5 seconds for faster redirect
-};
-
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Payment script loaded');
     
-    // Verify processPayment is available
-    if (typeof window.processPayment === 'function') {
-        console.log('processPayment function is available');
-    } else {
-        console.error('processPayment function is NOT available!');
+    if (typeof paypal === 'undefined') {
+        console.error('PayPal SDK not loaded!');
+        showPaymentError('PayPal is not available. Please refresh the page or try again later.');
+        return;
     }
     
-    // Add click event listener as backup (in addition to onclick attribute)
-    const payButton = document.querySelector('.btn-paypal');
-    if (payButton) {
-        payButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('PayPal button clicked via event listener');
-            if (typeof window.processPayment === 'function') {
-                window.processPayment();
-            } else {
-                alert('Payment function not available. Please refresh the page.');
-            }
-        });
+    const paypalContainer = document.getElementById('paypal-button-container');
+    if (!paypalContainer) {
+        console.log('PayPal button container not found - payment may already be completed');
+        return;
     }
     
-    const urlParams = new URLSearchParams(window.location.search);
-    const status = urlParams.get('status');
+    const eventId = document.getElementById('paypal-event-id')?.value || 0;
+    const packageId = document.getElementById('paypal-package-id')?.value || 0;
+    const amount = document.getElementById('paypal-amount')?.value || 0;
     
-    if (status === 'processing' || status === 'success') {
-        setTimeout(function() {
-            const statusMessages = document.getElementById('statusMessages');
-            if (statusMessages) {
-                statusMessages.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-        }, 500);
+    console.log('Payment data:', { eventId, packageId, amount });
+    
+    if (amount <= 0) {
+        showPaymentError('Invalid payment amount. Please go back and try again.');
+        return;
     }
+    
+    paypal.Buttons({
+        style: {
+            layout: 'vertical',
+            color: 'gold',
+            shape: 'rect',
+            label: 'paypal',
+            height: 50
+        },
+        
+        createOrder: function(data, actions) {
+            console.log('Creating PayPal order...');
+            showPaymentStatus('Creating your order...', 'processing');
+            
+            // Call our server to create the order
+            return fetch('api/paypal-create-order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    eventId: parseInt(eventId),
+                    packageId: parseInt(packageId),
+                    amount: parseFloat(amount)
+                })
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    return response.json().then(function(err) {
+                        throw new Error(err.error || 'Failed to create order');
+                    });
+                }
+                return response.json();
+            })
+            .then(function(orderData) {
+                console.log('Order created:', orderData.id);
+                hidePaymentStatus();
+                return orderData.id;
+            })
+            .catch(function(error) {
+                console.error('Create order error:', error);
+                showPaymentError('Failed to create order: ' + error.message);
+                throw error;
+            });
+        },
+        
+        onApprove: function(data, actions) {
+            console.log('Payment approved, capturing...', data);
+            showPaymentStatus('Processing your payment...', 'processing');
+            
+            return fetch('api/paypal-capture-order.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    orderId: data.orderID
+                })
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    return response.json().then(function(err) {
+                        throw new Error(err.error || 'Failed to capture payment');
+                    });
+                }
+                return response.json();
+            })
+            .then(function(captureData) {
+                console.log('Payment captured:', captureData);
+                
+                if (captureData.status === 'COMPLETED') {
+                    showPaymentStatus('Payment successful! Redirecting...', 'success');
+                    
+                    // Redirect to confirmation page
+                    setTimeout(function() {
+                        window.location.href = captureData.redirectUrl;
+                    }, 1000);
+                } else {
+                    throw new Error('Payment was not completed');
+                }
+            })
+            .catch(function(error) {
+                console.error('Capture error:', error);
+                showPaymentError('Payment processing failed: ' + error.message);
+            });
+        },
+        
+        onCancel: function(data) {
+            console.log('Payment cancelled by user');
+            showPaymentStatus('Payment was cancelled. You can try again when ready.', 'cancelled');
+            
+            setTimeout(function() {
+                hidePaymentStatus();
+            }, 5000);
+        },
+        
+        onError: function(err) {
+            console.error('PayPal error:', err);
+            showPaymentError('An error occurred with PayPal. Please try again.');
+        }
+        
+    }).render('#paypal-button-container')
+    .then(function() {
+        console.log('PayPal buttons rendered successfully');
+    })
+    .catch(function(error) {
+        console.error('Failed to render PayPal buttons:', error);
+        showPaymentError('Failed to load PayPal. Please refresh the page.');
+    });
 });
+
+function showPaymentStatus(message, type) {
+    let statusContainer = document.getElementById('statusMessages');
+    
+    if (!statusContainer) {
+        // Create status container if it doesn't exist
+        const paymentSection = document.querySelector('.payment-button-section');
+        if (paymentSection) {
+            statusContainer = document.createElement('div');
+            statusContainer.id = 'statusMessages';
+            statusContainer.className = 'mt-4';
+            paymentSection.parentNode.insertBefore(statusContainer, paymentSection.nextSibling);
+        } else {
+            return;
+        }
+    }
+    
+    let iconClass = '';
+    let statusClass = '';
+    
+    switch(type) {
+        case 'processing':
+            iconClass = 'spinner-border spinner-border-sm';
+            statusClass = 'status-processing';
+            break;
+        case 'success':
+            iconClass = 'fas fa-check-circle';
+            statusClass = 'status-success';
+            break;
+        case 'cancelled':
+            iconClass = 'fas fa-info-circle';
+            statusClass = 'status-info';
+            break;
+        default:
+            iconClass = 'fas fa-info-circle';
+            statusClass = 'status-info';
+    }
+    
+    statusContainer.innerHTML = `
+        <div class="status-message ${statusClass}">
+            <div class="status-content d-flex align-items-center">
+                <span class="${iconClass} me-3"></span>
+                <div>
+                    <p class="mb-0">${message}</p>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    statusContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function showPaymentError(message) {
+    let statusContainer = document.getElementById('statusMessages');
+    
+    if (!statusContainer) {
+        const paymentSection = document.querySelector('.payment-button-section');
+        if (paymentSection) {
+            statusContainer = document.createElement('div');
+            statusContainer.id = 'statusMessages';
+            statusContainer.className = 'mt-4';
+            paymentSection.parentNode.insertBefore(statusContainer, paymentSection.nextSibling);
+        } else {
+            alert(message);
+            return;
+        }
+    }
+    
+    statusContainer.innerHTML = `
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            ${message}
+        </div>
+    `;
+    
+    statusContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function hidePaymentStatus() {
+    const statusContainer = document.getElementById('statusMessages');
+    if (statusContainer) {
+        statusContainer.innerHTML = '';
+    }
+}

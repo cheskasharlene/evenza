@@ -1,7 +1,7 @@
 <?php
 session_start();
+require_once 'config/paypal.php';
 
-// Display success/error messages
 $success_message = '';
 $error_message = '';
 if (isset($_SESSION['success_message'])) {
@@ -21,7 +21,6 @@ $fullName = isset($_POST['fullName']) ? htmlspecialchars($_POST['fullName']) : (
 $email = isset($_POST['email']) ? htmlspecialchars($_POST['email']) : (isset($_SESSION['user_email']) ? $_SESSION['user_email'] : '');
 $mobile = isset($_POST['mobile']) ? htmlspecialchars($_POST['mobile']) : (isset($_SESSION['user_mobile']) ? $_SESSION['user_mobile'] : '');
 
-// If packageTier is provided but packageName is not, construct it
 if (!empty($packageTier) && empty($packageName)) {
     $packageName = $packageTier . ' Package';
 }
@@ -199,12 +198,16 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                 $_SESSION['pending_package_id'] = isset($_GET['packageId']) ? intval($_GET['packageId']) : 0;
                                 $_SESSION['pending_amount'] = $packagePrice;
                                 ?>
-                                <button type="button" class="btn btn-paypal w-100 btn-lg" onclick="processPayment()">
-                                    <i class="fab fa-paypal me-2"></i>Pay with PayPal
-                                </button>
+                                <!-- PayPal Button Container - SDK will render the button here -->
+                                <div id="paypal-button-container"></div>
                                 <p class="text-center text-muted small mt-3 mb-0">
-                                    You will be redirected to PayPal to complete your payment securely.
+                                    Secure payment powered by PayPal. You will be redirected to PayPal to complete your payment.
                                 </p>
+                                
+                                <!-- Hidden data for JavaScript -->
+                                <input type="hidden" id="paypal-event-id" value="<?php echo $eventId; ?>">
+                                <input type="hidden" id="paypal-package-id" value="<?php echo isset($_GET['packageId']) ? intval($_GET['packageId']) : 0; ?>">
+                                <input type="hidden" id="paypal-amount" value="<?php echo $packagePrice; ?>">
                             </div>
                         <?php endif; ?>
 
@@ -305,21 +308,9 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
+    <!-- PayPal JavaScript SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo getPayPalClientId(); ?>&currency=<?php echo PAYPAL_CURRENCY; ?>&intent=capture"></script>
     <script src="assets/js/payment.js?v=<?php echo time(); ?>"></script>
-    <script>
-        // Ensure processPayment is available and add fallback
-        document.addEventListener('DOMContentLoaded', function() {
-            const payButton = document.querySelector('.btn-paypal');
-            if (payButton && typeof window.processPayment === 'undefined') {
-                console.error('processPayment function not loaded!');
-                payButton.onclick = function() {
-                    alert('Payment script not loaded. Please refresh the page.');
-                };
-            } else if (payButton) {
-                console.log('Payment script loaded successfully');
-            }
-        });
-    </script>
 </body>
 </html>
 

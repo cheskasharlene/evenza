@@ -1,7 +1,6 @@
 (function() {
     'use strict';
 
-    // Simple search-only filter for events
     window.filterEvents = function() {
         const searchInput = document.getElementById('searchInput');
         const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
@@ -29,7 +28,6 @@
             });
         }
 
-        // Simple entrance animations for event cards
         const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry, index) => {

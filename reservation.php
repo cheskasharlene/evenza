@@ -2,7 +2,6 @@
 session_start();
 require_once 'connect.php';
 
-// Display success/error messages
 $success_message = '';
 $error_message = '';
 if (isset($_SESSION['success_message'])) {
@@ -16,13 +15,11 @@ if (isset($_SESSION['error_message'])) {
 
 $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 1;
 
-// Load packages from database
 $packages = [];
 $packagesQuery = "SELECT packageId, packageName, price FROM packages ORDER BY packageId ASC";
 $packagesResult = mysqli_query($conn, $packagesQuery);
 if ($packagesResult) {
     while ($row = mysqli_fetch_assoc($packagesResult)) {
-        // Extract tier from package name (e.g., "Bronze Package" -> "Bronze")
         $tier = str_replace(' Package', '', $row['packageName']);
         $packages[] = [
             'id' => $row['packageId'],
@@ -93,22 +90,6 @@ function calculatePackagePrice($packageTier) {
     }
 }
 
-// Alternative using if-else (commented out, using switch above)
-/*
-function calculatePackagePrice($packageTier) {
-    if (strtolower($packageTier) === 'bronze') {
-        return 7000;
-    } elseif (strtolower($packageTier) === 'silver') {
-        return 10000;
-    } elseif (strtolower($packageTier) === 'gold') {
-        return 15000;
-    } else {
-        return 0;
-    }
-}
-*/
-
-// Get selected package from POST/GET or default to first package
 $selectedPackageId = isset($_POST['packageId']) ? intval($_POST['packageId']) : (isset($_GET['packageId']) ? intval($_GET['packageId']) : ($packages[0]['id'] ?? 1));
 $selectedPackage = $packages[0] ?? ['id' => 1, 'name' => 'Bronze Package', 'tier' => 'Bronze', 'price' => 7000];
 foreach ($packages as $p) {
@@ -118,7 +99,6 @@ foreach ($packages as $p) {
     }
 }
 
-// Use price from database
 $totalAmount = $selectedPackage['price'];
 ?>
 <!DOCTYPE html>

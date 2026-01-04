@@ -1,13 +1,10 @@
 <?php
-// Admin Authentication Guard - Must be at the very top
 require_once 'adminAuth.php';
 require_once 'connect.php';
 
-// Get filter parameters
 $packageFilter = isset($_GET['package']) ? $_GET['package'] : '';
 $dateFilter = isset($_GET['date']) ? $_GET['date'] : '';
 
-// Build SQL query with JOINs to fetch customer name, event title, and package details
 $query = "SELECT 
             r.reservationId,
             r.userId,
@@ -34,7 +31,6 @@ $query = "SELECT
 $params = [];
 $types = '';
 
-// Apply filters - extract tier from package name (Bronze Package -> Bronze)
 if (!empty($packageFilter)) {
     $query .= " AND p.packageName LIKE ?";
     $params[] = $packageFilter . '%';
@@ -49,7 +45,6 @@ if (!empty($dateFilter)) {
 
 $query .= " ORDER BY r.reservationDate DESC, r.createdAt DESC";
 
-// Execute query with prepared statement
 $reservations = [];
 $totalRevenue = 0;
 
@@ -63,7 +58,6 @@ if ($stmt) {
         $result = mysqli_stmt_get_result($stmt);
         
         while ($row = mysqli_fetch_assoc($result)) {
-            // Extract package tier from package name (e.g., "Bronze Package" -> "Bronze")
             $packageTier = 'Unknown';
             if (!empty($row['packageName'])) {
                 $packageTier = str_replace(' Package', '', $row['packageName']);
@@ -84,7 +78,6 @@ if ($stmt) {
     $error_message = 'Error preparing query: ' . mysqli_error($conn);
 }
 
-// Group reservations by date
 $groupedReservations = [];
 foreach ($reservations as $reservation) {
     $reservationDate = isset($reservation['reservationDate']) ? date('Y-m-d', strtotime($reservation['reservationDate'])) : 'Unknown Date';
@@ -96,12 +89,10 @@ foreach ($reservations as $reservation) {
     $groupedReservations[$dateFormatted][] = $reservation;
 }
 
-// Sort dates
 uksort($groupedReservations, function($a, $b) {
     return strtotime($a) - strtotime($b);
 });
 
-// Calculate revenue by package tier
 $revenueByPackage = [
     'Bronze' => 0,
     'Silver' => 0,
@@ -256,7 +247,6 @@ foreach ($reservations as $reservation) {
 
 <body>
     <div class="d-flex admin-wrapper">
-        <!-- Sidebar -->
         <div class="d-flex flex-column admin-sidebar p-4" style="background-color: #F9F7F2;">
             <div class="d-flex align-items-center mb-4">
                 <div class="luxury-logo"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></div>
@@ -274,9 +264,7 @@ foreach ($reservations as $reservation) {
             </div>
         </div>
 
-        <!-- Content -->
         <div class="flex-fill admin-content">
-            <!-- Top Navigation Bar -->
             <div class="admin-top-nav d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <div class="me-3 d-lg-none">
@@ -298,7 +286,6 @@ foreach ($reservations as $reservation) {
             </div>
 
             <div class="p-4">
-                <!-- Filters Section -->
                 <div class="admin-card p-4 mb-4">
                     <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">Filter Reservations</h5>
                     <form method="GET" action="reservationsManagement.php" class="row g-3">
@@ -328,7 +315,6 @@ foreach ($reservations as $reservation) {
                     </form>
                 </div>
 
-                <!-- Revenue Summary -->
                 <div class="admin-card p-4 mb-4">
                     <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">Revenue Summary</h5>
                     <div class="row g-3">
@@ -359,7 +345,6 @@ foreach ($reservations as $reservation) {
                     </div>
                 </div>
 
-                <!-- Reservations List -->
                 <div class="admin-card p-4">
                     <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">
                         Reservations (<?php echo count($reservations); ?>)

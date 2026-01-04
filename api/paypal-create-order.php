@@ -1,0 +1,171 @@
+<?php
+/**
+ * PayPal Create Order API
+ * This endpoint creates a PayPal order when the user clicks the PayPal button
+ */
+
+session_start();
+header('Content-Type: application/json');
+
+require_once '../config/paypal.php';
+require_once '../connect.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['error' => 'User not logged in']);
+    exit;
+}
+
+// Get POST data
+$input = json_decode(file_get_contents('php://input'), true);
+
+$eventId = isset($input['eventId']) ? intval($input['eventId']) : 0;
+$packageId = isset($input['packageId']) ? intval($input['packageId']) : 0;
+$amount = isset($input['amount']) ? floatval($input['amount']) : 0;
+
+if ($amount <= 0) {
+    http_response_code(400);
+    echo json_encode(['error' => 'Invalid amount']);
+    exit;
+}
+
+// Get PayPal access token
+$accessToken = getPayPalAccessToken();
+if (!$accessToken) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Failed to authenticate with PayPal']);
+    exit;
+}
+
+// Get package details for description
+$packageName = 'Event Package';
+if ($packageId > 0) {
+    $packageQuery = "SELECT packageName FROM packages WHERE packageId = ?";
+    $stmt = mysqli_prepare($conn, $packageQuery);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "i", $packageId);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        if ($row = mysqli_fetch_assoc($result)) {
+            $packageName = $row['packageName'];
+        }
+        mysqli_stmt_close($stmt);
+    }
+}
+
+// Get event details
+$eventName = 'Event Reservation';
+if ($eventId > 0) {
+    $eventQuery = "SELECT title FROM events WHERE eventId = ?";
+    $stmt = mysqli_prepare($conn, $eventQuery);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "i", $eventId);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+        if ($row = mysqli_fetch_assoc($result)) {
+            $eventName = $row['title'];
+        }
+        mysqli_stmt_close($stmt);
+    }
+}
+
+// Create PayPal order
+$orderData = [
+    'intent' => 'CAPTURE',
+    'purchase_units' => [
+        [
+            'reference_id' => 'EVZ-' . time() . '-' . $eventId,
+            'description' => $packageName . ' - ' . $eventName,
+            'amount' => [
+                'currency_code' => PAYPAL_CURRENCY,
+                'value' => number_format($amount, 2, '.', '')
+            ]
+        ]
+    ],
+    'application_context' => [
+        'brand_name' => 'EVENZA',
+        'landing_page' => 'NO_PREFERENCE',
+        'user_action' => 'PAY_NOW',
+        'return_url' => getBaseUrl() . '/paypalCallback.php',
+        'cancel_url' => getBaseUrl() . '/payment.php?eventId=' . $eventId . '&packageId=' . $packageId . '&cancelled=1'
+    ]
+];
+
+$ch = curl_init(getPayPalBaseUrl() . '/v2/checkout/orders');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($orderData));
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Content-Type: application/json',
+    'Authorization: Bearer ' . $accessToken,
+    'PayPal-Request-Id: ' . uniqid('evenza-', true)
+]);
+
+$response = curl_exec($ch);
+$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+curl_close($ch);
+
+$orderResult = json_decode($response, true);
+
+if ($httpCode >= 200 && $httpCode < 300 && isset($orderResult['id'])) {
+    // Store order info in session for verification later
+    $_SESSION['paypal_order_id'] = $orderResult['id'];
+    $_SESSION['paypal_order_amount'] = $amount;
+    $_SESSION['paypal_order_event_id'] = $eventId;
+    $_SESSION['paypal_order_package_id'] = $packageId;
+    
+    echo json_encode([
+        'id' => $orderResult['id'],
+        'status' => $orderResult['status']
+    ]);
+} else {
+    error_log('PayPal Create Order Error: ' . $response);
+    http_response_code(500);
+    echo json_encode([
+        'error' => 'Failed to create PayPal order',
+        'details' => $orderResult['details'] ?? null
+    ]);
+}
+
+/**
+ * Get PayPal Access Token
+ */
+function getPayPalAccessToken() {
+    $clientId = getPayPalClientId();
+    $secret = getPayPalSecret();
+    
+    $ch = curl_init(getPayPalBaseUrl() . '/v1/oauth2/token');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, 'grant_type=client_credentials');
+    curl_setopt($ch, CURLOPT_USERPWD, $clientId . ':' . $secret);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/x-www-form-urlencoded'
+    ]);
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    if ($httpCode === 200) {
+        $data = json_decode($response, true);
+        return $data['access_token'] ?? null;
+    }
+    
+    error_log('PayPal Auth Error: ' . $response);
+    return null;
+}
+
+/**
+ * Get base URL of the application
+ */
+function getBaseUrl() {
+    $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    $path = dirname($_SERVER['SCRIPT_NAME']);
+    $path = dirname($path); // Go up one level from /api/
+    return $protocol . '://' . $host . $path;
+}
+?>
+
