@@ -1,17 +1,34 @@
 <?php
 session_start();
 require_once 'connect.php';
+require_once 'config/paypal.php';
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
 
+// Load fresh user info from database to avoid stale/empty session data
+$userId = $_SESSION['user_id'];
 $userData = [
     'name' => $_SESSION['user_name'] ?? 'User',
     'email' => $_SESSION['user_email'] ?? '',
     'mobile' => $_SESSION['user_mobile'] ?? ''
 ];
+
+$userQuery = "SELECT fullName, email, phone FROM users WHERE userId = ?";
+$userStmt = mysqli_prepare($conn, $userQuery);
+if ($userStmt) {
+    mysqli_stmt_bind_param($userStmt, "i", $userId);
+    mysqli_stmt_execute($userStmt);
+    $userResult = mysqli_stmt_get_result($userStmt);
+    if ($userRow = mysqli_fetch_assoc($userResult)) {
+        $userData['name'] = $userRow['fullName'] ?? $userData['name'];
+        $userData['email'] = $userRow['email'] ?? $userData['email'];
+        $userData['mobile'] = $userRow['phone'] ?? $userData['mobile'];
+    }
+    mysqli_stmt_close($userStmt);
+}
 
 $reservations = [];
 $userId = $_SESSION['user_id'];
@@ -167,9 +184,19 @@ if ($stmt) {
                                             
                                             <div class="col-md-3 text-center mb-3 mb-md-0">
                                                 <div class="ticket-status mb-2">
-                                                    <?php if ($reservation['status'] === 'confirmed'): ?>
+                                                    <?php 
+                                                    $status = strtolower($reservation['status'] ?? 'pending');
+                                                    if ($status === 'completed'): ?>
+                                                        <span class="status-badge status-paid" style="background-color: #28a745; color: white;">
+                                                            Completed
+                                                        </span>
+                                                    <?php elseif ($status === 'confirmed'): ?>
                                                         <span class="status-badge status-confirmed">
                                                             Confirmed
+                                                        </span>
+                                                    <?php elseif ($status === 'cancelled'): ?>
+                                                        <span class="status-badge status-cancelled" style="background-color: #dc3545; color: white;">
+                                                            Cancelled
                                                         </span>
                                                     <?php else: ?>
                                                         <span class="status-badge status-pending">
@@ -189,9 +216,21 @@ if ($stmt) {
                                             </div>
                                             
                                             <div class="col-md-3 text-center">
-                                                <a href="profile.php?viewReservation=<?php echo $reservation['reservationId']; ?>" class="btn btn-primary-luxury w-100">
+                                                <button type="button" class="btn btn-primary-luxury w-100" 
+                                                    onclick="openReservationDetails(<?php echo htmlspecialchars(json_encode([
+                                                        'reservationId' => $reservation['reservationId'],
+                                                        'eventName' => $reservation['eventName'],
+                                                        'eventId' => $reservation['eventId'],
+                                                        'packageId' => $reservation['packageId'],
+                                                        'packageName' => $reservation['packageName'],
+                                                        'venue' => $reservation['venue'],
+                                                        'date' => $reservation['date'],
+                                                        'time' => $reservation['time'],
+                                                        'totalAmount' => $reservation['totalAmount'],
+                                                        'status' => $reservation['status']
+                                                    ]), ENT_QUOTES); ?>)">
                                                     View Details
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -268,9 +307,267 @@ if ($stmt) {
         </div>
     </div>
 
+    <!-- Reservation Details Modal -->
+    <div class="modal fade" id="reservationDetailsModal" tabindex="-1" aria-labelledby="reservationDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reservationDetailsModalLabel" style="font-family: 'Playfair Display', serif;">Reservation Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Event</label>
+                                <div class="fw-semibold" id="modalEventName"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Venue</label>
+                                <div id="modalVenue"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Date</label>
+                                        <div id="modalDate"></div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted small">Time</label>
+                                        <div id="modalTime"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Package</label>
+                                <div id="modalPackage"></div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted small">Reservation ID</label>
+                                <div id="modalReservationId"></div>
+                            </div>
+
+                            <!-- Contact details -->
+                            <div class="border-top pt-3 mt-3">
+                                <div class="mb-2 fw-semibold">Contact Details</div>
+                                <div class="small text-muted">Full Name</div>
+                                <div class="mb-2" id="modalUserName"><?php echo htmlspecialchars($userData['name']); ?></div>
+                                <div class="small text-muted">Email</div>
+                                <div class="mb-2" id="modalUserEmail"><?php echo htmlspecialchars($userData['email']); ?></div>
+                                <div class="small text-muted">Phone</div>
+                                <div id="modalUserPhone"><?php echo htmlspecialchars($userData['mobile']); ?></div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="p-4 rounded" style="background-color: #F9F7F2;">
+                                <div class="text-center mb-3">
+                                    <label class="form-label text-muted small">Status</label>
+                                    <div id="modalStatus"></div>
+                                </div>
+                                <hr>
+                                <div class="text-center mb-3">
+                                    <label class="form-label text-muted small">Total Amount</label>
+                                    <div class="h3" style="color: #4A5D4A;" id="modalAmount"></div>
+                                </div>
+                                
+                                <!-- Status Messages -->
+                                <div id="pendingMessage" class="alert alert-warning text-center" style="display: none;">
+                                    <i class="fas fa-clock me-2"></i>
+                                    <strong>Awaiting Confirmation</strong>
+                                    <p class="small mb-0 mt-2">Your reservation is pending admin confirmation. Payment will be available once confirmed.</p>
+                                </div>
+                                
+                                <div id="cancelledMessage" class="alert alert-danger text-center" style="display: none;">
+                                    <i class="fas fa-times-circle me-2"></i>
+                                    <strong>Reservation Cancelled</strong>
+                                    <p class="small mb-0 mt-2">This reservation has been cancelled.</p>
+                                </div>
+                                
+                                <div id="paidMessage" class="alert alert-success text-center" style="display: none;">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Payment Completed</strong>
+                                    <p class="small mb-0 mt-2">Your reservation is confirmed and paid.</p>
+                                </div>
+                                
+                                <!-- PayPal Payment Section (only for confirmed reservations) -->
+                                <div id="paymentSection" style="display: none;">
+                                    <p class="small text-muted text-center mb-3">Your reservation is confirmed. Complete payment below.</p>
+                                    <div id="paypal-button-container-modal"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-luxury" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- PayPal JavaScript SDK -->
+    <script src="https://www.paypal.com/sdk/js?client-id=<?php echo getPayPalClientId(); ?>&currency=<?php echo PAYPAL_CURRENCY; ?>&intent=capture"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/profile.js"></script>
+    <script>
+        let currentReservation = null;
+        let paypalButtonsRendered = false;
+        
+        function openReservationDetails(reservation) {
+            currentReservation = reservation;
+            
+            // Populate modal fields
+            document.getElementById('modalEventName').textContent = reservation.eventName || 'N/A';
+            document.getElementById('modalVenue').textContent = reservation.venue || 'N/A';
+            document.getElementById('modalDate').textContent = reservation.date ? new Date(reservation.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
+            document.getElementById('modalTime').textContent = reservation.time && reservation.time !== ' - ' ? reservation.time : 'N/A';
+            document.getElementById('modalPackage').textContent = reservation.packageName || 'N/A';
+            document.getElementById('modalReservationId').textContent = '#' + reservation.reservationId;
+            document.getElementById('modalAmount').textContent = '₱ ' + parseFloat(reservation.totalAmount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            
+            // Set status badge
+            const statusEl = document.getElementById('modalStatus');
+            const status = (reservation.status || 'pending').toLowerCase();
+            
+            if (status === 'confirmed') {
+                statusEl.innerHTML = '<span class="badge bg-success fs-6">Confirmed</span>';
+            } else if (status === 'cancelled') {
+                statusEl.innerHTML = '<span class="badge bg-danger fs-6">Cancelled</span>';
+            } else if (status === 'paid') {
+                statusEl.innerHTML = '<span class="badge bg-primary fs-6">Paid</span>';
+            } else {
+                statusEl.innerHTML = '<span class="badge bg-warning text-dark fs-6">Pending</span>';
+            }
+            
+            // Hide all message/payment sections first
+            document.getElementById('pendingMessage').style.display = 'none';
+            document.getElementById('cancelledMessage').style.display = 'none';
+            document.getElementById('paidMessage').style.display = 'none';
+            document.getElementById('paymentSection').style.display = 'none';
+            
+            // Show appropriate section based on status
+            if (status === 'pending') {
+                document.getElementById('pendingMessage').style.display = 'block';
+            } else if (status === 'cancelled') {
+                document.getElementById('cancelledMessage').style.display = 'block';
+            } else if (status === 'completed') {
+                document.getElementById('paidMessage').style.display = 'block';
+            } else if (status === 'confirmed') {
+                // Show PayPal payment section
+                document.getElementById('paymentSection').style.display = 'block';
+                
+                // Render PayPal buttons
+                if (!paypalButtonsRendered) {
+                    renderPayPalButtons();
+                }
+            }
+            
+            // Open modal
+            const modal = new bootstrap.Modal(document.getElementById('reservationDetailsModal'));
+            modal.show();
+        }
+        
+        function renderPayPalButtons() {
+            if (typeof paypal === 'undefined') {
+                console.error('PayPal SDK not loaded');
+                document.getElementById('paymentSection').innerHTML = '<div class="alert alert-danger">PayPal is not available. Please refresh the page.</div>';
+                return;
+            }
+            
+            // Clear existing buttons
+            document.getElementById('paypal-button-container-modal').innerHTML = '';
+            
+            paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color: 'gold',
+                    shape: 'rect',
+                    label: 'paypal',
+                    height: 45
+                },
+                
+                createOrder: function(data, actions) {
+                    if (!currentReservation) {
+                        throw new Error('No reservation selected');
+                    }
+                    
+                    return fetch('api/paypal-create-order.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            eventId: parseInt(currentReservation.eventId),
+                            packageId: parseInt(currentReservation.packageId),
+                            amount: parseFloat(currentReservation.totalAmount),
+                            reservationId: parseInt(currentReservation.reservationId)
+                        })
+                    })
+                    .then(function(response) {
+                        if (!response.ok) {
+                            return response.json().then(function(err) {
+                                throw new Error(err.error || 'Failed to create order');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(function(orderData) {
+                        return orderData.id;
+                    });
+                },
+                
+                onApprove: function(data, actions) {
+                    return fetch('api/paypal-capture-order.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            orderId: data.orderID,
+                            reservationId: parseInt(currentReservation.reservationId)
+                        })
+                    })
+                    .then(function(response) {
+                        if (!response.ok) {
+                            return response.json().then(function(err) {
+                                throw new Error(err.error || 'Failed to capture payment');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(function(captureData) {
+                        if (captureData.status === 'COMPLETED') {
+                            // Close modal and redirect to confirmation
+                            const modal = bootstrap.Modal.getInstance(document.getElementById('reservationDetailsModal'));
+                            if (modal) modal.hide();
+                            
+                            window.location.href = captureData.redirectUrl;
+                        } else {
+                            throw new Error('Payment was not completed');
+                        }
+                    })
+                    .catch(function(error) {
+                        alert('Payment failed: ' + error.message);
+                    });
+                },
+                
+                onCancel: function(data) {
+                    console.log('Payment cancelled');
+                },
+                
+                onError: function(err) {
+                    console.error('PayPal error:', err);
+                    alert('An error occurred with PayPal. Please try again.');
+                }
+            }).render('#paypal-button-container-modal')
+            .then(function() {
+                paypalButtonsRendered = true;
+            });
+        }
+    </script>
 </body>
 </html>
 

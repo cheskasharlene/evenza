@@ -23,6 +23,7 @@ $input = json_decode(file_get_contents('php://input'), true);
 $eventId = isset($input['eventId']) ? intval($input['eventId']) : 0;
 $packageId = isset($input['packageId']) ? intval($input['packageId']) : 0;
 $amount = isset($input['amount']) ? floatval($input['amount']) : 0;
+$reservationId = isset($input['reservationId']) ? intval($input['reservationId']) : 0;
 
 if ($amount <= 0) {
     http_response_code(400);
@@ -114,6 +115,7 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($orderResult['id'])) {
     $_SESSION['paypal_order_amount'] = $amount;
     $_SESSION['paypal_order_event_id'] = $eventId;
     $_SESSION['paypal_order_package_id'] = $packageId;
+    $_SESSION['paypal_order_reservation_id'] = $reservationId;
     
     echo json_encode([
         'id' => $orderResult['id'],

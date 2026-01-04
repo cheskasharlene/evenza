@@ -364,15 +364,25 @@ if (!empty($searchQuery)) {
                             <label for="eventCategory" class="form-label">Category <span class="text-danger">*</span></label>
                             <select class="form-select" id="eventCategory" required>
                                 <option value="">Select Category</option>
-                                <option value="Conference">Conference</option>
-                                <option value="Wedding">Wedding</option>
-                                <option value="Seminar">Seminar</option>
-                                <option value="Workshop">Workshop</option>
                                 <option value="Business">Business</option>
+                                <option value="Weddings">Weddings</option>
                                 <option value="Socials">Socials</option>
-                                <option value="Hotel-Hosted Events">Hotel-Hosted Events</option>
-                                <option value="Premium">Premium</option>
+                                <option value="Workshops">Workshops</option>
                             </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="addEventDescription" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="addEventDescription" rows="4" placeholder="Enter a detailed description of the event..." required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addEventVenue" class="form-label">Venue <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addEventVenue" placeholder="e.g., Grand Luxe Hotel - Main Ballroom" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="addEventImagePath" class="form-label">Image Path <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="addEventImagePath" placeholder="assets/images/event_images/filename.jpg" required>
+                            <div class="form-text">Enter the path to the event image (e.g., assets/images/event_images/myevent.jpg)</div>
                         </div>
                     </form>
                 </div>
@@ -403,27 +413,25 @@ if (!empty($searchQuery)) {
                             <label for="editEventCategory" class="form-label">Category <span class="text-danger">*</span></label>
                             <select class="form-select" id="editEventCategory" required>
                                 <option value="">Select Category</option>
-                                <option value="Conference">Conference</option>
-                                <option value="Wedding">Wedding</option>
-                                <option value="Seminar">Seminar</option>
-                                <option value="Workshop">Workshop</option>
                                 <option value="Business">Business</option>
+                                <option value="Weddings">Weddings</option>
                                 <option value="Socials">Socials</option>
-                                <option value="Hotel-Hosted Events">Hotel-Hosted Events</option>
-                                <option value="Premium">Premium</option>
+                                <option value="Workshops">Workshops</option>
                             </select>
                         </div>
+                        
                         <div class="mb-3">
-                            <label for="editEventVenue" class="form-label">Venue</label>
-                            <input type="text" class="form-control" id="editEventVenue">
+                            <label for="editEventDescription" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="editEventDescription" rows="4" placeholder="Enter a detailed description of the event..." required></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="editEventDescription" class="form-label">Description</label>
-                            <textarea class="form-control" id="editEventDescription" rows="4"></textarea>
+                            <label for="editEventVenue" class="form-label">Venue <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editEventVenue" placeholder="e.g., Grand Luxe Hotel - Main Ballroom" required>
                         </div>
                         <div class="mb-3">
-                            <label for="editEventImagePath" class="form-label">Image Path</label>
-                            <input type="text" class="form-control" id="editEventImagePath" placeholder="assets/images/event_images/filename.jpg">
+                            <label for="editEventImagePath" class="form-label">Image Path <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editEventImagePath" placeholder="assets/images/event_images/filename.jpg" required>
+                            <div class="form-text">Enter the path to the event image (e.g., assets/images/event_images/myevent.jpg)</div>
                         </div>
                     </form>
                 </div>
@@ -570,9 +578,12 @@ if (!empty($searchQuery)) {
         function saveNewEvent() {
             const title = document.getElementById('eventName').value.trim();
             const category = document.getElementById('eventCategory').value;
+            const description = document.getElementById('addEventDescription').value.trim();
+            const venue = document.getElementById('addEventVenue').value.trim();
+            const imagePath = document.getElementById('addEventImagePath').value.trim();
             
-            if (!title || !category) {
-                showFeedback('Please fill in all required fields.', 'error');
+            if (!title || !category || !description || !venue || !imagePath) {
+                showFeedback('Please fill in all required fields including Description, Venue, and Image Path.', 'error');
                 return;
             }
             
@@ -580,9 +591,9 @@ if (!empty($searchQuery)) {
             formData.append('eventId', '0');
             formData.append('title', title);
             formData.append('category', category);
-            formData.append('venue', '');
-            formData.append('description', '');
-            formData.append('imagePath', '');
+            formData.append('venue', venue);
+            formData.append('description', description);
+            formData.append('imagePath', imagePath);
             
             fetch('api/updateEvent.php', {
                 method: 'POST',
@@ -623,8 +634,8 @@ if (!empty($searchQuery)) {
             const description = document.getElementById('editEventDescription').value.trim();
             const imagePath = document.getElementById('editEventImagePath').value.trim();
             
-            if (!title || !category) {
-                showFeedback('Please fill in all required fields.', 'error');
+            if (!title || !category || !description || !venue || !imagePath) {
+                showFeedback('Please fill in all required fields including Description, Venue, and Image Path.', 'error');
                 return;
             }
             

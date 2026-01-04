@@ -17,21 +17,51 @@
             return;
         }
 
-        if (mobile.length < 10) {
+        if (mobile.length < 7) {
             alert('Please enter a valid mobile number.');
             return;
         }
 
-        alert('Profile updated successfully!');
-        
-        document.querySelector('.profile-info-value').textContent = name;
-        document.querySelectorAll('.profile-info-value')[1].textContent = email;
-        document.querySelectorAll('.profile-info-value')[2].textContent = mobile;
+        // Disable button while saving
+        const saveBtn = document.querySelector('#editProfileModal .btn-primary-luxury');
+        if (saveBtn) saveBtn.disabled = true;
 
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
-        if (modal) {
-            modal.hide();
-        }
+        const formData = new URLSearchParams();
+        formData.append('fullName', name);
+        formData.append('email', email);
+        formData.append('mobile', mobile);
+
+        fetch('api/updateProfile.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                // Update visible profile info
+                const infoValues = document.querySelectorAll('.profile-info-value');
+                if (infoValues.length >= 3) {
+                    infoValues[0].textContent = name;
+                    infoValues[1].textContent = email;
+                    infoValues[2].textContent = mobile;
+                }
+                alert('Profile updated successfully!');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+                if (modal) modal.hide();
+            } else {
+                alert(data.message || 'Failed to update profile.');
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('An error occurred while saving your profile. Please try again.');
+        })
+        .finally(() => {
+            if (saveBtn) saveBtn.disabled = false;
+        });
     };
 
     document.addEventListener('DOMContentLoaded', function() {

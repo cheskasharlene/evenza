@@ -190,8 +190,6 @@ $totalAmount = $selectedPackage['price'];
                             <input type="hidden" name="packageTier" id="packageTier" value="<?php echo htmlspecialchars($selectedPackage['tier']); ?>">
                             <input type="hidden" name="packageName" id="packageName" value="<?php echo htmlspecialchars($selectedPackage['name']); ?>">
                             <input type="hidden" name="packagePrice" id="packagePrice" value="<?php echo $selectedPackage['price']; ?>">
-                            <input type="hidden" name="reservationDate" id="reservationDate" value="<?php echo date('Y-m-d'); ?>">
-                            
                             <div class="mb-4">
                                 <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control luxury-input" id="fullName" name="fullName" required placeholder="Enter your full name">
@@ -271,7 +269,7 @@ $totalAmount = $selectedPackage['price'];
 
                             <div class="d-flex gap-3 mt-4">
                                 <a href="eventDetails.php?id=<?php echo $eventId; ?>" class="btn btn-outline-luxury flex-fill">Back to Event</a>
-                                <button type="submit" class="btn btn-primary-luxury flex-fill">Proceed to Payment</button>
+                                <button type="submit" class="btn btn-primary-luxury flex-fill">Submit Reservation</button>
                             </div>
                         </form>
                     </div>
@@ -316,7 +314,7 @@ $totalAmount = $selectedPackage['price'];
 
                         <div class="summary-note mt-4">
                             <p class="small text-muted mb-0">
-                                You will be redirected to the payment page after submitting this form.
+                                Your reservation will be submitted for admin confirmation. Payment will be available once confirmed.
                             </p>
                         </div>
                     </div>
@@ -358,8 +356,39 @@ $totalAmount = $selectedPackage['price'];
         </div>
     </div>
 
+    <!-- Success Modal -->
+    <div class="modal fade" id="reservationSuccessModal" tabindex="-1" aria-labelledby="reservationSuccessModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-5">
+                    <div class="success-icon-wrapper mx-auto mb-4" style="width: 80px; height: 80px; background: linear-gradient(135deg, #4A5D4A 0%, #6B8E6B 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="white" viewBox="0 0 16 16">
+                            <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="mb-3" style="font-family: 'Playfair Display', serif;">Reservation Submitted!</h3>
+                    <p class="text-muted mb-4">Your reservation has been successfully submitted and is now awaiting admin confirmation.</p>
+                    <p class="small text-muted mb-4">Once confirmed, you will be able to proceed with payment from your profile page.</p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="profile.php" class="btn btn-primary-luxury">View My Reservations</a>
+                        <a href="events.php" class="btn btn-outline-luxury">Browse More Events</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
+    <script>
+        // Check if reservation was successful and show modal
+        <?php if (isset($_GET['success']) && $_GET['success'] === '1'): ?>
+        document.addEventListener('DOMContentLoaded', function() {
+            const successModal = new bootstrap.Modal(document.getElementById('reservationSuccessModal'));
+            successModal.show();
+        });
+        <?php endif; ?>
+    </script>
     <script>
         const reservationData = {
             packages: <?php echo json_encode($packages); ?>,

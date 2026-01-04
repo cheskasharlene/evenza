@@ -120,14 +120,28 @@ if ($reservationId <= 0 && $userId > 0 && $eventId > 0 && $packageId > 0 && $res
         $transactionReference = $transactionId;
     }
 } elseif ($reservationId > 0) {
-    // If reservation ID exists (shouldn't happen in new flow, but handle it)
-    // Update status to confirmed
-    $updateQuery = "UPDATE reservations SET status = 'confirmed' WHERE reservationId = ?";
+    // Reservation already exists - update status to completed (payment completed from profile)
+    $updateQuery = "UPDATE reservations SET status = 'completed' WHERE reservationId = ?";
     $updateStmt = mysqli_prepare($conn, $updateQuery);
     if ($updateStmt) {
         mysqli_stmt_bind_param($updateStmt, "i", $reservationId);
         mysqli_stmt_execute($updateStmt);
         mysqli_stmt_close($updateStmt);
+    }
+    
+    // Get the reservation amount if not set
+    if ($amount <= 0) {
+        $resQuery = "SELECT totalAmount FROM reservations WHERE reservationId = ?";
+        $resStmt = mysqli_prepare($conn, $resQuery);
+        if ($resStmt) {
+            mysqli_stmt_bind_param($resStmt, "i", $reservationId);
+            mysqli_stmt_execute($resStmt);
+            $resResult = mysqli_stmt_get_result($resStmt);
+            if ($resRow = mysqli_fetch_assoc($resResult)) {
+                $amount = floatval($resRow['totalAmount']);
+            }
+            mysqli_stmt_close($resStmt);
+        }
     }
     $reservationSaved = true;
 } else {

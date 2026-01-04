@@ -57,31 +57,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $endTimeFormatted = date('H:i:s', strtotime($endTime));
                 }
                 
-                // DO NOT save reservation to database yet - only store in session
-                // Reservation will be saved only after successful PayPal payment in confirmation.php
+                // Save reservation to database with status "pending"
+                // Payment will be done later after admin confirms
+                $insertQuery = "INSERT INTO reservations (userId, eventId, packageId, reservationDate, startTime, endTime, totalAmount, status) 
+                               VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')";
                 
-                // Store reservation data in session for payment processing
-                $_SESSION['pending_reservation_data'] = [
-                    'userId' => $userId,
-                    'eventId' => $eventId,
-                    'packageId' => $packageId,
-                    'packageName' => $packageName,
-                    'packageTier' => $packageTier,
-                    'reservationDate' => $reservationDate,
-                    'startTime' => $startTimeFormatted,
-                    'endTime' => $endTimeFormatted,
-                    'totalAmount' => $totalAmount
-                ];
+                $insertStmt = mysqli_prepare($conn, $insertQuery);
                 
-                // Also store for PayPal callback compatibility
-                $_SESSION['pending_reservation_id'] = 0; // Will be set after payment
-                $_SESSION['pending_event_id'] = $eventId;
-                $_SESSION['pending_package_id'] = $packageId;
-                $_SESSION['pending_amount'] = $totalAmount;
-                
-                // Redirect to payment page - NO database save yet
-                header('Location: payment.php?eventId=' . $eventId . '&packageId=' . $packageId . '&packageName=' . urlencode($packageName) . '&packagePrice=' . $totalAmount);
-                exit;
+                if ($insertStmt) {
+                    mysqli_stmt_bind_param($insertStmt, "iissssd", $userId, $eventId, $packageId, $reservationDate, $startTimeFormatted, $endTimeFormatted, $totalAmount);
+                    
+                    if (mysqli_stmt_execute($insertStmt)) {
+                        $reservationId = mysqli_insert_id($conn);
+                        $success = true;
+                        
+                        mysqli_stmt_close($insertStmt);
+                        
+                        // Redirect back to reservation page with success message
+                        header('Location: reservation.php?eventId=' . $eventId . '&success=1');
+                        exit;
+                    } else {
+                        $error_message = 'Failed to save reservation: ' . mysqli_error($conn);
+                        mysqli_stmt_close($insertStmt);
+                    }
+                } else {
+                    $error_message = 'Database error: ' . mysqli_error($conn);
+                }
             } else {
                 $error_message = 'Package not found in database.';
             }
@@ -103,4 +104,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 ?>
-

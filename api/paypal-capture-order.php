@@ -17,9 +17,12 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+$userId = $_SESSION['user_id'];
+
 // Get POST data
 $input = json_decode(file_get_contents('php://input'), true);
 $orderId = isset($input['orderId']) ? trim($input['orderId']) : '';
+$reservationId = isset($input['reservationId']) ? intval($input['reservationId']) : 0;
 
 if (empty($orderId)) {
     http_response_code(400);
@@ -27,8 +30,8 @@ if (empty($orderId)) {
     exit;
 }
 
-// Verify order ID matches session
-if (!isset($_SESSION['paypal_order_id']) || $_SESSION['paypal_order_id'] !== $orderId) {
+// Verify order ID matches session (if set)
+if (isset($_SESSION['paypal_order_id']) && $_SESSION['paypal_order_id'] !== $orderId) {
     http_response_code(400);
     echo json_encode(['error' => 'Order ID mismatch']);
     exit;
@@ -76,6 +79,48 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $c
     $packageId = $_SESSION['paypal_order_package_id'] ?? 0;
     $amount = $_SESSION['paypal_order_amount'] ?? 0;
     
+    // If reservationId provided, use it; otherwise get from session
+    if ($reservationId <= 0) {
+        $reservationId = $_SESSION['paypal_order_reservation_id'] ?? 0;
+    }
+    
+    // Update reservation status to "completed" if we have a reservationId
+    if ($reservationId > 0) {
+        $updateQuery = "UPDATE reservations SET status = 'completed' WHERE reservationId = ? AND userId = ?";
+        $updateStmt = mysqli_prepare($conn, $updateQuery);
+        if ($updateStmt) {
+            mysqli_stmt_bind_param($updateStmt, "ii", $reservationId, $userId);
+            mysqli_stmt_execute($updateStmt);
+            mysqli_stmt_close($updateStmt);
+        }
+        
+        // Get package name for payment record
+        $packageName = '';
+        if ($packageId > 0) {
+            $pkgQuery = "SELECT packageName FROM packages WHERE packageId = ?";
+            $pkgStmt = mysqli_prepare($conn, $pkgQuery);
+            if ($pkgStmt) {
+                mysqli_stmt_bind_param($pkgStmt, "i", $packageId);
+                mysqli_stmt_execute($pkgStmt);
+                $pkgResult = mysqli_stmt_get_result($pkgStmt);
+                if ($pkgRow = mysqli_fetch_assoc($pkgResult)) {
+                    $packageName = $pkgRow['packageName'];
+                }
+                mysqli_stmt_close($pkgStmt);
+            }
+        }
+        
+        // Save payment record
+        $paymentQuery = "INSERT INTO payments (reservationId, userId, transactionId, amount, packageName, paymentStatus) 
+                         VALUES (?, ?, ?, ?, ?, 'completed')";
+        $paymentStmt = mysqli_prepare($conn, $paymentQuery);
+        if ($paymentStmt) {
+            mysqli_stmt_bind_param($paymentStmt, "iisds", $reservationId, $userId, $transactionId, $amount, $packageName);
+            mysqli_stmt_execute($paymentStmt);
+            mysqli_stmt_close($paymentStmt);
+        }
+    }
+    
     // Generate success token for confirmation page
     $successToken = bin2hex(random_bytes(32));
     
@@ -86,7 +131,7 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $c
     $_SESSION['payment_order_id'] = $orderId;
     $_SESSION['payment_payer_id'] = $payerId;
     $_SESSION['payment_payer_email'] = $payerEmail;
-    $_SESSION['payment_reservation_id'] = 0; // Will be created in confirmation.php
+    $_SESSION['payment_reservation_id'] = $reservationId;
     $_SESSION['payment_event_id'] = $eventId;
     $_SESSION['payment_package_id'] = $packageId;
     $_SESSION['payment_amount'] = $amount;
@@ -96,6 +141,7 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $c
     unset($_SESSION['paypal_order_amount']);
     unset($_SESSION['paypal_order_event_id']);
     unset($_SESSION['paypal_order_package_id']);
+    unset($_SESSION['paypal_order_reservation_id']);
     
     // Return success with redirect URL
     echo json_encode([
@@ -142,4 +188,3 @@ function getPayPalAccessToken() {
     return null;
 }
 ?>
-

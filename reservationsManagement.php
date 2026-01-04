@@ -225,6 +225,14 @@ foreach ($reservations as $reservation) {
             background-color: #dc3545;
             color: #FFFFFF;
         }
+        .status-completed {
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        .status-completed.active {
+            background-color: #17a2b8;
+            color: #FFFFFF;
+        }
         .toast-container {
             position: fixed;
             top: 20px;
@@ -258,7 +266,6 @@ foreach ($reservations as $reservation) {
                         <a href="eventManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-calendar-alt"></i></span> Event Management</a>
                         <a href="reservationsManagement.php" class="nav-link active d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-clipboard-list"></i></span> Reservations</a>
                         <a href="userManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-users"></i></span> User Management</a>
-                        <a href="#" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-cog"></i></span> Settings</a>
                     </div>
                 </div>
             </div>
@@ -420,6 +427,12 @@ foreach ($reservations as $reservation) {
                                                     onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['reservationId'], ENT_QUOTES); ?>', 'cancelled')">
                                                 <i class="fas fa-times-circle me-1"></i> Cancelled
                                             </button>
+                                            <button type="button" 
+                                                    class="status-toggle-btn status-completed <?php echo (isset($reservation['status']) && strtolower($reservation['status']) === 'completed') ? 'active' : ''; ?>"
+                                                    onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['reservationId'], ENT_QUOTES); ?>', 'completed')"
+                                                    title="Mark as Completed (set automatically after PayPal payment)">
+                                                <i class="fas fa-credit-card me-1"></i> Completed
+                                            </button>
                                         </div>
                                     </div>
                                     <div class="text-muted small">
@@ -446,7 +459,6 @@ foreach ($reservations as $reservation) {
         </div>
     </div>
 
-    <!-- Toast Container for Feedback Messages -->
     <div class="toast-container">
         <div id="feedbackToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -501,6 +513,16 @@ foreach ($reservations as $reservation) {
 
         // Update reservation status
         function updateReservationStatus(reservationId, newStatus) {
+            // Disable all status buttons for this reservation while updating
+            const allButtons = document.querySelectorAll(`[onclick*="'${reservationId}'"]`);
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.6';
+            });
+            
+            // Show processing feedback
+            showFeedback('Updating reservation status...', 'info');
+            
             // Make AJAX call to update status in database
             fetch('api/updateReservationStatus.php', {
                 method: 'POST',
@@ -512,13 +534,19 @@ foreach ($reservations as $reservation) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    showFeedback('Reservation status updated to ' + newStatus + '.', 'success');
+                    // Capitalize first letter for display
+                    const displayStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+                    showFeedback('Reservation status updated to ' + displayStatus + ' successfully!', 'success');
                     
-                    // Update button states
-                    const buttons = document.querySelectorAll(`[onclick*="${reservationId}"]`);
-                    buttons.forEach(btn => {
+                    // Update button states immediately (case-insensitive comparison)
+                    allButtons.forEach(btn => {
                         btn.classList.remove('active');
-                        if (btn.textContent.includes(newStatus)) {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                        
+                        // Check if button text contains the status (case-insensitive)
+                        const btnText = btn.textContent.toLowerCase().trim();
+                        if (btnText.includes(newStatus.toLowerCase())) {
                             btn.classList.add('active');
                         }
                     });
@@ -526,12 +554,22 @@ foreach ($reservations as $reservation) {
                     // Reload after a short delay to reflect server-side changes
                     setTimeout(function() {
                         location.reload();
-                    }, 1500);
+                    }, 1000);
                 } else {
+                    // Re-enable buttons on error
+                    allButtons.forEach(btn => {
+                        btn.disabled = false;
+                        btn.style.opacity = '1';
+                    });
                     showFeedback('Error updating status: ' + (data.message || 'Unknown error'), 'error');
                 }
             })
             .catch(error => {
+                // Re-enable buttons on error
+                allButtons.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                });
                 showFeedback('Error updating status: ' + error.message, 'error');
             });
         }
