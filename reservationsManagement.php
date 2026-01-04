@@ -1,49 +1,119 @@
 <?php
 // Admin Authentication Guard - Must be at the very top
 require_once 'adminAuth.php';
-
-// Load reservations data
-$reservationsFile = __DIR__ . '/data/reservations.json';
-$reservations = [];
-if (file_exists($reservationsFile)) {
-    $reservations = json_decode(file_get_contents($reservationsFile), true) ?? [];
-}
+require_once 'connect.php';
 
 // Get filter parameters
 $packageFilter = isset($_GET['package']) ? $_GET['package'] : '';
 $dateFilter = isset($_GET['date']) ? $_GET['date'] : '';
 
-// Filter reservations
-$filteredReservations = $reservations;
+// Build SQL query with JOINs to fetch customer name, event title, and package details
+$query = "SELECT 
+            r.reservationId,
+            r.userId,
+            r.eventId,
+            r.packageId,
+            r.reservationDate,
+            r.startTime,
+            r.endTime,
+            r.totalAmount,
+            r.status,
+            r.createdAt,
+            u.fullName AS customerName,
+            u.email AS customerEmail,
+            e.title AS eventTitle,
+            e.venue AS eventVenue,
+            p.packageName,
+            p.price AS packagePrice
+          FROM reservations r
+          INNER JOIN users u ON r.userId = u.userid
+          INNER JOIN events e ON r.eventId = e.eventId
+          INNER JOIN packages p ON r.packageId = p.packageId
+          WHERE 1=1";
+
+$params = [];
+$types = '';
+
+// Apply filters - extract tier from package name (Bronze Package -> Bronze)
 if (!empty($packageFilter)) {
-    $filteredReservations = array_filter($filteredReservations, function($r) use ($packageFilter) {
-        $packageName = isset($r['packageName']) ? strtolower($r['packageName']) : '';
-        return stripos($packageName, strtolower($packageFilter)) !== false;
-    });
+    $query .= " AND p.packageName LIKE ?";
+    $params[] = $packageFilter . '%';
+    $types .= 's';
 }
+
 if (!empty($dateFilter)) {
-    $filteredReservations = array_filter($filteredReservations, function($r) use ($dateFilter) {
-        $reservationDate = isset($r['date']) ? $r['date'] : '';
-        // Convert date format for comparison
-        $resDate = date('Y-m-d', strtotime($reservationDate));
-        return $resDate === $dateFilter;
-    });
+    $query .= " AND DATE(r.reservationDate) = ?";
+    $params[] = $dateFilter;
+    $types .= 's';
+}
+
+$query .= " ORDER BY r.reservationDate DESC, r.createdAt DESC";
+
+// Execute query with prepared statement
+$reservations = [];
+$totalRevenue = 0;
+
+$stmt = mysqli_prepare($conn, $query);
+if ($stmt) {
+    if (!empty($params)) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+    }
+    
+    if (mysqli_stmt_execute($stmt)) {
+        $result = mysqli_stmt_get_result($stmt);
+        
+        while ($row = mysqli_fetch_assoc($result)) {
+            // Extract package tier from package name (e.g., "Bronze Package" -> "Bronze")
+            $packageTier = 'Unknown';
+            if (!empty($row['packageName'])) {
+                $packageTier = str_replace(' Package', '', $row['packageName']);
+            }
+            $row['packageTier'] = $packageTier;
+            
+            $reservations[] = $row;
+            $totalRevenue += floatval($row['totalAmount']);
+        }
+        
+        mysqli_free_result($result);
+    } else {
+        $error_message = 'Error fetching reservations: ' . mysqli_error($conn);
+    }
+    
+    mysqli_stmt_close($stmt);
+} else {
+    $error_message = 'Error preparing query: ' . mysqli_error($conn);
 }
 
 // Group reservations by date
 $groupedReservations = [];
-foreach ($filteredReservations as $reservation) {
-    $date = isset($reservation['date']) ? $reservation['date'] : 'Unknown Date';
-    if (!isset($groupedReservations[$date])) {
-        $groupedReservations[$date] = [];
+foreach ($reservations as $reservation) {
+    $reservationDate = isset($reservation['reservationDate']) ? date('Y-m-d', strtotime($reservation['reservationDate'])) : 'Unknown Date';
+    $dateFormatted = date('F j, Y', strtotime($reservation['reservationDate']));
+    
+    if (!isset($groupedReservations[$dateFormatted])) {
+        $groupedReservations[$dateFormatted] = [];
     }
-    $groupedReservations[$date][] = $reservation;
+    $groupedReservations[$dateFormatted][] = $reservation;
 }
 
 // Sort dates
 uksort($groupedReservations, function($a, $b) {
     return strtotime($a) - strtotime($b);
 });
+
+// Calculate revenue by package tier
+$revenueByPackage = [
+    'Bronze' => 0,
+    'Silver' => 0,
+    'Gold' => 0
+];
+
+foreach ($reservations as $reservation) {
+    $tier = $reservation['packageTier'];
+    if (isset($revenueByPackage[$tier])) {
+        $revenueByPackage[$tier] += floatval($reservation['totalAmount']);
+    }
+}
 ?>
 <!doctype html>
 <html lang="en">
@@ -198,6 +268,7 @@ uksort($groupedReservations, function($a, $b) {
                         <a href="eventManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-calendar-alt"></i></span> Event Management</a>
                         <a href="reservationsManagement.php" class="nav-link active d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-clipboard-list"></i></span> Reservations</a>
                         <a href="userManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-users"></i></span> User Management</a>
+                        <a href="#" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-cog"></i></span> Settings</a>
                     </div>
                 </div>
             </div>
@@ -257,11 +328,49 @@ uksort($groupedReservations, function($a, $b) {
                     </form>
                 </div>
 
+                <!-- Revenue Summary -->
+                <div class="admin-card p-4 mb-4">
+                    <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">Revenue Summary</h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="text-center p-3" style="background-color: #F9F7F2; border-radius: 8px;">
+                                <div class="text-muted small mb-1">Total Revenue</div>
+                                <div class="h4 mb-0" style="color: #4A5D4A; font-weight: 600;">₱<?php echo number_format($totalRevenue, 2); ?></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3" style="background-color: #F9F7F2; border-radius: 8px;">
+                                <div class="text-muted small mb-1">Bronze Package</div>
+                                <div class="h5 mb-0" style="color: #4A5D4A; font-weight: 600;">₱<?php echo number_format($revenueByPackage['Bronze'], 2); ?></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3" style="background-color: #F9F7F2; border-radius: 8px;">
+                                <div class="text-muted small mb-1">Silver Package</div>
+                                <div class="h5 mb-0" style="color: #4A5D4A; font-weight: 600;">₱<?php echo number_format($revenueByPackage['Silver'], 2); ?></div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3" style="background-color: #F9F7F2; border-radius: 8px;">
+                                <div class="text-muted small mb-1">Gold Package</div>
+                                <div class="h5 mb-0" style="color: #4A5D4A; font-weight: 600;">₱<?php echo number_format($revenueByPackage['Gold'], 2); ?></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Reservations List -->
                 <div class="admin-card p-4">
                     <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">
-                        Reservations (<?php echo count($filteredReservations); ?>)
+                        Reservations (<?php echo count($reservations); ?>)
                     </h5>
+                    
+                    <?php if (isset($error_message)): ?>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i><?php echo htmlspecialchars($error_message); ?>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <?php endif; ?>
                     
                     <?php if (empty($groupedReservations)): ?>
                     <div class="text-center text-muted py-5">
@@ -281,27 +390,30 @@ uksort($groupedReservations, function($a, $b) {
                             <div class="row align-items-center">
                                 <div class="col-md-6">
                                     <h6 class="mb-2" style="font-family: 'Playfair Display', serif;">
-                                        <?php echo htmlspecialchars($reservation['eventName'] ?? 'Unknown Event'); ?>
+                                        <?php echo htmlspecialchars($reservation['eventTitle'] ?? 'Unknown Event'); ?>
                                     </h6>
                                     <div class="text-muted small mb-2">
+                                        <i class="fas fa-user me-1"></i>
+                                        <strong>Customer:</strong> <?php echo htmlspecialchars($reservation['customerName'] ?? 'N/A'); ?>
+                                        <span class="ms-2 text-muted">(<?php echo htmlspecialchars($reservation['customerEmail'] ?? 'N/A'); ?>)</span>
+                                    </div>
+                                    <div class="text-muted small mb-2">
                                         <i class="fas fa-clock me-1"></i>
-                                        <?php echo htmlspecialchars($reservation['time'] ?? 'N/A'); ?>
+                                        <?php echo htmlspecialchars($reservation['eventTime'] ?? 'N/A'); ?>
                                     </div>
                                     <div class="text-muted small mb-2">
                                         <i class="fas fa-map-marker-alt me-1"></i>
-                                        <?php echo htmlspecialchars($reservation['venue'] ?? 'N/A'); ?>
+                                        <?php echo htmlspecialchars($reservation['eventVenue'] ?? 'N/A'); ?>
                                     </div>
-                                    <?php if (isset($reservation['packageName'])): ?>
                                     <div class="mb-2">
                                         <span class="badge bg-light text-dark">
                                             <i class="fas fa-box me-1"></i>
-                                            <?php echo htmlspecialchars($reservation['packageName']); ?>
+                                            <?php echo htmlspecialchars($reservation['packageName'] ?? ($reservation['packageTier'] ?? 'N/A') . ' Package'); ?>
                                         </span>
                                     </div>
-                                    <?php endif; ?>
                                     <div class="text-muted small">
                                         <i class="fas fa-money-bill-wave me-1"></i>
-                                        ₱<?php echo number_format($reservation['totalAmount'] ?? 0, 2); ?>
+                                        <strong>Revenue:</strong> ₱<?php echo number_format($reservation['totalAmount'] ?? 0, 2); ?>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -310,24 +422,32 @@ uksort($groupedReservations, function($a, $b) {
                                         <div class="status-toggle-group">
                                             <button type="button" 
                                                     class="status-toggle-btn status-pending <?php echo (isset($reservation['status']) && strtolower($reservation['status']) === 'pending') ? 'active' : ''; ?>"
-                                                    onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['id'], ENT_QUOTES); ?>', 'pending')">
+                                                    onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['reservationId'], ENT_QUOTES); ?>', 'pending')">
                                                 <i class="fas fa-clock me-1"></i> Pending
                                             </button>
                                             <button type="button" 
                                                     class="status-toggle-btn status-confirmed <?php echo (isset($reservation['status']) && strtolower($reservation['status']) === 'confirmed') ? 'active' : ''; ?>"
-                                                    onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['id'], ENT_QUOTES); ?>', 'confirmed')">
+                                                    onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['reservationId'], ENT_QUOTES); ?>', 'confirmed')">
                                                 <i class="fas fa-check-circle me-1"></i> Confirmed
                                             </button>
                                             <button type="button" 
                                                     class="status-toggle-btn status-cancelled <?php echo (isset($reservation['status']) && strtolower($reservation['status']) === 'cancelled') ? 'active' : ''; ?>"
-                                                    onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['id'], ENT_QUOTES); ?>', 'cancelled')">
+                                                    onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['reservationId'], ENT_QUOTES); ?>', 'cancelled')">
                                                 <i class="fas fa-times-circle me-1"></i> Cancelled
                                             </button>
                                         </div>
                                     </div>
                                     <div class="text-muted small">
                                         <i class="fas fa-id-badge me-1"></i>
-                                        Reservation ID: <?php echo htmlspecialchars($reservation['id'] ?? 'N/A'); ?>
+                                        Reservation ID: <?php echo htmlspecialchars($reservation['reservationId'] ?? 'N/A'); ?>
+                                    </div>
+                                    <div class="text-muted small mt-1">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        Booked: <?php echo date('M j, Y', strtotime($reservation['reservationDate'] ?? 'now')); ?>
+                                        <?php if (!empty($reservation['startTime']) && !empty($reservation['endTime'])): ?>
+                                            <br><i class="fas fa-clock me-1"></i>
+                                            <?php echo date('g:i A', strtotime($reservation['startTime'])); ?> - <?php echo date('g:i A', strtotime($reservation['endTime'])); ?>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -396,30 +516,39 @@ uksort($groupedReservations, function($a, $b) {
 
         // Update reservation status
         function updateReservationStatus(reservationId, newStatus) {
-            // In a real implementation, this would make an AJAX call to update the status
-            // For now, we'll show feedback and update the UI
-            
-            const statusLabels = {
-                'pending': 'Pending',
-                'confirmed': 'Confirmed',
-                'cancelled': 'Cancelled'
-            };
-            
-            showFeedback('Reservation status updated to ' + statusLabels[newStatus] + '.', 'success');
-            
-            // Update button states
-            const buttons = document.querySelectorAll(`[onclick*="${reservationId}"]`);
-            buttons.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.textContent.toLowerCase().includes(newStatus)) {
-                    btn.classList.add('active');
+            // Make AJAX call to update status in database
+            fetch('api/updateReservationStatus.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'reservationId=' + encodeURIComponent(reservationId) + '&status=' + encodeURIComponent(newStatus)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showFeedback('Reservation status updated to ' + newStatus + '.', 'success');
+                    
+                    // Update button states
+                    const buttons = document.querySelectorAll(`[onclick*="${reservationId}"]`);
+                    buttons.forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.textContent.includes(newStatus)) {
+                            btn.classList.add('active');
+                        }
+                    });
+                    
+                    // Reload after a short delay to reflect server-side changes
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500);
+                } else {
+                    showFeedback('Error updating status: ' + (data.message || 'Unknown error'), 'error');
                 }
+            })
+            .catch(error => {
+                showFeedback('Error updating status: ' + error.message, 'error');
             });
-            
-            // In production, reload after a short delay to reflect server-side changes
-            setTimeout(function() {
-                location.reload();
-            }, 1500);
         }
 
         // Show feedback on page load if there's a message in URL

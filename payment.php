@@ -1,12 +1,30 @@
 <?php
 session_start();
 
+// Display success/error messages
+$success_message = '';
+$error_message = '';
+if (isset($_SESSION['success_message'])) {
+    $success_message = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    $error_message = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
+
 $eventId = isset($_POST['eventId']) ? intval($_POST['eventId']) : (isset($_GET['eventId']) ? intval($_GET['eventId']) : 1);
+$packageTier = isset($_POST['packageTier']) ? htmlspecialchars($_POST['packageTier']) : (isset($_GET['packageTier']) ? htmlspecialchars($_GET['packageTier']) : '');
 $packageName = isset($_POST['packageName']) ? htmlspecialchars($_POST['packageName']) : (isset($_GET['packageName']) ? htmlspecialchars($_GET['packageName']) : '');
 $packagePrice = isset($_POST['packagePrice']) ? floatval($_POST['packagePrice']) : (isset($_GET['packagePrice']) ? floatval($_GET['packagePrice']) : 0.0);
-$fullName = isset($_POST['fullName']) ? htmlspecialchars($_POST['fullName']) : '';
-$email = isset($_POST['email']) ? htmlspecialchars($_POST['email']) : '';
-$mobile = isset($_POST['mobile']) ? htmlspecialchars($_POST['mobile']) : '';
+$fullName = isset($_POST['fullName']) ? htmlspecialchars($_POST['fullName']) : (isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '');
+$email = isset($_POST['email']) ? htmlspecialchars($_POST['email']) : (isset($_SESSION['user_email']) ? $_SESSION['user_email'] : '');
+$mobile = isset($_POST['mobile']) ? htmlspecialchars($_POST['mobile']) : (isset($_SESSION['user_mobile']) ? $_SESSION['user_mobile'] : '');
+
+// If packageTier is provided but packageName is not, construct it
+if (!empty($packageTier) && empty($packageName)) {
+    $packageName = $packageTier . ' Package';
+}
 
 $eventsData = [
     1 => [
@@ -121,6 +139,20 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                     <div class="luxury-card payment-summary-card p-5 mb-4">
                         <h2 class="page-title mb-4 text-center">Payment Summary</h2>
                         
+                        <?php if (!empty($success_message)): ?>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i><?php echo htmlspecialchars($success_message); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($error_message)): ?>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i><?php echo htmlspecialchars($error_message); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
+                        
                         <div class="payment-summary-content">
                             <div class="payment-summary-item mb-4">
                                 <div class="payment-label">Event Name</div>
@@ -144,9 +176,35 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
 
                         <?php if ($paymentStatus === 'pending'): ?>
                             <div class="payment-button-section mt-5">
+                                <?php
+                                // Ensure reservation data is in session for PayPal callback
+                                // Note: Reservation is NOT saved to database yet - only in session
+                                if (!isset($_SESSION['pending_reservation_data'])) {
+                                    // Store reservation data in session (if not already stored from reserve.php)
+                                    $_SESSION['pending_reservation_data'] = [
+                                        'userId' => isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0,
+                                        'eventId' => $eventId,
+                                        'packageId' => isset($_GET['packageId']) ? intval($_GET['packageId']) : 0,
+                                        'packageName' => $packageName,
+                                        'packageTier' => $packageTier,
+                                        'reservationDate' => date('Y-m-d'),
+                                        'startTime' => null,
+                                        'endTime' => null,
+                                        'totalAmount' => $packagePrice
+                                    ];
+                                }
+                                
+                                // Store for PayPal callback compatibility
+                                $_SESSION['pending_event_id'] = $eventId;
+                                $_SESSION['pending_package_id'] = isset($_GET['packageId']) ? intval($_GET['packageId']) : 0;
+                                $_SESSION['pending_amount'] = $packagePrice;
+                                ?>
                                 <button type="button" class="btn btn-paypal w-100 btn-lg" onclick="processPayment()">
-                                    Pay with PayPal
+                                    <i class="fab fa-paypal me-2"></i>Pay with PayPal
                                 </button>
+                                <p class="text-center text-muted small mt-3 mb-0">
+                                    You will be redirected to PayPal to complete your payment securely.
+                                </p>
                             </div>
                         <?php endif; ?>
 
@@ -167,14 +225,13 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                     <div class="status-content">
                                         <h5>Payment Successful</h5>
                                         <p>Your payment has been processed successfully. Redirecting to confirmation page...</p>
-                                        <div class="mt-3">
-                                            <a href="confirmation.php?eventId=<?php echo $eventId; ?>&packageName=<?php echo urlencode($packageName); ?>&packagePrice=<?php echo $packagePrice; ?>&fullName=<?php echo urlencode($fullName); ?>&email=<?php echo urlencode($email); ?>" class="btn btn-primary-luxury">View Confirmation</a>
-                                        </div>
                                     </div>
                                 </div>
                                 <script>
+                                    // This should not happen in normal flow - payment should go through paypalCallback.php
+                                    // But if it does, redirect to home
                                     setTimeout(function() {
-                                        window.location.href = 'confirmation.php?eventId=<?php echo $eventId; ?>&packageName=<?php echo urlencode($packageName); ?>&packagePrice=<?php echo $packagePrice; ?>&fullName=<?php echo urlencode($fullName); ?>&email=<?php echo urlencode($email); ?>';
+                                        window.location.href = 'index.php';
                                     }, 2000);
                                 </script>
                             <?php endif; ?>
@@ -248,7 +305,21 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
-    <script src="assets/js/payment.js"></script>
+    <script src="assets/js/payment.js?v=<?php echo time(); ?>"></script>
+    <script>
+        // Ensure processPayment is available and add fallback
+        document.addEventListener('DOMContentLoaded', function() {
+            const payButton = document.querySelector('.btn-paypal');
+            if (payButton && typeof window.processPayment === 'undefined') {
+                console.error('processPayment function not loaded!');
+                payButton.onclick = function() {
+                    alert('Payment script not loaded. Please refresh the page.');
+                };
+            } else if (payButton) {
+                console.log('Payment script loaded successfully');
+            }
+        });
+    </script>
 </body>
 </html>
 

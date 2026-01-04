@@ -1,9 +1,39 @@
 <?php
 session_start();
+require_once 'connect.php';
+
+// Display success/error messages
+$success_message = '';
+$error_message = '';
+if (isset($_SESSION['success_message'])) {
+    $success_message = $_SESSION['success_message'];
+    unset($_SESSION['success_message']);
+}
+if (isset($_SESSION['error_message'])) {
+    $error_message = $_SESSION['error_message'];
+    unset($_SESSION['error_message']);
+}
 
 $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 1;
 
-// Package-based reservation: define packages for the event
+// Load packages from database
+$packages = [];
+$packagesQuery = "SELECT packageId, packageName, price FROM packages ORDER BY packageId ASC";
+$packagesResult = mysqli_query($conn, $packagesQuery);
+if ($packagesResult) {
+    while ($row = mysqli_fetch_assoc($packagesResult)) {
+        // Extract tier from package name (e.g., "Bronze Package" -> "Bronze")
+        $tier = str_replace(' Package', '', $row['packageName']);
+        $packages[] = [
+            'id' => $row['packageId'],
+            'name' => $row['packageName'],
+            'tier' => $tier,
+            'price' => floatval($row['price'])
+        ];
+    }
+    mysqli_free_result($packagesResult);
+}
+
 $eventsData = [
     1 => [
         'name' => 'Business Innovation Summit 2024',
@@ -49,14 +79,46 @@ $eventsData = [
 
 $event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
 
-// Define package options (example packages) — replace with event-specific packages as needed
-$packages = [
-    ['id' => 'bronze', 'name' => 'Bronze Package', 'price' => 7000],
-    ['id' => 'silver', 'name' => 'Silver Package', 'price' => 10000],
-    ['id' => 'gold', 'name' => 'Gold Package', 'price' => 15000]
-];
+// Price calculation function using switch statement (for reference, but we'll use DB prices)
+function calculatePackagePrice($packageTier) {
+    switch(strtolower($packageTier)) {
+        case 'bronze':
+            return 7000;
+        case 'silver':
+            return 10000;
+        case 'gold':
+            return 15000;
+        default:
+            return 0;
+    }
+}
 
-$selectedPackage = $packages[0];
+// Alternative using if-else (commented out, using switch above)
+/*
+function calculatePackagePrice($packageTier) {
+    if (strtolower($packageTier) === 'bronze') {
+        return 7000;
+    } elseif (strtolower($packageTier) === 'silver') {
+        return 10000;
+    } elseif (strtolower($packageTier) === 'gold') {
+        return 15000;
+    } else {
+        return 0;
+    }
+}
+*/
+
+// Get selected package from POST/GET or default to first package
+$selectedPackageId = isset($_POST['packageId']) ? intval($_POST['packageId']) : (isset($_GET['packageId']) ? intval($_GET['packageId']) : ($packages[0]['id'] ?? 1));
+$selectedPackage = $packages[0] ?? ['id' => 1, 'name' => 'Bronze Package', 'tier' => 'Bronze', 'price' => 7000];
+foreach ($packages as $p) {
+    if ($p['id'] == $selectedPackageId) {
+        $selectedPackage = $p;
+        break;
+    }
+}
+
+// Use price from database
 $totalAmount = $selectedPackage['price'];
 ?>
 <!DOCTYPE html>
@@ -127,12 +189,28 @@ $totalAmount = $selectedPackage['price'];
                     <div class="luxury-card p-4">
                         <h2 class="page-title mb-4">Reservation Form</h2>
                         
-                        <form id="reservationForm" method="POST" action="payment.php">
+                        <?php if (!empty($success_message)): ?>
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i><?php echo htmlspecialchars($success_message); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if (!empty($error_message)): ?>
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i><?php echo htmlspecialchars($error_message); ?>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <form id="reservationForm" method="POST" action="reserve.php">
                             <input type="hidden" name="eventId" value="<?php echo $eventId; ?>">
                             <!-- Package selection hidden fields -->
                             <input type="hidden" name="packageId" id="packageId" value="<?php echo $selectedPackage['id']; ?>">
+                            <input type="hidden" name="packageTier" id="packageTier" value="<?php echo htmlspecialchars($selectedPackage['tier']); ?>">
                             <input type="hidden" name="packageName" id="packageName" value="<?php echo htmlspecialchars($selectedPackage['name']); ?>">
                             <input type="hidden" name="packagePrice" id="packagePrice" value="<?php echo $selectedPackage['price']; ?>">
+                            <input type="hidden" name="reservationDate" id="reservationDate" value="<?php echo date('Y-m-d'); ?>">
                             
                             <div class="mb-4">
                                 <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
@@ -201,7 +279,7 @@ $totalAmount = $selectedPackage['price'];
                                 <label class="form-label">Select Package <span class="text-danger">*</span></label>
                                 <div class="package-options d-flex gap-2 mt-2 flex-wrap" id="packageOptions">
                                     <?php foreach ($packages as $p): ?>
-                                        <div class="package-tile" role="button" tabindex="0" data-id="<?php echo $p['id']; ?>" data-name="<?php echo htmlspecialchars($p['name']); ?>" data-price="<?php echo $p['price']; ?>">
+                                        <div class="package-tile <?php echo ($p['id'] == $selectedPackageId) ? 'selected' : ''; ?>" role="button" tabindex="0" data-id="<?php echo $p['id']; ?>" data-tier="<?php echo htmlspecialchars($p['tier']); ?>" data-name="<?php echo htmlspecialchars($p['name']); ?>" data-price="<?php echo $p['price']; ?>">
                                             <div class="package-tile-name"><?php echo htmlspecialchars($p['name']); ?></div>
                                             <div class="package-tile-rate">Flat rate</div>
                                             <div class="package-tile-price">₱ <?php echo number_format($p['price'], 2); ?></div>
@@ -366,10 +444,12 @@ $totalAmount = $selectedPackage['price'];
                     
                     // Update hidden fields
                     const packageId = this.getAttribute('data-id');
+                    const packageTier = this.getAttribute('data-tier');
                     const packageName = this.getAttribute('data-name');
                     const packagePrice = this.getAttribute('data-price');
                     
                     document.getElementById('packageId').value = packageId;
+                    document.getElementById('packageTier').value = packageTier;
                     document.getElementById('packageName').value = packageName;
                     document.getElementById('packagePrice').value = packagePrice;
                     

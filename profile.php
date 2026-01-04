@@ -16,7 +16,12 @@ $userData = [
 $reservations = [];
 $userId = $_SESSION['user_id'];
 $query = "
-    SELECT r.*, e.title as eventName, e.venue, p.packageName 
+    SELECT r.*, 
+           e.title as eventName, 
+           e.venue, 
+           p.packageName,
+           r.reservationDate as date,
+           CONCAT(COALESCE(r.startTime, ''), ' - ', COALESCE(r.endTime, '')) as time
     FROM reservations r
     LEFT JOIN events e ON r.eventId = e.eventId
     LEFT JOIN packages p ON r.packageId = p.packageId
@@ -147,8 +152,12 @@ if ($stmt) {
                                                 <!-- category removed -->
                                                 
                                                 <div class="reservation-date mb-2">
-                                                    <span><?php echo htmlspecialchars($reservation['date']); ?></span>
-                                                    <span class="text-muted ms-2"><?php echo htmlspecialchars($reservation['time']); ?></span>
+                                                    <?php if (!empty($reservation['date'])): ?>
+                                                        <span><?php echo date('F j, Y', strtotime($reservation['date'])); ?></span>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($reservation['time']) && $reservation['time'] !== ' - '): ?>
+                                                        <span class="text-muted ms-2"><?php echo htmlspecialchars($reservation['time']); ?></span>
+                                                    <?php endif; ?>
                                                 </div>
                                                 
                                                 <div class="reservation-venue text-muted small">
@@ -175,13 +184,13 @@ if ($stmt) {
                                                     <?php else: ?>
                                                         <div>Qty: <?php echo htmlspecialchars($reservation['quantity'] ?? 1); ?></div>
                                                     <?php endif; ?>
-                                                    <div>Total: ₱ <?php echo number_format($reservation['totalAmount'], 2); ?></div>
+                                                    <div>Total: ₱ <?php echo number_format($reservation['totalAmount'] ?? 0, 2); ?></div>
                                                 </div>
                                             </div>
                                             
                                             <div class="col-md-3 text-center">
-                                                <a href="confirmation.php?eventId=<?php echo $reservation['eventId']; ?><?php echo isset($reservation['packageName']) ? '&packageName=' . urlencode($reservation['packageName']) . '&packagePrice=' . urlencode($reservation['totalAmount']) : '&quantity=' . urlencode($reservation['quantity']); ?>&ticketId=<?php echo htmlspecialchars($reservation['ticketId']); ?>" class="btn btn-primary-luxury w-100">
-                                                    View Ticket
+                                                <a href="profile.php?viewReservation=<?php echo $reservation['reservationId']; ?>" class="btn btn-primary-luxury w-100">
+                                                    View Details
                                                 </a>
                                             </div>
                                         </div>
