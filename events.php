@@ -207,7 +207,7 @@ function getCategoryFilter($category) {
                     </div>
                 <?php else: ?>
                     <?php 
-                    // Debug output in HTML comments (view page source to see)
+                    
                     echo "<!-- DEBUG: Total events fetched: " . count($events) . " -->\n";
                     foreach ($events as $debugEvent) {
                         echo "<!-- Event: " . htmlspecialchars($debugEvent['title']) . " | Category: " . htmlspecialchars($debugEvent['category'] ?? 'N/A') . " | Status: " . (isset($debugEvent['status']) ? htmlspecialchars($debugEvent['status']) : 'N/A') . " | Filter Category: " . getCategoryFilter($debugEvent['category'] ?? '') . " -->\n";

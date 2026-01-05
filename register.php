@@ -18,12 +18,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
     $confirmPassword = isset($_POST['confirmPassword']) ? trim($_POST['confirmPassword']) : '';
 
+    // Password validation function
+    function validatePassword($password) {
+        if (strlen($password) < 8) {
+            return 'Password must be at least 8 characters long.';
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            return 'Password must contain at least one uppercase letter.';
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            return 'Password must contain at least one lowercase letter.';
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            return 'Password must contain at least one number.';
+        }
+        return true;
+    }
+
     if (empty($firstName) || empty($lastName) || empty($email) || empty($phoneNumber) || empty($password)) {
         $error = 'All fields are required.';
     } elseif ($password !== $confirmPassword) {
         $error = 'Passwords do not match.';
-    } elseif (strlen($password) < 6) {
-        $error = 'Password must be at least 6 characters long.';
+    } elseif (($passwordValidation = validatePassword($password)) !== true) {
+        $error = $passwordValidation;
     } else {
         try {
             // Check if email already exists
@@ -145,12 +162,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <div class="form-group mb-4">
                                 <label for="phoneNumber" class="form-label">Phone Number</label>
-                                <input id="phoneNumber" name="phoneNumber" type="tel" class="form-control luxury-input" required placeholder="+1 (555) 123-4567">
+                                <input id="phoneNumber" name="phoneNumber" type="tel" class="form-control luxury-input" required placeholder="0921 123 4567">
                             </div>
 
                             <div class="form-group mb-4">
                                 <label for="password" class="form-label">Password</label>
                                 <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password">
+                                <small class="text-muted">Must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number.</small>
                             </div>
 
                             <div class="form-group mb-4">

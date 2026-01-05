@@ -1,16 +1,10 @@
 <?php
-/**
- * PayPal Capture Order API
- * This endpoint captures (completes) the PayPal payment after user approval
- */
-
 session_start();
 header('Content-Type: application/json');
 
 require_once '../config/paypal.php';
 require_once '../connect.php';
 
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode(['error' => 'User not logged in']);
@@ -19,7 +13,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $userId = $_SESSION['user_id'];
 
-// Get POST data
 $input = json_decode(file_get_contents('php://input'), true);
 $orderId = isset($input['orderId']) ? trim($input['orderId']) : '';
 $reservationId = isset($input['reservationId']) ? intval($input['reservationId']) : 0;
@@ -30,14 +23,12 @@ if (empty($orderId)) {
     exit;
 }
 
-// Verify order ID matches session (if set)
 if (isset($_SESSION['paypal_order_id']) && $_SESSION['paypal_order_id'] !== $orderId) {
     http_response_code(400);
     echo json_encode(['error' => 'Order ID mismatch']);
     exit;
 }
 
-// Get PayPal access token
 $accessToken = getPayPalAccessToken();
 if (!$accessToken) {
     http_response_code(500);
@@ -45,7 +36,6 @@ if (!$accessToken) {
     exit;
 }
 
-// Capture the order
 $ch = curl_init(getPayPalBaseUrl() . '/v2/checkout/orders/' . $orderId . '/capture');
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
@@ -63,28 +53,23 @@ curl_close($ch);
 $captureResult = json_decode($response, true);
 
 if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $captureResult['status'] === 'COMPLETED') {
-    // Extract transaction details
     $transactionId = '';
     $payerId = $captureResult['payer']['payer_id'] ?? '';
     $payerEmail = $captureResult['payer']['email_address'] ?? '';
     
-    // Get capture ID from purchase units
     if (isset($captureResult['purchase_units'][0]['payments']['captures'][0])) {
         $capture = $captureResult['purchase_units'][0]['payments']['captures'][0];
         $transactionId = $capture['id'];
     }
     
-    // Get stored data from session
     $eventId = $_SESSION['paypal_order_event_id'] ?? 0;
     $packageId = $_SESSION['paypal_order_package_id'] ?? 0;
     $amount = $_SESSION['paypal_order_amount'] ?? 0;
     
-    // If reservationId provided, use it; otherwise get from session
     if ($reservationId <= 0) {
         $reservationId = $_SESSION['paypal_order_reservation_id'] ?? 0;
     }
     
-    // Update reservation status to "completed" if we have a reservationId
     if ($reservationId > 0) {
         $updateQuery = "UPDATE reservations SET status = 'completed' WHERE reservationId = ? AND userId = ?";
         $updateStmt = mysqli_prepare($conn, $updateQuery);
@@ -94,7 +79,6 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $c
             mysqli_stmt_close($updateStmt);
         }
         
-        // Get package name for payment record
         $packageName = '';
         if ($packageId > 0) {
             $pkgQuery = "SELECT packageName FROM packages WHERE packageId = ?";
@@ -110,7 +94,6 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $c
             }
         }
         
-        // Save payment record
         $paymentQuery = "INSERT INTO payments (reservationId, userId, transactionId, amount, packageName, paymentStatus) 
                          VALUES (?, ?, ?, ?, ?, 'completed')";
         $paymentStmt = mysqli_prepare($conn, $paymentQuery);
@@ -121,10 +104,8 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $c
         }
     }
     
-    // Generate success token for confirmation page
-    $successToken = bin2hex(random_bytes(32));
+        $successToken = bin2hex(random_bytes(32));
     
-    // Store payment data in session
     $_SESSION['payment_success_token'] = $successToken;
     $_SESSION['payment_success_time'] = time();
     $_SESSION['payment_transaction_id'] = $transactionId;
@@ -136,14 +117,12 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $c
     $_SESSION['payment_package_id'] = $packageId;
     $_SESSION['payment_amount'] = $amount;
     
-    // Clear PayPal order session data
     unset($_SESSION['paypal_order_id']);
     unset($_SESSION['paypal_order_amount']);
     unset($_SESSION['paypal_order_event_id']);
     unset($_SESSION['paypal_order_package_id']);
     unset($_SESSION['paypal_order_reservation_id']);
     
-    // Return success with redirect URL
     echo json_encode([
         'status' => 'COMPLETED',
         'transactionId' => $transactionId,
@@ -159,9 +138,6 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($captureResult['status']) && $c
     ]);
 }
 
-/**
- * Get PayPal Access Token
- */
 function getPayPalAccessToken() {
     $clientId = getPayPalClientId();
     $secret = getPayPalSecret();

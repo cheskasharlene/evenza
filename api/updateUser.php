@@ -1,18 +1,14 @@
 <?php
-// Start output buffering FIRST to catch any output
 ob_start();
 
-// Suppress any output before JSON
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
 
-// Set JSON header early
 header('Content-Type: application/json');
 
 session_start();
 require_once '../connect.php';
 
-// Check admin authentication manually to avoid redirect
 if (!isset($_SESSION['admin_id']) && !(isset($_SESSION['user_id']) && isset($_SESSION['role']) && (strtolower($_SESSION['role']) === 'admin'))) {
     ob_clean();
     echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
@@ -32,7 +28,6 @@ $fullName = isset($_POST['fullName']) ? trim($_POST['fullName']) : '';
 $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 $phone = isset($_POST['mobile']) ? trim($_POST['mobile']) : '';
 $password = isset($_POST['password']) ? trim($_POST['password']) : '';
-// Handle isAdmin checkbox - FormData sends boolean as string 'true' or 'false', or may not be set if unchecked
 $isAdminValue = isset($_POST['isAdmin']) ? $_POST['isAdmin'] : 'false';
 $role = ($isAdminValue === 'true' || $isAdminValue === true) ? 'admin' : 'user';
 
@@ -44,7 +39,6 @@ if (empty($fullName) || empty($email)) {
 }
 
 if ($userId > 0) {
-    // Update existing user
     if (!empty($password)) {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $query = "UPDATE users SET fullName = ?, email = ?, phone = ?, password = ?, role = ? WHERE userid = ?";
@@ -60,14 +54,12 @@ if ($userId > 0) {
         }
     }
 } else {
-    // Insert new user
     if (empty($password)) {
         echo json_encode(['success' => false, 'message' => 'Password is required for new users']);
         exit;
     }
     $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
     
-    // Split fullName into firstName and lastName
     $nameParts = explode(' ', $fullName, 2);
     $firstName = $nameParts[0];
     $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
@@ -79,7 +71,6 @@ if ($userId > 0) {
     }
 }
 
-// Clear any output that might have been generated
 ob_clean();
 
 if ($stmt && mysqli_stmt_execute($stmt)) {
@@ -93,6 +84,5 @@ if ($stmt) {
     mysqli_stmt_close($stmt);
 }
 
-// End output buffering and send response
 ob_end_flush();
 exit;

@@ -134,7 +134,6 @@ if (!$event) {
             </div>
 
             <div class="event-details-layout">
-                <!-- Main Content Column -->
                 <div class="event-main-content">
                     <div class="event-detail-image mb-4">
                         <img src="<?php echo htmlspecialchars($eventImagePath); ?>" 
@@ -190,9 +189,7 @@ if (!$event) {
                     </div> <!-- end .luxury-card -->
                 </div>
 
-                <!-- Sidebar Column -->
                 <div class="event-sidebar">
-                    <!-- AI Assistant Card -->
                     <div class="luxury-card p-4 mb-4">
                         <div class="ai-assistant-header mb-3">
                             <div class="ai-icon">
@@ -215,7 +212,6 @@ if (!$event) {
                         </div>
                     </div>
 
-                    <!-- FAQ Card -->
                     <div class="luxury-card p-4">
                         <h5 class="mb-4">Frequently Asked Questions</h5>
                         <div class="faq-list">
@@ -299,7 +295,6 @@ if (!$event) {
         </div>
     </div>
 
-    <!-- Pass event data to JavaScript -->
     <script type="application/json" id="eventData">
     {
         "title": <?php echo json_encode($event['title']); ?>,

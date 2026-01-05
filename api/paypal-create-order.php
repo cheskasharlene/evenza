@@ -1,23 +1,16 @@
 <?php
-/**
- * PayPal Create Order API
- * This endpoint creates a PayPal order when the user clicks the PayPal button
- */
-
 session_start();
 header('Content-Type: application/json');
 
 require_once '../config/paypal.php';
 require_once '../connect.php';
 
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     echo json_encode(['error' => 'User not logged in']);
     exit;
 }
 
-// Get POST data
 $input = json_decode(file_get_contents('php://input'), true);
 
 $eventId = isset($input['eventId']) ? intval($input['eventId']) : 0;
@@ -31,7 +24,6 @@ if ($amount <= 0) {
     exit;
 }
 
-// Get PayPal access token
 $accessToken = getPayPalAccessToken();
 if (!$accessToken) {
     http_response_code(500);
@@ -39,7 +31,6 @@ if (!$accessToken) {
     exit;
 }
 
-// Get package details for description
 $packageName = 'Event Package';
 if ($packageId > 0) {
     $packageQuery = "SELECT packageName FROM packages WHERE packageId = ?";
@@ -55,7 +46,6 @@ if ($packageId > 0) {
     }
 }
 
-// Get event details
 $eventName = 'Event Reservation';
 if ($eventId > 0) {
     $eventQuery = "SELECT title FROM events WHERE eventId = ?";
@@ -71,7 +61,6 @@ if ($eventId > 0) {
     }
 }
 
-// Create PayPal order
 $orderData = [
     'intent' => 'CAPTURE',
     'purchase_units' => [
@@ -110,7 +99,6 @@ curl_close($ch);
 $orderResult = json_decode($response, true);
 
 if ($httpCode >= 200 && $httpCode < 300 && isset($orderResult['id'])) {
-    // Store order info in session for verification later
     $_SESSION['paypal_order_id'] = $orderResult['id'];
     $_SESSION['paypal_order_amount'] = $amount;
     $_SESSION['paypal_order_event_id'] = $eventId;
@@ -130,9 +118,6 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($orderResult['id'])) {
     ]);
 }
 
-/**
- * Get PayPal Access Token
- */
 function getPayPalAccessToken() {
     $clientId = getPayPalClientId();
     $secret = getPayPalSecret();
@@ -159,14 +144,11 @@ function getPayPalAccessToken() {
     return null;
 }
 
-/**
- * Get base URL of the application
- */
 function getBaseUrl() {
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
     $path = dirname($_SERVER['SCRIPT_NAME']);
-    $path = dirname($path); // Go up one level from /api/
+    $path = dirname($path);
     return $protocol . '://' . $host . $path;
 }
 ?>

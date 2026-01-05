@@ -13,7 +13,7 @@ if (isset($_SESSION['error_message'])) {
     unset($_SESSION['error_message']);
 }
 
-$eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 1;
+$eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 0;
 
 $packages = [];
 $packagesQuery = "SELECT packageId, packageName, price FROM packages ORDER BY packageId ASC";
@@ -31,50 +31,38 @@ if ($packagesResult) {
     mysqli_free_result($packagesResult);
 }
 
-$eventsData = [
-    1 => [
-        'name' => 'Business Innovation Summit 2024',
-        'category' => 'Conference',
-        'price' => 299,
-        'priceType' => 'per person',
-        'date' => 'December 25, 2024',
-        'time' => '9:00 AM - 6:00 PM',
-        'venue' => 'Grand Luxe Hotel - Grand Ballroom',
-        'slots' => 45
-    ],
-    2 => [
-        'name' => 'Elegant Garden Wedding',
-        'category' => 'Wedding',
-        'price' => 5500,
-        'priceType' => 'package',
-        'date' => 'January 10, 2025',
-        'time' => '4:00 PM - 11:00 PM',
-        'venue' => 'Grand Luxe Hotel - Garden Pavilion',
-        'slots' => 12
-    ],
-    3 => [
-        'name' => 'Digital Marketing Masterclass',
-        'category' => 'Seminar',
-        'price' => 149,
-        'priceType' => 'per person',
-        'date' => 'December 30, 2024',
-        'time' => '10:00 AM - 5:00 PM',
-        'venue' => 'Grand Luxe Hotel - Conference Hall A',
-        'slots' => 78
-    ],
-    4 => [
-        'name' => 'New Year\'s Eve Gala Dinner',
-        'category' => 'Hotel-Hosted Events',
-        'price' => 450,
-        'priceType' => 'per person',
-        'date' => 'December 31, 2024',
-        'time' => '7:00 PM - 1:00 AM',
-        'venue' => 'Grand Luxe Hotel - Crystal Ballroom',
-        'slots' => 23
-    ]
-];
+// Fetch event from database
+$event = null;
+if ($eventId > 0) {
+    $eventQuery = "SELECT eventId, title, category, venue, description FROM events WHERE eventId = ?";
+    $eventStmt = mysqli_prepare($conn, $eventQuery);
+    if ($eventStmt) {
+        mysqli_stmt_bind_param($eventStmt, "i", $eventId);
+        mysqli_stmt_execute($eventStmt);
+        $eventResult = mysqli_stmt_get_result($eventStmt);
+        $eventRow = mysqli_fetch_assoc($eventResult);
+        mysqli_stmt_close($eventStmt);
+        
+        if ($eventRow) {
+            // Date and time are not stored in events table, so set as TBA
+            // Users will select their preferred date/time in the reservation form
+            $event = [
+                'name' => $eventRow['title'],
+                'category' => $eventRow['category'] ?? '',
+                'date' => 'Date TBA',
+                'time' => 'Time TBA',
+                'venue' => $eventRow['venue'] ?? 'Venue TBA',
+                'description' => $eventRow['description'] ?? ''
+            ];
+        }
+    }
+}
 
-$event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
+// Redirect to events page if event not found
+if (!$event) {
+    header('Location: events.php');
+    exit;
+}
 
 // Price calculation function using switch statement (for reference, but we'll use DB prices)
 function calculatePackagePrice($packageTier) {
@@ -202,7 +190,7 @@ $totalAmount = $selectedPackage['price'];
 
                             <div class="mb-4">
                                 <label for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
-                                <input type="tel" class="form-control luxury-input" id="mobile" name="mobile" required placeholder="+63-9123-456-7890">
+                                <input type="tel" class="form-control luxury-input" id="mobile" name="mobile" required placeholder="0921 123 4567">
                             </div>
 
                             <div class="mb-4">

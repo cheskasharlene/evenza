@@ -1,6 +1,7 @@
 <?php
 require_once 'adminAuth.php';
 require_once 'connect.php';
+require_once 'includes/helpers.php';
 
 $users = [];
 $query = "SELECT userid, firstName, lastName, fullName, email, phone, role FROM users ORDER BY userid ASC";
@@ -14,7 +15,7 @@ if ($result) {
             'lastName' => $row['lastName'],
             'fullName' => $row['fullName'],
             'email' => $row['email'],
-            'mobile' => $row['phone'] ?? 'N/A',
+            'mobile' => !empty($row['phone']) ? formatPhoneNumber($row['phone']) : 'N/A',
             'role' => ucfirst(strtolower($row['role'])) 
         ];
     }
@@ -326,7 +327,6 @@ if ($result) {
         let isEditMode = false;
         let currentUserId = null;
 
-        // Sidebar toggle for mobile
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('adminSidebarToggle');
             const sidebar = document.querySelector('.admin-sidebar');
@@ -338,7 +338,6 @@ if ($result) {
             }
         });
 
-        // Show feedback toast
         function showFeedback(message, type = 'info') {
             const toast = document.getElementById('feedbackToast');
             const toastMessage = document.getElementById('toastMessage');
@@ -346,7 +345,6 @@ if ($result) {
             
             toastMessage.textContent = message;
             
-            // Update icon based on type
             const icon = toastHeader.querySelector('i');
             if (type === 'success') {
                 icon.className = 'fas fa-check-circle me-2 text-success';
@@ -363,7 +361,6 @@ if ($result) {
             bsToast.show();
         }
 
-        // Open add user modal
         function openAddUserModal() {
             isEditMode = false;
             currentUserId = null;
@@ -374,12 +371,10 @@ if ($result) {
             document.getElementById('userPassword').required = true;
         }
 
-        // Edit user function
         function editUser(userId, fullName, email, mobile, role) {
             isEditMode = true;
             currentUserId = userId;
             
-            // Fetch latest user data from database
             fetch('api/getUser.php?userId=' + userId)
                 .then(response => response.json())
                 .then(data => {
@@ -399,7 +394,6 @@ if ($result) {
                         const modal = new bootstrap.Modal(document.getElementById('userModal'));
                         modal.show();
                     } else {
-                        // Fallback to passed parameters if fetch fails
                         document.getElementById('userModalLabel').textContent = 'Edit User';
                         document.getElementById('userId').value = userId;
                         document.getElementById('userFullName').value = fullName;
@@ -416,7 +410,6 @@ if ($result) {
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    // Fallback to passed parameters
                     document.getElementById('userModalLabel').textContent = 'Edit User';
                     document.getElementById('userId').value = userId;
                     document.getElementById('userFullName').value = fullName;
@@ -432,7 +425,6 @@ if ($result) {
                 });
         }
 
-        // Save user function
         function saveUser() {
             const fullName = document.getElementById('userFullName').value.trim();
             const email = document.getElementById('userEmail').value.trim();
@@ -479,7 +471,6 @@ if ($result) {
                         modal.hide();
                     }
                     
-                    // Reload immediately to show updated data
                     setTimeout(function() {
                         window.location.reload();
                     }, 1000);
@@ -493,7 +484,6 @@ if ($result) {
             });
         }
 
-        // Delete user function
         function deleteUser(userId, userName) {
             if (confirm('Are you sure you want to delete user "' + userName + '"? This action cannot be undone.')) {
                 const formData = new FormData();
@@ -526,7 +516,6 @@ if ($result) {
             }
         }
 
-        // Show feedback on page load if there's a message in URL
         const urlParams = new URLSearchParams(window.location.search);
         const message = urlParams.get('message');
         const messageType = urlParams.get('type') || 'success';

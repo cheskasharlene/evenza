@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'connect.php';
+require_once 'includes/helpers.php';
 
 $error = '';
 $redirect = '';
@@ -31,9 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required.';
+    } elseif (($passwordValidation = validatePassword($password)) !== true) {
+        $error = $passwordValidation;
     } else {
-        // Use MySQLi prepared statement - make email comparison case-insensitive
-        $query = "SELECT userId, firstName, lastName, fullName, email, phone, password, role FROM users WHERE LOWER(email) = LOWER(?)";
+        $query = "SELECT userId, firstName, lastName, fullName, email, phone, password, role FROM users WHERE LOWER(email) = LOWER(?) AND (role IS NULL OR role != 'Admin')";
         $stmt = mysqli_prepare($conn, $query);
         
         if ($stmt) {
@@ -43,43 +45,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = mysqli_fetch_assoc($result);
             mysqli_stmt_close($stmt);
 
-            // Debug: Check if user was found and password verification
             if ($user) {
-                // User found, verify password
-                if (password_verify($password, $user['password'])) {
-                    $_SESSION['userId'] = $user['userId'];
-                    $_SESSION['firstName'] = $user['firstName'];
-                    $_SESSION['role'] = $user['role'];
-                    
-                    $_SESSION['user_id'] = $user['userId'];
-                    $_SESSION['user_name'] = $user['fullName'];
-                    $_SESSION['user_email'] = $user['email'];
-                    $_SESSION['user_mobile'] = $user['phoneNumber'];
-                    $_SESSION['user_role'] = $user['role'];
+                if (strtolower($user['role'] ?? '') === 'admin') {
+                    $error = 'Admin accounts must use the admin login page. Please visit the admin login page to access your account.';
+                } else {
+                    if (password_verify($password, $user['password'])) {
+                        $_SESSION['userId'] = $user['userId'];
+                        $_SESSION['firstName'] = $user['firstName'];
+                        $_SESSION['role'] = $user['role'];
+                        
+                        $_SESSION['user_id'] = $user['userId'];
+                        $_SESSION['user_name'] = $user['fullName'];
+                        $_SESSION['user_email'] = $user['email'];
+                        $_SESSION['user_mobile'] = $user['phone'] ?? '';
+                        $_SESSION['user_role'] = $user['role'] ?? 'user';
 
-                    if ($user['role'] === 'admin' || $user['role'] === 'Admin') {
-                        header('Location: admin.php');
-                    } else {
                         if (!empty($redirect) && strpos($redirect, 'http') === false && strpos($redirect, '//') === false) {
                             header('Location: ' . $redirect);
                         } else {
                             header('Location: index.php');
                         }
+                        exit;
+                    } else {
+                        $error = 'Invalid email or password';
                     }
-                    exit;
-                } else {
-                    // Password verification failed
-                    $error = 'Invalid email or password';
                 }
             } else {
-                // User not found
-                $error = 'Invalid email or password';
+                $adminCheckQuery = "SELECT userId, role FROM users WHERE LOWER(email) = LOWER(?) AND role = 'Admin'";
+                $adminCheckStmt = mysqli_prepare($conn, $adminCheckQuery);
+                if ($adminCheckStmt) {
+                    mysqli_stmt_bind_param($adminCheckStmt, "s", $email);
+                    mysqli_stmt_execute($adminCheckStmt);
+                    $adminCheckResult = mysqli_stmt_get_result($adminCheckStmt);
+                    $adminUser = mysqli_fetch_assoc($adminCheckResult);
+                    mysqli_stmt_close($adminCheckStmt);
+                    
+                    if ($adminUser) {
+                        $error = 'Admin accounts must use the admin login page. Please visit the admin login page to access your account.';
+                    } else {
+                        $error = 'Invalid email or password';
+                    }
+                } else {
+                    $error = 'Invalid email or password';
+                }
             }
         } else {
-            // Query preparation failed - log the error for debugging
             $error = 'Database connection error. Please try again.';
-            // Uncomment the line below for debugging (remove in production)
-            // $error = 'Database error: ' . mysqli_error($conn);
         }
     }
 }
@@ -156,7 +167,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <div class="form-group mb-4">
                                 <label for="password" class="form-label">Password</label>
-                                <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password">
+                                <div class="password-input-wrapper" style="position: relative;">
+                                    <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('password', 'toggle_password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6c757d; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                        <span id="toggle_password">Show</span>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number.</small>
                             </div>
 
                             <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
@@ -175,5 +192,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/login.js"></script>
+    <script>
+        function togglePassword(inputId, toggleId) {
+            const input = document.getElementById(inputId);
+            const toggle = document.getElementById(toggleId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                toggle.textContent = 'Hide';
+            } else {
+                input.type = 'password';
+                toggle.textContent = 'Show';
+            }
+        }
+    </script>
 </body>
 </html>

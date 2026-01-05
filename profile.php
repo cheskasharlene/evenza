@@ -2,6 +2,7 @@
 session_start();
 require_once 'connect.php';
 require_once 'config/paypal.php';
+require_once 'includes/helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -140,7 +141,7 @@ if ($stmt) {
                             <div class="profile-info-label">
                                 Mobile Number
                             </div>
-                            <div class="profile-info-value"><?php echo htmlspecialchars($userData['mobile']); ?></div>
+                            <div class="profile-info-value"><?php echo htmlspecialchars(formatPhoneNumber($userData['mobile'])); ?></div>
                         </div>
 
                         <button type="button" class="btn btn-outline-luxury w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
@@ -357,7 +358,7 @@ if ($stmt) {
                                 <div class="small text-muted">Email</div>
                                 <div class="mb-2" id="modalUserEmail"><?php echo htmlspecialchars($userData['email']); ?></div>
                                 <div class="small text-muted">Phone</div>
-                                <div id="modalUserPhone"><?php echo htmlspecialchars($userData['mobile']); ?></div>
+                                <div id="modalUserPhone"><?php echo htmlspecialchars(formatPhoneNumber($userData['mobile'])); ?></div>
                             </div>
                         </div>
                         <div class="col-md-5">

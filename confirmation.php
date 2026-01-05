@@ -2,53 +2,43 @@
 session_start();
 require_once 'connect.php';
 
-// RESTRICTED ACCESS: Only allow access if success token is present
 $successToken = isset($_GET['success']) ? trim($_GET['success']) : '';
 $transactionId = isset($_GET['tx']) ? trim($_GET['tx']) : '';
 
-// Verify success token from session
 $isAuthorized = false;
 if (!empty($successToken) && isset($_SESSION['payment_success_token'])) {
     if ($successToken === $_SESSION['payment_success_token']) {
-        // Check if token is not expired (5 minutes)
         if (isset($_SESSION['payment_success_time']) && (time() - $_SESSION['payment_success_time']) < 300) {
             $isAuthorized = true;
         }
     }
 }
 
-// If not authorized, redirect to home page with message
 if (!$isAuthorized) {
     $_SESSION['error_message'] = 'Invalid or expired payment confirmation link. Please complete your payment to view confirmation.';
     header('Location: index.php');
     exit;
 }
 
-// Get payment data from session
 $userId = isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0;
 
-// Get reservation data from session (stored before payment)
 $reservationData = isset($_SESSION['pending_reservation_data']) ? $_SESSION['pending_reservation_data'] : null;
 
-// Fallback to individual session variables for compatibility
 $reservationId = isset($_SESSION['payment_reservation_id']) ? intval($_SESSION['payment_reservation_id']) : 0;
 $eventId = isset($_SESSION['payment_event_id']) ? intval($_SESSION['payment_event_id']) : ($reservationData ? $reservationData['eventId'] : 0);
 $packageId = isset($_SESSION['payment_package_id']) ? intval($_SESSION['payment_package_id']) : ($reservationData ? $reservationData['packageId'] : 0);
 $amount = isset($_SESSION['payment_amount']) ? floatval($_SESSION['payment_amount']) : ($reservationData ? $reservationData['totalAmount'] : 0);
 
-// If transactionId is in URL, use it; otherwise use session
 if (empty($transactionId) && isset($_SESSION['payment_transaction_id'])) {
     $transactionId = $_SESSION['payment_transaction_id'];
 }
 
-// Initialize variables
 $errorOccurred = false;
 $errorMessage = '';
 $transactionReference = '';
 $reservationSaved = false;
 $paymentSaved = false;
 
-// Fetch event and package details
 $event = null;
 $package = null;
 
@@ -76,7 +66,6 @@ if ($packageId > 0) {
     }
 }
 
-// Extract package tier from package name
 $packageTier = 'Unknown';
 if ($package && !empty($package['packageName'])) {
     $packageTier = str_replace(' Package', '', $package['packageName']);
@@ -85,17 +74,12 @@ if ($package && !empty($package['packageName'])) {
     $packageName = 'Package';
 }
 
-// Save reservation to database ONLY after successful payment
-// This is the first time the reservation is saved - it was NOT saved before payment
 if ($reservationId <= 0 && $userId > 0 && $eventId > 0 && $packageId > 0 && $reservationData) {
-    // Use data from session that was stored before payment
     $reservationDate = $reservationData['reservationDate'] ?? date('Y-m-d');
     $startTime = $reservationData['startTime'] ?? null;
     $endTime = $reservationData['endTime'] ?? null;
     $totalAmount = $reservationData['totalAmount'] ?? $amount;
     
-    // Insert reservation using MySQLi prepared statement
-    // Status is 'confirmed' because payment was successful
     $reservationQuery = "INSERT INTO reservations (userId, eventId, packageId, reservationDate, startTime, endTime, totalAmount, status) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, 'confirmed')";
     
@@ -120,7 +104,6 @@ if ($reservationId <= 0 && $userId > 0 && $eventId > 0 && $packageId > 0 && $res
         $transactionReference = $transactionId;
     }
 } elseif ($reservationId > 0) {
-    // Reservation already exists - update status to completed (payment completed from profile)
     $updateQuery = "UPDATE reservations SET status = 'completed' WHERE reservationId = ?";
     $updateStmt = mysqli_prepare($conn, $updateQuery);
     if ($updateStmt) {
@@ -129,7 +112,6 @@ if ($reservationId <= 0 && $userId > 0 && $eventId > 0 && $packageId > 0 && $res
         mysqli_stmt_close($updateStmt);
     }
     
-    // Get the reservation amount if not set
     if ($amount <= 0) {
         $resQuery = "SELECT totalAmount FROM reservations WHERE reservationId = ?";
         $resStmt = mysqli_prepare($conn, $resQuery);
@@ -145,15 +127,12 @@ if ($reservationId <= 0 && $userId > 0 && $eventId > 0 && $packageId > 0 && $res
     }
     $reservationSaved = true;
 } else {
-    // No reservation data available
     $errorOccurred = true;
     $errorMessage = 'Reservation data not found. Please contact support.';
     $transactionReference = $transactionId;
 }
 
-// Save payment details if reservation was saved successfully
 if ($reservationSaved && !$errorOccurred && $reservationId > 0) {
-    // Check if payment already exists for this transaction
     $checkPaymentQuery = "SELECT paymentId FROM payments WHERE transactionId = ?";
     $checkStmt = mysqli_prepare($conn, $checkPaymentQuery);
     $paymentExists = false;
@@ -168,7 +147,6 @@ if ($reservationSaved && !$errorOccurred && $reservationId > 0) {
         mysqli_stmt_close($checkStmt);
     }
     
-    // Insert payment if it doesn't exist
     if (!$paymentExists) {
         $paymentQuery = "INSERT INTO payments (reservationId, userId, transactionId, amount, packageName, paymentStatus) 
                          VALUES (?, ?, ?, ?, ?, 'completed')";
@@ -193,11 +171,10 @@ if ($reservationSaved && !$errorOccurred && $reservationId > 0) {
             $transactionReference = $transactionId;
         }
     } else {
-        $paymentSaved = true; // Payment already exists
+        $paymentSaved = true;
     }
 }
 
-// Clear session data after processing
 unset($_SESSION['payment_success_token']);
 unset($_SESSION['payment_success_time']);
 unset($_SESSION['payment_transaction_id']);
@@ -209,9 +186,8 @@ unset($_SESSION['pending_reservation_id']);
 unset($_SESSION['pending_event_id']);
 unset($_SESSION['pending_package_id']);
 unset($_SESSION['pending_amount']);
-unset($_SESSION['pending_reservation_data']); // Clear reservation data after saving
+unset($_SESSION['pending_reservation_data']);
 
-// Fallback data if event/package not found
 if (!$event) {
     $event = [
         'title' => 'Event Not Found',
@@ -456,7 +432,6 @@ if (!$package) {
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <?php if ($errorOccurred): ?>
-                        <!-- Error Message -->
                         <div class="confirmation-card p-5">
                             <div class="error-message-box">
                                 <i class="fas fa-exclamation-triangle"></i>
@@ -479,7 +454,6 @@ if (!$package) {
                             </div>
                         </div>
                     <?php else: ?>
-                        <!-- Success Confirmation -->
                         <div class="confirmation-card p-5">
                             <div class="thank-you-message text-center">
                                 <div class="success-icon-wrapper">

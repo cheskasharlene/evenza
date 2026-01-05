@@ -25,29 +25,47 @@ if ($fullName === '' || $email === '' || $phone === '') {
     exit;
 }
 
-// basic email check
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(['success' => false, 'message' => 'Invalid email address.']);
     exit;
 }
 
+$checkEmailQuery = "SELECT userId FROM users WHERE email = ? AND userId != ?";
+$checkStmt = mysqli_prepare($conn, $checkEmailQuery);
+if ($checkStmt) {
+    mysqli_stmt_bind_param($checkStmt, "si", $email, $userId);
+    mysqli_stmt_execute($checkStmt);
+    $checkResult = mysqli_stmt_get_result($checkStmt);
+    if (mysqli_num_rows($checkResult) > 0) {
+        mysqli_stmt_close($checkStmt);
+        echo json_encode(['success' => false, 'message' => 'This email is already registered to another account.']);
+        exit;
+    }
+    mysqli_stmt_close($checkStmt);
+}
+
 $query = "UPDATE users SET fullName = ?, email = ?, phone = ? WHERE userId = ?";
 $stmt = mysqli_prepare($conn, $query);
 if (!$stmt) {
-    echo json_encode(['success' => false, 'message' => 'Database error.']);
+    $error = mysqli_error($conn);
+    error_log("Profile update error: " . $error);
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $error]);
     exit;
 }
 
 mysqli_stmt_bind_param($stmt, "sssi", $fullName, $email, $phone, $userId);
 $ok = mysqli_stmt_execute($stmt);
-mysqli_stmt_close($stmt);
 
 if (!$ok) {
-    echo json_encode(['success' => false, 'message' => 'Failed to update profile.']);
+    $error = mysqli_error($conn);
+    error_log("Profile update execution error: " . $error);
+    mysqli_stmt_close($stmt);
+    echo json_encode(['success' => false, 'message' => 'Failed to update profile. Please try again.']);
     exit;
 }
 
-// refresh session data
+mysqli_stmt_close($stmt);
+
 $_SESSION['user_name'] = $fullName;
 $_SESSION['user_email'] = $email;
 $_SESSION['user_mobile'] = $phone;

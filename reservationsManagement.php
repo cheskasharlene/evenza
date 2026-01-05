@@ -41,6 +41,9 @@ if (!empty($dateFilter)) {
     $query .= " AND DATE(r.reservationDate) = ?";
     $params[] = $dateFilter;
     $types .= 's';
+} else {
+    // Only show future or today's reservations when no date filter is applied
+    $query .= " AND DATE(r.reservationDate) >= CURDATE()";
 }
 
 $query .= " ORDER BY r.reservationDate DESC, r.createdAt DESC";

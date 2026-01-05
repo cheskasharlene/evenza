@@ -22,7 +22,6 @@
             return;
         }
 
-        // Disable button while saving
         const saveBtn = document.querySelector('#editProfileModal .btn-primary-luxury');
         if (saveBtn) saveBtn.disabled = true;
 
@@ -38,28 +37,28 @@
             },
             body: formData.toString()
         })
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return res.json();
+        })
         .then(data => {
             if (data.success) {
-                // Update visible profile info
-                const infoValues = document.querySelectorAll('.profile-info-value');
-                if (infoValues.length >= 3) {
-                    infoValues[0].textContent = name;
-                    infoValues[1].textContent = email;
-                    infoValues[2].textContent = mobile;
-                }
-                alert('Profile updated successfully!');
                 const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
                 if (modal) modal.hide();
+                
+                alert('Profile updated successfully!');
+                
+                window.location.reload();
             } else {
                 alert(data.message || 'Failed to update profile.');
+                if (saveBtn) saveBtn.disabled = false;
             }
         })
         .catch(err => {
-            console.error(err);
+            console.error('Profile update error:', err);
             alert('An error occurred while saving your profile. Please try again.');
-        })
-        .finally(() => {
             if (saveBtn) saveBtn.disabled = false;
         });
     };

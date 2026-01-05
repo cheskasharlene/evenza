@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Email and password are required.';
     } else {
-        // Use MySQLi prepared statement
         $query = "SELECT userId, firstName, lastName, fullName, email, phoneNumber, password, role FROM users WHERE email = ?";
         $stmt = mysqli_prepare($conn, $query);
         

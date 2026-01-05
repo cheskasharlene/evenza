@@ -1,6 +1,8 @@
 <?php
 session_start();
+require_once 'connect.php';
 require_once 'config/paypal.php';
+require_once 'includes/helpers.php';
 
 $success_message = '';
 $error_message = '';
@@ -25,46 +27,33 @@ if (!empty($packageTier) && empty($packageName)) {
     $packageName = $packageTier . ' Package';
 }
 
-$eventsData = [
-    1 => [
-        'name' => 'Business Innovation Summit 2024',
-        'category' => 'Conference',
-        'price' => 299,
-        'priceType' => 'per person',
-        'date' => 'December 25, 2024',
-        'time' => '9:00 AM - 6:00 PM',
-        'venue' => 'Grand Luxe Hotel - Grand Ballroom'
-    ],
-    2 => [
-        'name' => 'Elegant Garden Wedding',
-        'category' => 'Wedding',
-        'price' => 5500,
-        'priceType' => 'package',
-        'date' => 'January 10, 2025',
-        'time' => '4:00 PM - 11:00 PM',
-        'venue' => 'Grand Luxe Hotel - Garden Pavilion'
-    ],
-    3 => [
-        'name' => 'Digital Marketing Masterclass',
-        'category' => 'Seminar',
-        'price' => 149,
-        'priceType' => 'per person',
-        'date' => 'December 30, 2024',
-        'time' => '10:00 AM - 5:00 PM',
-        'venue' => 'Grand Luxe Hotel - Conference Hall A'
-    ],
-    4 => [
-        'name' => 'New Year\'s Eve Gala Dinner',
-        'category' => 'Hotel-Hosted Events',
-        'price' => 450,
-        'priceType' => 'per person',
-        'date' => 'December 31, 2024',
-        'time' => '7:00 PM - 1:00 AM',
-        'venue' => 'Grand Luxe Hotel - Crystal Ballroom'
-    ]
-];
+$event = null;
+if ($eventId > 0) {
+    $eventQuery = "SELECT eventId, title, category, venue FROM events WHERE eventId = ?";
+    $eventStmt = mysqli_prepare($conn, $eventQuery);
+    if ($eventStmt) {
+        mysqli_stmt_bind_param($eventStmt, "i", $eventId);
+        mysqli_stmt_execute($eventStmt);
+        $eventResult = mysqli_stmt_get_result($eventStmt);
+        $eventRow = mysqli_fetch_assoc($eventResult);
+        mysqli_stmt_close($eventStmt);
+        
+        if ($eventRow) {
+            $event = [
+                'name' => $eventRow['title'],
+                'category' => $eventRow['category'] ?? '',
+                'date' => 'Date TBA',
+                'time' => 'Time TBA',
+                'venue' => $eventRow['venue'] ?? 'Venue TBA'
+            ];
+        }
+    }
+}
 
-$event = isset($eventsData[$eventId]) ? $eventsData[$eventId] : $eventsData[1];
+if (!$event) {
+    header('Location: events.php');
+    exit;
+}
 
 $totalAmount = $packagePrice;
 
@@ -176,10 +165,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                         <?php if ($paymentStatus === 'pending'): ?>
                             <div class="payment-button-section mt-5">
                                 <?php
-                                // Ensure reservation data is in session for PayPal callback
-                                // Note: Reservation is NOT saved to database yet - only in session
                                 if (!isset($_SESSION['pending_reservation_data'])) {
-                                    // Store reservation data in session (if not already stored from reserve.php)
                                     $_SESSION['pending_reservation_data'] = [
                                         'userId' => isset($_SESSION['user_id']) ? intval($_SESSION['user_id']) : 0,
                                         'eventId' => $eventId,
@@ -193,18 +179,15 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                     ];
                                 }
                                 
-                                // Store for PayPal callback compatibility
                                 $_SESSION['pending_event_id'] = $eventId;
                                 $_SESSION['pending_package_id'] = isset($_GET['packageId']) ? intval($_GET['packageId']) : 0;
                                 $_SESSION['pending_amount'] = $packagePrice;
                                 ?>
-                                <!-- PayPal Button Container - SDK will render the button here -->
                                 <div id="paypal-button-container"></div>
                                 <p class="text-center text-muted small mt-3 mb-0">
                                     Secure payment powered by PayPal. You will be redirected to PayPal to complete your payment.
                                 </p>
                                 
-                                <!-- Hidden data for JavaScript -->
                                 <input type="hidden" id="paypal-event-id" value="<?php echo $eventId; ?>">
                                 <input type="hidden" id="paypal-package-id" value="<?php echo isset($_GET['packageId']) ? intval($_GET['packageId']) : 0; ?>">
                                 <input type="hidden" id="paypal-amount" value="<?php echo $packagePrice; ?>">
@@ -231,8 +214,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                     </div>
                                 </div>
                                 <script>
-                                    // This should not happen in normal flow - payment should go through paypalCallback.php
-                                    // But if it does, redirect to home
                                     setTimeout(function() {
                                         window.location.href = 'index.php';
                                     }, 2000);
@@ -249,7 +230,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                 <ul class="list-unstyled mt-2">
                                     <li><small>Name: <?php echo htmlspecialchars($fullName); ?></small></li>
                                     <li><small>Email: <?php echo htmlspecialchars($email); ?></small></li>
-                                    <li><small>Mobile: <?php echo htmlspecialchars($mobile); ?></small></li>
+                                    <li><small>Mobile: <?php echo htmlspecialchars(formatPhoneNumber($mobile)); ?></small></li>
                                 </ul>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -308,7 +289,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/main.js"></script>
-    <!-- PayPal JavaScript SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=<?php echo getPayPalClientId(); ?>&currency=<?php echo PAYPAL_CURRENCY; ?>&intent=capture"></script>
     <script src="assets/js/payment.js?v=<?php echo time(); ?>"></script>
 </body>
