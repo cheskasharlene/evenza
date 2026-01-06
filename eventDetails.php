@@ -172,7 +172,7 @@ if (!$event) {
                                         <h6 class="detail-label">Date</h6>
                                         <p class="detail-value"><?php echo htmlspecialchars($event['formattedDate']); ?></p>
                                         <?php if (isset($event['eventTime']) && !empty($event['eventTime'])): ?>
-                                            <p class="detail-value text-muted small"><?php echo htmlspecialchars($event['eventTime']); ?></p>
+                                            <p class="detail-value text-muted small"><?php echo htmlspecialchars(formatTime12Hour($event['eventTime'])); ?></p>
                                         <?php endif; ?>
                                     </div>
                                 </div>

@@ -62,5 +62,41 @@ function validatePassword($password) {
     }
     return true;
 }
+
+/**
+ * Format time string to 12-hour format with AM/PM
+ * @param string $timeString - Time string in format "HH:MM:SS" or "HH:MM" or "HH:MM:SS - HH:MM:SS"
+ * @return string - Formatted time in 12-hour format (e.g., "11:00 AM - 4:00 PM")
+ */
+function formatTime12Hour($timeString) {
+    if (empty($timeString) || $timeString === ' - ') {
+        return '';
+    }
+    
+    // Handle time range (e.g., "11:00:00 - 16:00:00")
+    if (strpos($timeString, ' - ') !== false) {
+        $parts = explode(' - ', $timeString);
+        $start = formatTime12Hour($parts[0]);
+        $end = formatTime12Hour($parts[1]);
+        return $start && $end ? $start . ' - ' . $end : $timeString;
+    }
+    
+    // Extract time part (handle formats like "11:00:00" or "11:00")
+    $timeOnly = trim(explode(' ', $timeString)[0]);
+    $timeParts = explode(':', $timeOnly);
+    
+    if (count($timeParts) < 2) {
+        return $timeString;
+    }
+    
+    $hour = (int)$timeParts[0];
+    $minute = isset($timeParts[1]) ? $timeParts[1] : '00';
+    
+    // Convert to 12-hour format
+    $period = $hour >= 12 ? 'PM' : 'AM';
+    $hour12 = $hour == 0 ? 12 : ($hour > 12 ? $hour - 12 : $hour);
+    
+    return sprintf('%d:%s %s', $hour12, $minute, $period);
+}
 ?>
 

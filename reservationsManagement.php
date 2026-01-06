@@ -1,9 +1,16 @@
 <?php
 require_once 'adminAuth.php';
 require_once 'connect.php';
+require_once 'includes/helpers.php';
 
 $packageFilter = isset($_GET['package']) ? $_GET['package'] : '';
 $dateFilter = isset($_GET['date']) ? $_GET['date'] : '';
+$filterDate = isset($_GET['filter_date']) ? $_GET['filter_date'] : '';
+
+// Pagination
+$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$perPage = 5;
+$offset = ($page - 1) * $perPage;
 
 $query = "SELECT 
             r.reservationId,
@@ -41,25 +48,96 @@ if (!empty($dateFilter)) {
     $query .= " AND DATE(r.reservationDate) = ?";
     $params[] = $dateFilter;
     $types .= 's';
+} elseif (!empty($filterDate)) {
+    // Filter by specific date from date box click
+    $query .= " AND DATE(r.reservationDate) = ?";
+    $params[] = $filterDate;
+    $types .= 's';
 } else {
     // Only show future or today's reservations when no date filter is applied
     $query .= " AND DATE(r.reservationDate) >= CURDATE()";
 }
 
-$query .= " ORDER BY r.reservationDate DESC, r.createdAt DESC";
+// Get total count for pagination (before adding ORDER BY and LIMIT)
+$countQuery = "SELECT COUNT(*) as total FROM reservations r
+          INNER JOIN users u ON r.userId = u.userid
+          INNER JOIN events e ON r.eventId = e.eventId
+          INNER JOIN packages p ON r.packageId = p.packageId
+          WHERE 1=1";
+
+$countParams = [];
+$countTypes = '';
+
+if (!empty($packageFilter)) {
+    $countQuery .= " AND p.packageName LIKE ?";
+    $countParams[] = $packageFilter . '%';
+    $countTypes .= 's';
+}
+
+if (!empty($dateFilter)) {
+    $countQuery .= " AND DATE(r.reservationDate) = ?";
+    $countParams[] = $dateFilter;
+    $countTypes .= 's';
+} elseif (!empty($filterDate)) {
+    $countQuery .= " AND DATE(r.reservationDate) = ?";
+    $countParams[] = $filterDate;
+    $countTypes .= 's';
+} else {
+    $countQuery .= " AND DATE(r.reservationDate) >= CURDATE()";
+}
+
+$totalCount = 0;
+$countStmt = mysqli_prepare($conn, $countQuery);
+if ($countStmt) {
+    if (!empty($countParams)) {
+        mysqli_stmt_bind_param($countStmt, $countTypes, ...$countParams);
+    }
+    mysqli_stmt_execute($countStmt);
+    $countResult = mysqli_stmt_get_result($countStmt);
+    if ($countRow = mysqli_fetch_assoc($countResult)) {
+        $totalCount = $countRow['total'];
+    }
+    mysqli_stmt_close($countStmt);
+}
+
+$totalPages = ceil($totalCount / $perPage);
+
+// Add pagination to main query
+$query .= " ORDER BY r.reservationDate DESC, r.createdAt DESC LIMIT " . intval($perPage) . " OFFSET " . intval($offset);
 
 $reservations = [];
 $totalRevenue = 0;
 
-$stmt = mysqli_prepare($conn, $query);
-if ($stmt) {
-    if (!empty($params)) {
+// Execute query with pagination
+if (!empty($params)) {
+    $stmt = mysqli_prepare($conn, $query);
+    if ($stmt) {
         mysqli_stmt_bind_param($stmt, $types, ...$params);
+        if (mysqli_stmt_execute($stmt)) {
+            $result = mysqli_stmt_get_result($stmt);
+            
+            while ($row = mysqli_fetch_assoc($result)) {
+                $packageTier = 'Unknown';
+                if (!empty($row['packageName'])) {
+                    $packageTier = str_replace(' Package', '', $row['packageName']);
+                }
+                $row['packageTier'] = $packageTier;
+                
+                $reservations[] = $row;
+                $totalRevenue += floatval($row['totalAmount']);
+            }
+            
+            mysqli_free_result($result);
+        } else {
+            $error_message = 'Error fetching reservations: ' . mysqli_error($conn);
+        }
+        mysqli_stmt_close($stmt);
+    } else {
+        $error_message = 'Error preparing query: ' . mysqli_error($conn);
     }
-    
-    if (mysqli_stmt_execute($stmt)) {
-        $result = mysqli_stmt_get_result($stmt);
-        
+} else {
+    $result = mysqli_query($conn, $query);
+    if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
             $packageTier = 'Unknown';
             if (!empty($row['packageName'])) {
@@ -70,15 +148,10 @@ if ($stmt) {
             $reservations[] = $row;
             $totalRevenue += floatval($row['totalAmount']);
         }
-        
         mysqli_free_result($result);
     } else {
         $error_message = 'Error fetching reservations: ' . mysqli_error($conn);
     }
-    
-    mysqli_stmt_close($stmt);
-} else {
-    $error_message = 'Error preparing query: ' . mysqli_error($conn);
 }
 
 $groupedReservations = [];
@@ -87,9 +160,12 @@ foreach ($reservations as $reservation) {
     $dateFormatted = date('F j, Y', strtotime($reservation['reservationDate']));
     
     if (!isset($groupedReservations[$dateFormatted])) {
-        $groupedReservations[$dateFormatted] = [];
+        $groupedReservations[$dateFormatted] = [
+            'dateKey' => $reservationDate,
+            'reservations' => []
+        ];
     }
-    $groupedReservations[$dateFormatted][] = $reservation;
+    $groupedReservations[$dateFormatted]['reservations'][] = $reservation;
 }
 
 uksort($groupedReservations, function($a, $b) {
@@ -117,7 +193,7 @@ foreach ($reservations as $reservation) {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
     <title>Reservations Management - EVENZA Admin</title>
     <style>
@@ -151,14 +227,24 @@ foreach ($reservations as $reservation) {
             border: none;
         }
         .btn-admin-primary {
-            background-color: #4A5D4A;
-            border-color: #4A5D4A;
+            background-color: #5A6B4F;
+            border-color: #5A6B4F;
             color: #FFFFFF;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         .btn-admin-primary:hover {
-            background-color: #3a4a3a;
-            border-color: #3a4a3a;
+            background-color: #8B7A6B;
+            border-color: #8B7A6B;
             color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-admin-primary.btn-sm {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
         }
         .date-group-header {
             background-color: #F9F7F2;
@@ -176,10 +262,11 @@ foreach ($reservations as $reservation) {
             border-radius: 10px;
             padding: 1.25rem;
             margin-bottom: 1rem;
-            transition: all 0.2s;
+            transition: none !important;
         }
         .reservation-item:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: none !important;
+            box-shadow: none !important;
         }
         .status-toggle-group {
             display: flex;
@@ -188,53 +275,166 @@ foreach ($reservations as $reservation) {
         }
         .status-toggle-btn {
             padding: 0.5rem 1rem;
-            border: 2px solid #4A5D4A;
+            border: none;
             background-color: #FFFFFF;
             color: #4A5D4A;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         .status-toggle-btn:hover {
-            background-color: #F9F7F2;
+            background-color: #8B7A6B;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         .status-toggle-btn.active {
-            background-color: #4A5D4A;
-            color: #FFFFFF;
+            border: 2px solid currentColor;
+            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+            font-weight: 700;
         }
         .status-pending {
-            border-color: #ffc107;
-            color: #856404;
+            background-color: rgba(217, 119, 6, 0.15);
+            color: #d97706;
+            border: 1px solid #d97706;
         }
         .status-pending.active {
-            background-color: #ffc107;
-            color: #000;
+            background-color: rgba(217, 119, 6, 0.15);
+            color: #d97706;
+            border-color: #d97706;
+        }
+        .status-pending:hover {
+            background-color: rgba(217, 119, 6, 0.25);
         }
         .status-confirmed {
-            border-color: #28a745;
-            color: #155724;
+            background-color: rgba(5, 150, 105, 0.15);
+            color: #059669;
+            border: 1px solid #059669;
         }
         .status-confirmed.active {
-            background-color: #28a745;
-            color: #FFFFFF;
+            background-color: rgba(5, 150, 105, 0.15);
+            color: #059669;
+            border-color: #059669;
+        }
+        .status-confirmed:hover {
+            background-color: rgba(5, 150, 105, 0.25);
         }
         .status-cancelled {
-            border-color: #dc3545;
-            color: #721c24;
+            background-color: rgba(220, 38, 38, 0.15);
+            color: #dc2626;
+            border: 1px solid #dc2626;
         }
         .status-cancelled.active {
-            background-color: #dc3545;
-            color: #FFFFFF;
+            background-color: rgba(220, 38, 38, 0.15);
+            color: #dc2626;
+            border-color: #dc2626;
+        }
+        .status-cancelled:hover {
+            background-color: rgba(220, 38, 38, 0.25);
         }
         .status-completed {
-            border-color: #17a2b8;
-            color: #0c5460;
+            background-color: rgba(2, 132, 199, 0.15);
+            color: #0284c7;
+            border: 1px solid #0284c7;
         }
         .status-completed.active {
-            background-color: #17a2b8;
+            background-color: rgba(2, 132, 199, 0.15);
+            color: #0284c7;
+            border-color: #0284c7;
+        }
+        .status-completed:hover {
+            background-color: rgba(2, 132, 199, 0.25);
+        }
+        .date-group-header {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .date-group-header:hover {
+            background-color: #F0EDE5;
+            transform: translateX(5px);
+        }
+        .pagination-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 0.5rem;
+        }
+        .pagination-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid rgba(74, 93, 74, 0.2);
+            background-color: #FFFFFF;
+            color: #4A5D4A;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .pagination-btn:hover {
+            background-color: #5A6B4F;
             color: #FFFFFF;
+            border-color: #5A6B4F;
+        }
+        .pagination-btn.active {
+            background-color: #5A6B4F;
+            color: #FFFFFF;
+            border-color: #5A6B4F;
+        }
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        .empty-state-logo {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3rem;
+            color: #4A5D4A;
+            margin-bottom: 1rem;
+        }
+        .empty-state-icon {
+            font-size: 4rem;
+            color: rgba(74, 93, 74, 0.3);
+            margin-bottom: 1.5rem;
+        }
+        .empty-state-message {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #4A5D4A;
+            margin-bottom: 0.5rem;
+        }
+        .empty-state-subtext {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+        .btn-back-to-all {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.6rem 1.5rem;
+            background-color: #5A6B4F;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .btn-back-to-all:hover {
+            background-color: #8B7A6B;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         .toast-container {
             position: fixed;
@@ -356,9 +556,23 @@ foreach ($reservations as $reservation) {
                 </div>
 
                 <div class="admin-card p-4">
-                    <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">
-                        Reservations (<?php echo count($reservations); ?>)
-                    </h5>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="mb-0" style="font-family: 'Playfair Display', serif;">
+                                Reservations (<?php echo $totalCount; ?>)
+                            </h5>
+                            <?php if (!empty($filterDate)): ?>
+                                <div class="text-muted small mt-1">
+                                    <i class="fas fa-filter me-1"></i>Filtered by: <?php echo date('F j, Y', strtotime($filterDate)); ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                        <?php if (!empty($filterDate)): ?>
+                            <a href="?<?php echo !empty($packageFilter) ? 'package=' . htmlspecialchars($packageFilter) : ''; ?>" class="btn-back-to-all">
+                                <i class="fas fa-arrow-left me-2"></i>Back to All Reservations
+                            </a>
+                        <?php endif; ?>
+                    </div>
                     
                     <?php if (isset($error_message)): ?>
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -368,14 +582,25 @@ foreach ($reservations as $reservation) {
                     <?php endif; ?>
                     
                     <?php if (empty($groupedReservations)): ?>
-                    <div class="text-center text-muted py-5">
-                        <i class="fas fa-clipboard-list fa-3x mb-3 d-block"></i>
-                        <p>No reservations found.</p>
+                    <div class="empty-state">
+                        <div class="empty-state-logo">EVENZA</div>
+                        <i class="fas fa-clipboard-list empty-state-icon"></i>
+                        <div class="empty-state-message">No reservations found</div>
+                        <div class="empty-state-subtext">
+                            <?php if (!empty($filterDate)): ?>
+                                No reservations found for the selected date.
+                            <?php else: ?>
+                                There are no reservations to display at this time.
+                            <?php endif; ?>
+                        </div>
                     </div>
                     <?php else: ?>
-                    <?php foreach ($groupedReservations as $date => $dateReservations): ?>
+                    <?php foreach ($groupedReservations as $date => $dateData): 
+                        $dateKey = $dateData['dateKey'];
+                        $dateReservations = $dateData['reservations'];
+                    ?>
                     <div class="mb-4">
-                        <div class="date-group-header">
+                        <div class="date-group-header" onclick="filterByDate('<?php echo htmlspecialchars($dateKey, ENT_QUOTES); ?>')" title="Click to filter by this date">
                             <i class="fas fa-calendar-day me-2"></i><?php echo htmlspecialchars($date); ?>
                             <span class="badge bg-secondary ms-2"><?php echo count($dateReservations); ?> reservation(s)</span>
                         </div>
@@ -394,7 +619,15 @@ foreach ($reservations as $reservation) {
                                     </div>
                                     <div class="text-muted small mb-2">
                                         <i class="fas fa-clock me-1"></i>
-                                        <?php echo htmlspecialchars($reservation['eventTime'] ?? 'N/A'); ?>
+                                        <?php 
+                                        $timeDisplay = 'N/A';
+                                        if (!empty($reservation['startTime']) && !empty($reservation['endTime'])) {
+                                            $timeDisplay = formatTime12Hour($reservation['startTime'] . ' - ' . $reservation['endTime']);
+                                        } elseif (!empty($reservation['eventTime'])) {
+                                            $timeDisplay = formatTime12Hour($reservation['eventTime']);
+                                        }
+                                        echo htmlspecialchars($timeDisplay); 
+                                        ?>
                                     </div>
                                     <div class="text-muted small mb-2">
                                         <i class="fas fa-map-marker-alt me-1"></i>
@@ -445,10 +678,6 @@ foreach ($reservations as $reservation) {
                                     <div class="text-muted small mt-1">
                                         <i class="fas fa-calendar me-1"></i>
                                         Booked: <?php echo date('M j, Y', strtotime($reservation['reservationDate'] ?? 'now')); ?>
-                                        <?php if (!empty($reservation['startTime']) && !empty($reservation['endTime'])): ?>
-                                            <br><i class="fas fa-clock me-1"></i>
-                                            <?php echo date('g:i A', strtotime($reservation['startTime'])); ?> - <?php echo date('g:i A', strtotime($reservation['endTime'])); ?>
-                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>
@@ -456,6 +685,44 @@ foreach ($reservations as $reservation) {
                         <?php endforeach; ?>
                     </div>
                     <?php endforeach; ?>
+                    
+                    <?php if ($totalPages > 1): ?>
+                    <div class="pagination-wrapper">
+                        <?php if ($page > 1): ?>
+                            <a href="?page=<?php echo $page - 1; ?><?php echo !empty($filterDate) ? '&filter_date=' . htmlspecialchars($filterDate) : ''; ?><?php echo !empty($packageFilter) ? '&package=' . htmlspecialchars($packageFilter) : ''; ?>" class="pagination-btn">Prev</a>
+                        <?php else: ?>
+                            <span class="pagination-btn" style="opacity: 0.5; cursor: not-allowed;">Prev</span>
+                        <?php endif; ?>
+                        
+                        <?php
+                        $startPage = max(1, $page - 2);
+                        $endPage = min($totalPages, $page + 2);
+                        
+                        if ($startPage > 1): ?>
+                            <a href="?page=1<?php echo !empty($filterDate) ? '&filter_date=' . htmlspecialchars($filterDate) : ''; ?><?php echo !empty($packageFilter) ? '&package=' . htmlspecialchars($packageFilter) : ''; ?>" class="pagination-btn">1</a>
+                            <?php if ($startPage > 2): ?>
+                                <span class="pagination-btn" style="border: none; cursor: default;">...</span>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        
+                        <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                            <a href="?page=<?php echo $i; ?><?php echo !empty($filterDate) ? '&filter_date=' . htmlspecialchars($filterDate) : ''; ?><?php echo !empty($packageFilter) ? '&package=' . htmlspecialchars($packageFilter) : ''; ?>" class="pagination-btn <?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                        <?php endfor; ?>
+                        
+                        <?php if ($endPage < $totalPages): ?>
+                            <?php if ($endPage < $totalPages - 1): ?>
+                                <span class="pagination-btn" style="border: none; cursor: default;">...</span>
+                            <?php endif; ?>
+                            <a href="?page=<?php echo $totalPages; ?><?php echo !empty($filterDate) ? '&filter_date=' . htmlspecialchars($filterDate) : ''; ?><?php echo !empty($packageFilter) ? '&package=' . htmlspecialchars($packageFilter) : ''; ?>" class="pagination-btn"><?php echo $totalPages; ?></a>
+                        <?php endif; ?>
+                        
+                        <?php if ($page < $totalPages): ?>
+                            <a href="?page=<?php echo $page + 1; ?><?php echo !empty($filterDate) ? '&filter_date=' . htmlspecialchars($filterDate) : ''; ?><?php echo !empty($packageFilter) ? '&package=' . htmlspecialchars($packageFilter) : ''; ?>" class="pagination-btn">Next</a>
+                        <?php else: ?>
+                            <span class="pagination-btn" style="opacity: 0.5; cursor: not-allowed;">Next</span>
+                        <?php endif; ?>
+                    </div>
+                    <?php endif; ?>
                     <?php endif; ?>
                 </div>
             </div>
@@ -515,6 +782,14 @@ foreach ($reservations as $reservation) {
         }
 
         // Update reservation status
+        function filterByDate(dateKey) {
+            // Build URL with filter_date parameter and preserve other filters
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('filter_date', dateKey);
+            urlParams.set('page', '1'); // Reset to first page when filtering
+            window.location.href = '?' + urlParams.toString();
+        }
+
         function updateReservationStatus(reservationId, newStatus) {
             // Disable all status buttons for this reservation while updating
             const allButtons = document.querySelectorAll(`[onclick*="'${reservationId}'"]`);

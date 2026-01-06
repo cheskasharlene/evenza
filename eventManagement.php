@@ -111,14 +111,24 @@ if (!empty($searchQuery)) {
             border: none;
         }
         .btn-admin-primary {
-            background-color: #4A5D4A;
-            border-color: #4A5D4A;
+            background-color: #5A6B4F;
+            border-color: #5A6B4F;
             color: #FFFFFF;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         .btn-admin-primary:hover {
-            background-color: #3a4a3a;
-            border-color: #3a4a3a;
+            background-color: #8B7A6B;
+            border-color: #8B7A6B;
             color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-admin-primary.btn-sm {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
         }
         .table th {
             font-weight: 600;

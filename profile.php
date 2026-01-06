@@ -70,6 +70,7 @@ if ($stmt) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -118,41 +119,59 @@ if ($stmt) {
                 <p class="page-subtitle">Manage your account and view your reservations</p>
             </div>
 
-            <div class="row">
-                <div class="col-lg-4 mb-4">
-                    <div class="luxury-card p-4">
-                        <h3 class="mb-4">Profile Information</h3>
-
-                        <div class="profile-info-item mb-4">
-                            <div class="profile-info-label">
-                                Name
+            <div class="profile-content-wrapper">
+                <div class="profile-info-column">
+                    <div class="luxury-card profile-card">
+                        <div class="profile-header-section">
+                            <div class="profile-avatar">
+                                <i class="fas fa-user"></i>
                             </div>
+                            <h3 class="profile-section-heading">Profile Information</h3>
+                        </div>
+
+                        <div class="profile-info-container">
+                            <div class="profile-info-item">
+                                <div class="profile-info-icon">
+                                    <i class="fas fa-user-circle"></i>
+                            </div>
+                                <div class="profile-info-content">
+                                    <div class="profile-info-label">Full Name</div>
                             <div class="profile-info-value"><?php echo htmlspecialchars($userData['name']); ?></div>
+                                </div>
                         </div>
 
-                        <div class="profile-info-item mb-4">
-                            <div class="profile-info-label">
-                                Email
+                            <div class="profile-info-item">
+                                <div class="profile-info-icon">
+                                    <i class="fas fa-envelope"></i>
                             </div>
+                                <div class="profile-info-content">
+                                    <div class="profile-info-label">Email Address</div>
                             <div class="profile-info-value"><?php echo htmlspecialchars($userData['email']); ?></div>
+                                </div>
                         </div>
 
-                        <div class="profile-info-item mb-4">
-                            <div class="profile-info-label">
-                                Mobile Number
+                            <div class="profile-info-item">
+                                <div class="profile-info-icon">
+                                    <i class="fas fa-phone"></i>
                             </div>
+                                <div class="profile-info-content">
+                                    <div class="profile-info-label">Mobile Number</div>
                             <div class="profile-info-value"><?php echo htmlspecialchars(formatPhoneNumber($userData['mobile'])); ?></div>
+                                </div>
+                            </div>
                         </div>
 
-                        <button type="button" class="btn btn-outline-luxury w-100 mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                            Edit Profile
+                        <div class="profile-action-section">
+                            <button type="button" class="btn btn-primary-luxury w-100" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                                <i class="fas fa-edit me-2"></i>Edit Profile
                         </button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="col-lg-8">
-                    <div class="luxury-card p-4">
-                        <h3 class="mb-4">My Reservations</h3>
+                <div class="reservations-column">
+                    <div class="luxury-card profile-card">
+                        <h3 class="profile-section-heading">My Reservations</h3>
                         
                         <?php if (empty($reservations)): ?>
                             <div class="text-center py-5">
@@ -160,9 +179,10 @@ if ($stmt) {
                                 <a href="events.php" class="btn btn-primary-luxury mt-3">Browse Events</a>
                             </div>
                         <?php else: ?>
+                            <div class="reservations-list-wrapper">
                             <div class="reservations-list">
                                 <?php foreach ($reservations as $reservation): ?>
-                                    <div class="reservation-item luxury-card p-4 mb-3">
+                                    <div class="reservation-item luxury-card p-4">
                                         <div class="row align-items-center">
                                             <div class="col-md-6 mb-3 mb-md-0">
                                                 <h5 class="reservation-event-name mb-2"><?php echo htmlspecialchars($reservation['eventName']); ?></h5>
@@ -174,7 +194,7 @@ if ($stmt) {
                                                         <span><?php echo date('F j, Y', strtotime($reservation['date'])); ?></span>
                                                     <?php endif; ?>
                                                     <?php if (!empty($reservation['time']) && $reservation['time'] !== ' - '): ?>
-                                                        <span class="text-muted ms-2"><?php echo htmlspecialchars($reservation['time']); ?></span>
+                                                        <span class="text-muted ms-2"><?php echo htmlspecialchars(formatTime12Hour($reservation['time'])); ?></span>
                                                     <?php endif; ?>
                                                 </div>
                                                 
@@ -188,7 +208,7 @@ if ($stmt) {
                                                     <?php 
                                                     $status = strtolower($reservation['status'] ?? 'pending');
                                                     if ($status === 'completed'): ?>
-                                                        <span class="status-badge status-paid" style="background-color: #28a745; color: white;">
+                                                        <span class="status-badge status-completed">
                                                             Completed
                                                         </span>
                                                     <?php elseif ($status === 'confirmed'): ?>
@@ -196,7 +216,7 @@ if ($stmt) {
                                                             Confirmed
                                                         </span>
                                                     <?php elseif ($status === 'cancelled'): ?>
-                                                        <span class="status-badge status-cancelled" style="background-color: #dc3545; color: white;">
+                                                        <span class="status-badge status-cancelled">
                                                             Cancelled
                                                         </span>
                                                     <?php else: ?>
@@ -236,6 +256,7 @@ if ($stmt) {
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
+                                </div>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -314,7 +335,6 @@ if ($stmt) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="reservationDetailsModalLabel" style="font-family: 'Playfair Display', serif;">Reservation Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -351,26 +371,30 @@ if ($stmt) {
                             </div>
 
                             <!-- Contact details -->
-                            <div class="border-top pt-3 mt-3">
-                                <div class="mb-2 fw-semibold">Contact Details</div>
-                                <div class="small text-muted">Full Name</div>
-                                <div class="mb-2" id="modalUserName"><?php echo htmlspecialchars($userData['name']); ?></div>
-                                <div class="small text-muted">Email</div>
-                                <div class="mb-2" id="modalUserEmail"><?php echo htmlspecialchars($userData['email']); ?></div>
-                                <div class="small text-muted">Phone</div>
-                                <div id="modalUserPhone"><?php echo htmlspecialchars(formatPhoneNumber($userData['mobile'])); ?></div>
+                            <div class="border-top pt-4 mt-5">
+                                <div class="mb-3 fw-semibold" style="font-family: 'Playfair Display', serif; font-size: 1.1rem;">Contact Details</div>
+                                <div class="contact-details-grid">
+                                    <div class="contact-details-label">Full Name</div>
+                                    <div class="contact-details-value" id="modalUserName"><?php echo htmlspecialchars($userData['name']); ?></div>
+                                    
+                                    <div class="contact-details-label">Email</div>
+                                    <div class="contact-details-value" id="modalUserEmail"><?php echo htmlspecialchars($userData['email']); ?></div>
+                                    
+                                    <div class="contact-details-label">Phone</div>
+                                    <div class="contact-details-value" id="modalUserPhone"><?php echo htmlspecialchars(formatPhoneNumber($userData['mobile'])); ?></div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-5">
-                            <div class="p-4 rounded" style="background-color: #F9F7F2;">
-                                <div class="text-center mb-3">
-                                    <label class="form-label text-muted small">Status</label>
+                            <div class="p-4 rounded status-payment-box" style="background-color: #F9F7F2;">
+                                <div class="text-center mb-4">
+                                    <label class="form-label text-muted small d-block mb-2">Status</label>
                                     <div id="modalStatus"></div>
                                 </div>
-                                <hr>
-                                <div class="text-center mb-3">
-                                    <label class="form-label text-muted small">Total Amount</label>
-                                    <div class="h3" style="color: #4A5D4A;" id="modalAmount"></div>
+                                <hr style="margin: 1.5rem 0;">
+                                <div class="text-center mb-4">
+                                    <label class="form-label text-muted small d-block mb-2">Total Amount</label>
+                                    <div class="h3" style="color: #4A5D4A; font-family: 'Playfair Display', serif;" id="modalAmount"></div>
                                 </div>
                                 
                                 <!-- Status Messages -->
@@ -424,23 +448,61 @@ if ($stmt) {
             document.getElementById('modalEventName').textContent = reservation.eventName || 'N/A';
             document.getElementById('modalVenue').textContent = reservation.venue || 'N/A';
             document.getElementById('modalDate').textContent = reservation.date ? new Date(reservation.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
-            document.getElementById('modalTime').textContent = reservation.time && reservation.time !== ' - ' ? reservation.time : 'N/A';
+            
+            // Format time in 12-hour format
+            let timeDisplay = 'N/A';
+            if (reservation.time && reservation.time !== ' - ') {
+                const timeParts = reservation.time.split(' - ');
+                if (timeParts.length === 2) {
+                    const startTime = timeParts[0].trim();
+                    const endTime = timeParts[1].trim();
+                    
+                    // Convert to 12-hour format
+                    function formatTo12Hour(timeStr) {
+                        if (!timeStr || timeStr === '') return '';
+                        // Handle formats like "11:00:00" or "11:00"
+                        const timeOnly = timeStr.split(' ')[0]; // Remove any extra text
+                        const [hours, minutes] = timeOnly.split(':');
+                        const hour = parseInt(hours);
+                        const min = minutes || '00';
+                        const period = hour >= 12 ? 'PM' : 'AM';
+                        const hour12 = hour === 0 ? 12 : (hour > 12 ? hour - 12 : hour);
+                        return `${hour12}:${min} ${period}`;
+                    }
+                    
+                    const formattedStart = formatTo12Hour(startTime);
+                    const formattedEnd = formatTo12Hour(endTime);
+                    timeDisplay = formattedStart && formattedEnd ? `${formattedStart} - ${formattedEnd}` : reservation.time;
+                } else {
+                    timeDisplay = reservation.time;
+                }
+            }
+            document.getElementById('modalTime').textContent = timeDisplay;
+            
             document.getElementById('modalPackage').textContent = reservation.packageName || 'N/A';
             document.getElementById('modalReservationId').textContent = '#' + reservation.reservationId;
             document.getElementById('modalAmount').textContent = '₱ ' + parseFloat(reservation.totalAmount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             
-            // Set status badge
+            // Set status badge - Different colors for Completed vs Confirmed
             const statusEl = document.getElementById('modalStatus');
             const status = (reservation.status || 'pending').toLowerCase();
             
-            if (status === 'confirmed') {
-                statusEl.innerHTML = '<span class="badge bg-success fs-6">Confirmed</span>';
+            // Standardized status colors - Light background with dark text
+            if (status === 'completed') {
+                // Completed = Light Blue Background, Dark Blue Text
+                statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #e0f2fe; color: #0284c7; border-radius: 50px;">Completed</span>';
+            } else if (status === 'confirmed') {
+                // Confirmed = Light Green Background, Dark Green Text
+                statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #d1fae5; color: #059669; border-radius: 50px;">Confirmed</span>';
             } else if (status === 'cancelled') {
-                statusEl.innerHTML = '<span class="badge bg-danger fs-6">Cancelled</span>';
+                // Cancelled = Light Red Background, Dark Red Text
+                statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #fee2e2; color: #dc2626; border-radius: 50px;">Cancelled</span>';
             } else if (status === 'paid') {
-                statusEl.innerHTML = '<span class="badge bg-primary fs-6">Paid</span>';
+                // Paid = Completed status
+                statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #e0f2fe; color: #0284c7; border-radius: 50px;">Completed</span>';
             } else {
-                statusEl.innerHTML = '<span class="badge bg-warning text-dark fs-6">Pending</span>';
+                // Pending = Light Yellow Background, Dark Amber Text
+                statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #fef3c7; color: #d97706; border-radius: 50px;">Pending</span>';
             }
             
             // Hide all message/payment sections first

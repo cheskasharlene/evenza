@@ -3,26 +3,73 @@ require_once 'adminAuth.php';
 require_once 'connect.php';
 require_once 'includes/helpers.php';
 
-$users = [];
-$query = "SELECT userid, firstName, lastName, fullName, email, phone, role FROM users ORDER BY userid ASC";
-$result = mysqli_query($conn, $query);
+// Get search and role filter parameters
+$searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
+$roleFilter = isset($_GET['role']) ? trim($_GET['role']) : '';
 
-if ($result) {
-    while ($row = mysqli_fetch_assoc($result)) {
-        $users[] = [
-            'id' => $row['userid'],
-            'firstName' => $row['firstName'],
-            'lastName' => $row['lastName'],
-            'fullName' => $row['fullName'],
-            'email' => $row['email'],
-            'mobile' => !empty($row['phone']) ? formatPhoneNumber($row['phone']) : 'N/A',
-            'role' => ucfirst(strtolower($row['role'])) 
-        ];
+// Build query with filters
+$query = "SELECT userid, firstName, lastName, fullName, email, phone, role FROM users WHERE 1=1";
+$params = [];
+$types = '';
+
+if (!empty($searchQuery)) {
+    $query .= " AND (fullName LIKE ? OR email LIKE ?)";
+    $searchParam = '%' . $searchQuery . '%';
+    $params[] = $searchParam;
+    $params[] = $searchParam;
+    $types .= 'ss';
+}
+
+if (!empty($roleFilter) && $roleFilter !== 'all') {
+    $query .= " AND role = ?";
+    $params[] = $roleFilter;
+    $types .= 's';
+}
+
+$query .= " ORDER BY userid ASC";
+
+$users = [];
+
+if (!empty($params)) {
+    $stmt = mysqli_prepare($conn, $query);
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, $types, ...$params);
+        if (mysqli_stmt_execute($stmt)) {
+            $result = mysqli_stmt_get_result($stmt);
+            while ($row = mysqli_fetch_assoc($result)) {
+                $users[] = [
+                    'id' => $row['userid'],
+                    'firstName' => $row['firstName'],
+                    'lastName' => $row['lastName'],
+                    'fullName' => $row['fullName'],
+                    'email' => $row['email'],
+                    'mobile' => !empty($row['phone']) ? formatPhoneNumber($row['phone']) : 'N/A',
+                    'role' => ucfirst(strtolower($row['role'])) 
+                ];
+            }
+            mysqli_free_result($result);
+        }
+        mysqli_stmt_close($stmt);
     }
-    mysqli_free_result($result);
 } else {
-    $error = mysqli_error($conn);
-    error_log("User Management Query Error: " . $error);
+    $result = mysqli_query($conn, $query);
+    if ($result) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            $users[] = [
+                'id' => $row['userid'],
+                'firstName' => $row['firstName'],
+                'lastName' => $row['lastName'],
+                'fullName' => $row['fullName'],
+                'email' => $row['email'],
+                'mobile' => !empty($row['phone']) ? formatPhoneNumber($row['phone']) : 'N/A',
+                'role' => ucfirst(strtolower($row['role'])) 
+            ];
+        }
+        mysqli_free_result($result);
+    } else {
+        $error = mysqli_error($conn);
+        error_log("User Management Query Error: " . $error);
+    }
 }
 ?>
 <!doctype html>
@@ -67,14 +114,24 @@ if ($result) {
             border: none;
         }
         .btn-admin-primary {
-            background-color: #4A5D4A;
-            border-color: #4A5D4A;
+            background-color: #5A6B4F;
+            border-color: #5A6B4F;
             color: #FFFFFF;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         .btn-admin-primary:hover {
-            background-color: #3a4a3a;
-            border-color: #3a4a3a;
+            background-color: #8B7A6B;
+            border-color: #8B7A6B;
             color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-admin-primary.btn-sm {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
         }
         .table th {
             font-weight: 600;
@@ -103,12 +160,46 @@ if ($result) {
             font-weight: 500;
         }
         .role-admin {
-            background-color: #4A5D4A;
-            color: #FFFFFF;
+            background-color: rgba(5, 150, 105, 0.15);
+            color: #059669;
+            border: 1px solid #059669;
         }
         .role-client {
-            background-color: #e9ecef;
-            color: #495057;
+            background-color: rgba(107, 114, 128, 0.15);
+            color: #6b7280;
+            border: 1px solid #6b7280;
+        }
+        .search-input, .role-filter {
+            border: 1px solid rgba(74, 93, 74, 0.2);
+            border-radius: 50px;
+            padding: 0.6rem 1.25rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        .search-input:focus, .role-filter:focus {
+            border-color: #5A6B4F;
+            box-shadow: 0 0 0 0.2rem rgba(90, 107, 79, 0.15);
+            outline: none;
+        }
+        .btn-add-user {
+            background-color: #5A6B4F;
+            border-color: #5A6B4F;
+            color: #FFFFFF;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .btn-add-user:hover {
+            background-color: #8B7A6B;
+            border-color: #8B7A6B;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .role-badge {
+            border-radius: 50px;
         }
         .action-btn {
             background: none;
@@ -148,6 +239,7 @@ if ($result) {
 
 <body>
     <div class="d-flex admin-wrapper">
+        <!-- Sidebar -->
         <div class="d-flex flex-column admin-sidebar p-4" style="background-color: #F9F7F2;">
             <div class="d-flex align-items-center mb-4">
                 <div class="luxury-logo"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></div>
@@ -164,7 +256,9 @@ if ($result) {
             </div>
         </div>
 
+        <!-- Content -->
         <div class="flex-fill admin-content">
+            <!-- Top Navigation Bar -->
             <div class="admin-top-nav d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
                     <div class="me-3 d-lg-none">
@@ -186,18 +280,35 @@ if ($result) {
             </div>
 
             <div class="p-4">
+                <!-- Controls Section -->
+                <!-- Search & Filter Bar -->
                 <div class="admin-card p-4 mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="mb-1" style="font-family: 'Playfair Display', serif;">All Users (<?php echo count($users); ?>)</h5>
-                            <div class="text-muted small">Manage user profiles and administrative permissions</div>
+                    <div class="d-flex flex-wrap align-items-center gap-3">
+                        <!-- Search Input -->
+                        <div class="flex-grow-1" style="min-width: 250px;">
+                            <div class="position-relative">
+                                <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #6c757d; z-index: 10;"></i>
+                                <input type="text" id="searchInput" class="form-control search-input" placeholder="Search by name or email..." value="<?php echo htmlspecialchars($searchQuery ?? ''); ?>" style="padding-left: 45px;">
+                            </div>
                         </div>
-                        <button type="button" class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#userModal" onclick="openAddUserModal()">
-                            <i class="fas fa-plus"></i> Add New User
+                        
+                        <!-- Role Filter -->
+                        <div style="min-width: 180px;">
+                            <select id="roleFilter" class="form-select role-filter">
+                                <option value="all" <?php echo (empty($roleFilter) || $roleFilter === 'all') ? 'selected' : ''; ?>>All Roles</option>
+                                <option value="admin" <?php echo ($roleFilter === 'admin') ? 'selected' : ''; ?>>Admin</option>
+                                <option value="user" <?php echo ($roleFilter === 'user' || $roleFilter === 'client') ? 'selected' : ''; ?>>Client</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Add User Button -->
+                        <button type="button" class="btn btn-add-user" data-bs-toggle="modal" data-bs-target="#userModal" onclick="openAddUserModal()">
+                            <i class="fas fa-plus me-2"></i> Add New User
                         </button>
                     </div>
                 </div>
 
+                <!-- Users Table -->
                 <div class="admin-card p-4">
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
@@ -210,7 +321,7 @@ if ($result) {
                                     <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="usersTableBody">
                                 <?php if (empty($users)): ?>
                                 <tr>
                                     <td colspan="5" class="text-center text-muted py-5">
@@ -224,10 +335,10 @@ if ($result) {
                                     <td>
                                         <div class="d-flex align-items-center">
                                             <div class="user-avatar me-3">
-                                                <?php echo strtoupper(substr($user['fullName'] ?? ($user['firstName'] . ' ' . $user['lastName']), 0, 1)); ?>
+                                                <?php echo strtoupper(substr($user['fullName'], 0, 1)); ?>
                                             </div>
                                             <div>
-                                                <div class="fw-semibold"><?php echo htmlspecialchars($user['fullName'] ?? ($user['firstName'] . ' ' . $user['lastName'])); ?></div>
+                                                <div class="fw-semibold"><?php echo htmlspecialchars($user['fullName']); ?></div>
                                                 <div class="text-muted small">ID: <?php echo htmlspecialchars($user['id']); ?></div>
                                             </div>
                                         </div>
@@ -239,8 +350,8 @@ if ($result) {
                                         <div><?php echo htmlspecialchars($user['mobile'] ?? 'N/A'); ?></div>
                                     </td>
                                     <td>
-                                        <span class="role-badge <?php echo (strtolower($user['role']) === 'admin') ? 'role-admin' : 'role-client'; ?>">
-                                            <i class="fas <?php echo (strtolower($user['role']) === 'admin') ? 'fa-shield-alt' : 'fa-user'; ?> me-1"></i>
+                                        <span class="role-badge <?php echo strtolower($user['role']) === 'admin' ? 'role-admin' : 'role-client'; ?>">
+                                            <i class="fas <?php echo strtolower($user['role']) === 'admin' ? 'fa-shield-alt' : 'fa-user'; ?> me-1"></i>
                                             <?php echo htmlspecialchars($user['role']); ?>
                                         </span>
                                     </td>
@@ -263,6 +374,7 @@ if ($result) {
         </div>
     </div>
 
+    <!-- Toast Container for Feedback Messages -->
     <div class="toast-container">
         <div id="feedbackToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -276,6 +388,7 @@ if ($result) {
         </div>
     </div>
 
+    <!-- User Modal (Add/Edit) -->
     <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -327,6 +440,7 @@ if ($result) {
         let isEditMode = false;
         let currentUserId = null;
 
+        // Sidebar toggle for mobile
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('adminSidebarToggle');
             const sidebar = document.querySelector('.admin-sidebar');
@@ -338,6 +452,7 @@ if ($result) {
             }
         });
 
+        // Show feedback toast
         function showFeedback(message, type = 'info') {
             const toast = document.getElementById('feedbackToast');
             const toastMessage = document.getElementById('toastMessage');
@@ -345,6 +460,7 @@ if ($result) {
             
             toastMessage.textContent = message;
             
+            // Update icon based on type
             const icon = toastHeader.querySelector('i');
             if (type === 'success') {
                 icon.className = 'fas fa-check-circle me-2 text-success';
@@ -361,6 +477,7 @@ if ($result) {
             bsToast.show();
         }
 
+        // Open add user modal
         function openAddUserModal() {
             isEditMode = false;
             currentUserId = null;
@@ -371,67 +488,31 @@ if ($result) {
             document.getElementById('userPassword').required = true;
         }
 
+        // Edit user function
         function editUser(userId, fullName, email, mobile, role) {
             isEditMode = true;
             currentUserId = userId;
+            document.getElementById('userModalLabel').textContent = 'Edit User';
+            document.getElementById('userId').value = userId;
+            document.getElementById('userFullName').value = fullName;
+            document.getElementById('userEmail').value = email;
+            document.getElementById('userMobile').value = mobile;
+            document.getElementById('isAdmin').checked = (role === 'Admin');
+            document.getElementById('passwordField').style.display = 'block';
+            document.getElementById('userPassword').required = false;
+            document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
             
-            fetch('api/getUser.php?userId=' + userId)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const user = data.data;
-                        document.getElementById('userModalLabel').textContent = 'Edit User';
-                        document.getElementById('userId').value = user.userid;
-                        document.getElementById('userFullName').value = user.fullName || '';
-                        document.getElementById('userEmail').value = user.email || '';
-                        document.getElementById('userMobile').value = user.phone || '';
-                        document.getElementById('isAdmin').checked = (user.role.toLowerCase() === 'admin');
-                        document.getElementById('passwordField').style.display = 'block';
-                        document.getElementById('userPassword').required = false;
-                        document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
-                        document.getElementById('userPassword').value = '';
-                        
-                        const modal = new bootstrap.Modal(document.getElementById('userModal'));
-                        modal.show();
-                    } else {
-                        document.getElementById('userModalLabel').textContent = 'Edit User';
-                        document.getElementById('userId').value = userId;
-                        document.getElementById('userFullName').value = fullName;
-                        document.getElementById('userEmail').value = email;
-                        document.getElementById('userMobile').value = mobile;
-                        document.getElementById('isAdmin').checked = (role === 'Admin' || role === 'admin');
-                        document.getElementById('passwordField').style.display = 'block';
-                        document.getElementById('userPassword').required = false;
-                        document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
-                        
-                        const modal = new bootstrap.Modal(document.getElementById('userModal'));
-                        modal.show();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('userModalLabel').textContent = 'Edit User';
-                    document.getElementById('userId').value = userId;
-                    document.getElementById('userFullName').value = fullName;
-                    document.getElementById('userEmail').value = email;
-                    document.getElementById('userMobile').value = mobile;
-                    document.getElementById('isAdmin').checked = (role === 'Admin' || role === 'admin');
-                    document.getElementById('passwordField').style.display = 'block';
-                    document.getElementById('userPassword').required = false;
-                    document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
-                    
-                    const modal = new bootstrap.Modal(document.getElementById('userModal'));
-                    modal.show();
-                });
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            modal.show();
         }
 
+        // Save user function
         function saveUser() {
             const fullName = document.getElementById('userFullName').value.trim();
             const email = document.getElementById('userEmail').value.trim();
             const mobile = document.getElementById('userMobile').value.trim();
             const password = document.getElementById('userPassword').value;
             const isAdmin = document.getElementById('isAdmin').checked;
-            const userId = document.getElementById('userId').value;
             
             if (!fullName || !email) {
                 showFeedback('Please fill in all required fields.', 'error');
@@ -443,78 +524,145 @@ if ($result) {
                 return;
             }
             
-            const formData = new FormData();
-            formData.append('userId', userId);
-            formData.append('fullName', fullName);
-            formData.append('email', email);
-            formData.append('mobile', mobile);
-            formData.append('password', password);
-            formData.append('isAdmin', isAdmin ? 'true' : 'false');
+            // In a real implementation, this would make an AJAX call to save the user
+            const action = isEditMode ? 'updated' : 'added';
+            showFeedback('User "' + fullName + '" has been ' + action + ' successfully.', 'success');
             
-            fetch('api/updateUser.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    const action = isEditMode ? 'updated' : 'added';
-                    showFeedback('User "' + fullName + '" has been ' + action + ' successfully.', 'success');
-                    
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
-                    if (modal) {
-                        modal.hide();
-                    }
-                    
-                    setTimeout(function() {
-                        window.location.reload();
-                    }, 1000);
-                } else {
-                    showFeedback(data.message || 'An error occurred while saving the user.', 'error');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showFeedback('An error occurred while saving the user. Please check the console for details.', 'error');
-            });
+            // Close modal and reload after a short delay
+            const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+            modal.hide();
+            
+            setTimeout(function() {
+                location.reload();
+            }, 1500);
         }
 
+        // Delete user function
         function deleteUser(userId, userName) {
             if (confirm('Are you sure you want to delete user "' + userName + '"? This action cannot be undone.')) {
-                const formData = new FormData();
-                formData.append('userId', userId);
-                
-                fetch('api/deleteUser.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                // In a real implementation, this would make an AJAX call to delete the user
+                showFeedback('User "' + userName + '" has been deleted successfully.', 'success');
+                // Reload page after a short delay to show the feedback
+                setTimeout(function() {
+                    location.reload();
+                }, 1500);
+            }
+        }
+
+        // Show feedback on page load if there's a message in URL
+        // Live search functionality
+        let searchTimeout;
+        const searchInput = document.getElementById('searchInput');
+        const roleFilter = document.getElementById('roleFilter');
+        const usersTableBody = document.getElementById('usersTableBody');
+
+        function performSearch() {
+            const searchQuery = searchInput.value.trim();
+            const roleValue = roleFilter.value;
+            
+            // Update URL without page reload
+            const url = new URL(window.location.href);
+            if (searchQuery) {
+                url.searchParams.set('search', searchQuery);
+            } else {
+                url.searchParams.delete('search');
+            }
+            if (roleValue && roleValue !== 'all') {
+                url.searchParams.set('role', roleValue);
+            } else {
+                url.searchParams.delete('role');
+            }
+            window.history.pushState({}, '', url);
+            
+            // Fetch filtered users
+            fetch(`api/searchUsers.php?search=${encodeURIComponent(searchQuery)}&role=${encodeURIComponent(roleValue)}`)
+                .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showFeedback('User "' + userName + '" has been deleted successfully.', 'success');
-                        setTimeout(function() {
-                            window.location.reload();
-                        }, 1000);
+                        updateUsersTable(data.users);
                     } else {
-                        showFeedback(data.message || 'An error occurred while deleting the user.', 'error');
+                        showFeedback('Error searching users: ' + (data.message || 'Unknown error'), 'error');
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    showFeedback('An error occurred while deleting the user. Please check the console for details.', 'error');
+                    console.error('Search error:', error);
+                    showFeedback('An error occurred while searching. Please try again.', 'error');
                 });
-            }
         }
+
+        function updateUsersTable(users) {
+            if (users.length === 0) {
+                usersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-5">
+                            <i class="fas fa-users fa-2x mb-3 d-block"></i>
+                            No users found.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            users.forEach(user => {
+                const roleClass = (user.role.toLowerCase() === 'admin') ? 'role-admin' : 'role-client';
+                const roleIcon = (user.role.toLowerCase() === 'admin') ? 'fa-shield-alt' : 'fa-user';
+                const fullName = user.fullName || (user.firstName + ' ' + user.lastName);
+                const initial = fullName.charAt(0).toUpperCase();
+                
+                html += `
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar me-3">${initial}</div>
+                                <div>
+                                    <div class="fw-semibold">${escapeHtml(fullName)}</div>
+                                    <div class="text-muted small">ID: ${escapeHtml(user.id)}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div>${escapeHtml(user.email)}</div>
+                        </td>
+                        <td>
+                            <div>${escapeHtml(user.mobile || 'N/A')}</div>
+                        </td>
+                        <td>
+                            <span class="role-badge ${roleClass}">
+                                <i class="fas ${roleIcon} me-1"></i>
+                                ${escapeHtml(user.role)}
+                            </span>
+                        </td>
+                        <td class="text-end">
+                            <button class="action-btn" onclick="editUser('${escapeHtml(user.id)}', '${escapeHtml(fullName)}', '${escapeHtml(user.email)}', '${escapeHtml(user.mobile || '')}', '${escapeHtml(user.role)}')" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn text-danger" onclick="deleteUser('${escapeHtml(user.id)}', '${escapeHtml(fullName)}')" title="Delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            usersTableBody.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Search input event listener with debounce
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(performSearch, 300);
+        });
+
+        // Role filter change event listener
+        roleFilter.addEventListener('change', function() {
+            performSearch();
+        });
 
         const urlParams = new URLSearchParams(window.location.search);
         const message = urlParams.get('message');

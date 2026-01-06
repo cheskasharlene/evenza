@@ -1,7 +1,7 @@
 <?php
 require_once 'adminAuth.php';
 require_once 'connect.php';
-
+require_once 'includes/helpers.php';
 
 $stats = [
     'totalRevenue' => 0,
@@ -92,6 +92,9 @@ try {
         SELECT 
             r.reservationId,
             r.createdAt,
+            r.reservationDate,
+            r.startTime,
+            r.endTime,
             r.totalAmount,
             u.fullName as userName,
             e.title as eventName,
@@ -100,8 +103,8 @@ try {
         LEFT JOIN users u ON r.userId = u.userId
         LEFT JOIN events e ON r.eventId = e.eventId
         LEFT JOIN packages p ON r.packageId = p.packageId
-        ORDER BY r.createdAt DESC
-        LIMIT 5
+        ORDER BY r.reservationDate DESC, r.createdAt DESC
+        LIMIT 3
     ";
     $recentActivityResult = mysqli_query($conn, $recentActivityQuery);
     if ($recentActivityResult) {
@@ -111,6 +114,9 @@ try {
                 'eventName' => $row['eventName'] ?? 'Unknown Event',
                 'packageName' => $row['packageName'] ?? 'N/A',
                 'createdAt' => $row['createdAt'],
+                'reservationDate' => $row['reservationDate'] ?? null,
+                'startTime' => $row['startTime'] ?? null,
+                'endTime' => $row['endTime'] ?? null,
                 'totalAmount' => floatval($row['totalAmount'] ?? 0)
             ];
         }
@@ -213,22 +219,82 @@ try {
             border-left: 3px solid rgba(74, 93, 74, 0.2); 
             padding-left: 0.75rem; 
             margin-bottom: 0.75rem;
+            border-radius: 8px;
+            padding: 0.75rem;
+            background-color: rgba(249, 247, 242, 0.5);
+        }
+        #recentActivity {
+            overflow: visible;
+            max-height: none;
+        }
+        .view-all-link {
+            color: #5A6B4F;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .view-all-link:hover {
+            color: #8B7A6B;
+            text-decoration: underline;
         }
         .admin-card {
             background-color: #FFFFFF;
-            border-radius: 15px;
+            border-radius: 20px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             border: none;
+            padding: 24px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .dashboard-grid {
+            display: flex;
+            align-items: stretch;
+            gap: 24px;
+            margin-bottom: 2rem;
+        }
+        .top-events-card {
+            flex: 0 0 67.5%;
+            max-width: 67.5%;
+            display: flex;
+            flex-direction: column;
+        }
+        .recent-activity-card {
+            flex: 0 0 30%;
+            max-width: 30%;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+        }
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         .btn-admin-primary {
-            background-color: #4A5D4A;
-            border-color: #4A5D4A;
+            background-color: #5A6B4F;
+            border-color: #5A6B4F;
             color: #FFFFFF;
+            border-radius: 50px;
+            padding: 0.6rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         .btn-admin-primary:hover {
-            background-color: #3a4a3a;
-            border-color: #3a4a3a;
+            background-color: #8B7A6B;
+            border-color: #8B7A6B;
             color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        .btn-admin-primary.btn-sm {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.875rem;
         }
         .trend-indicator {
             font-size: 0.85rem;
@@ -236,6 +302,17 @@ try {
         }
         .trend-up {
             color: #4A5D4A;
+        }
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .top-events-card,
+            .recent-activity-card {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
         }
         @media (max-width: 991px) { 
             .admin-sidebar { 
@@ -347,18 +424,19 @@ try {
                     </div>
                 </div>
 
-                <div class="row g-4">
-                    <div class="col-lg-8">
-                        <div class="admin-card p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="dashboard-grid">
+                    <div class="top-events-card">
+                        <div class="admin-card">
+                            <div class="card-header">
                                 <div>
                                     <h5 class="mb-1" style="font-family: 'Playfair Display', serif;">Top Performing Events</h5>
                                     <div class="text-muted small">Top 5 events by tickets sold & capacity%</div>
                                 </div>
                                 <div class="text-muted small">Updated just now</div>
                             </div>
-                            <div class="table-responsive">
-                                <table class="table table-sm align-middle mb-0">
+                            <div class="card-content">
+                                <div class="table-responsive">
+                                    <table class="table table-sm align-middle mb-0">
                                     <thead>
                                         <tr style="border-bottom: 2px solid rgba(74, 93, 74, 0.1);">
                                             <th style="font-weight: 600; color: #1A1A1A;">Event Name</th>
@@ -396,32 +474,49 @@ try {
                                             <?php endforeach; ?>
                                         <?php endif; ?>
                                     </tbody>
-                                </table>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="col-lg-4">
-                        <div class="admin-card p-4">
-                            <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="recent-activity-card">
+                        <div class="admin-card">
+                            <div class="card-header">
                                 <div>
                                     <h5 class="mb-1" style="font-family: 'Playfair Display', serif;">Recent Activity</h5>
                                     <div class="text-muted small">Latest reservations</div>
                                 </div>
-                                <div class="text-muted small"><a href="reservationsManagement.php" style="color: #4A5D4A; text-decoration: none;">View all</a></div>
+                                <a href="reservationsManagement.php" class="view-all-link">View all</a>
                             </div>
-                            <div id="recentActivity">
+                            <div class="card-content">
+                                <div id="recentActivity">
                                 <?php if (empty($stats['recentActivity'])): ?>
                                     <div class="text-center text-muted">No recent activity</div>
                                 <?php else: ?>
                                     <?php foreach ($stats['recentActivity'] as $activity): 
-                                        $dateTime = new DateTime($activity['createdAt']);
-                                        $formattedDate = $dateTime->format('Y-m-d H:i');
+                                        // Format date
+                                        $reservationDate = !empty($activity['reservationDate']) ? $activity['reservationDate'] : $activity['createdAt'];
+                                        $dateTime = new DateTime($reservationDate);
+                                        $formattedDate = $dateTime->format('M j, Y');
+                                        
+                                        // Format time in 12-hour format
+                                        $timeDisplay = 'N/A';
+                                        if (!empty($activity['startTime']) && !empty($activity['endTime'])) {
+                                            $timeDisplay = formatTime12Hour($activity['startTime'] . ' - ' . $activity['endTime']);
+                                        } elseif (!empty($activity['startTime'])) {
+                                            $timeDisplay = formatTime12Hour($activity['startTime']);
+                                        }
                                     ?>
                                         <div class="mb-3 activity-item">
-                                            <div class="d-flex justify-content-between">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
                                                 <div class="fw-semibold"><?php echo htmlspecialchars($activity['userName']); ?></div>
-                                                <div class="text-muted small"><?php echo htmlspecialchars($formattedDate); ?></div>
+                                                <div class="text-muted small text-end">
+                                                    <div><?php echo htmlspecialchars($formattedDate); ?></div>
+                                                    <?php if ($timeDisplay !== 'N/A'): ?>
+                                                        <div class="mt-1"><?php echo htmlspecialchars($timeDisplay); ?></div>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
                                             <div class="text-muted small">
                                                 Reserved <?php echo htmlspecialchars($activity['packageName']); ?> — <?php echo htmlspecialchars($activity['eventName']); ?>
@@ -429,6 +524,7 @@ try {
                                         </div>
                                     <?php endforeach; ?>
                                 <?php endif; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
