@@ -126,14 +126,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <li class="nav-item">
                         <a class="nav-link" href="about.php">About</a>
                     </li>
+                    <li class="nav-item nav-divider">
+                        <span class="nav-separator"></span>
+                    </li>
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item ms-3">
+                        <li class="nav-item">
                             <a class="nav-link" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
                             <a class="nav-link btn-register" href="logout.php">Logout</a>
                         </li>
                     <?php else: ?>
+                        <li class="nav-item">
+                            <a class="nav-link btn-login active" href="login.php">Login</a>
+                        </li>
                         <li class="nav-item ms-2">
                             <a class="nav-link btn-register" href="register.php">Register</a>
                         </li>

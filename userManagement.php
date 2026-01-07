@@ -86,32 +86,39 @@ if (!empty($params)) {
     <style>
         .admin-wrapper { 
             min-height: 100vh; 
-            background-color: #F9F7F2;
+            background: linear-gradient(135deg, #F9F7F2 0%, #F5F3ED 100%);
         }
         .admin-sidebar { 
-            width: 260px; 
+            width: 240px; 
             position: fixed;
             left: 0;
             top: 0;
             height: 100vh;
             overflow-y: auto;
             z-index: 1000;
+            background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
         }
         .admin-content {
-            margin-left: 260px;
-            width: calc(100% - 260px);
+            margin-left: 240px;
+            width: calc(100% - 240px);
         }
         .admin-top-nav {
             background-color: #FFFFFF;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(74, 93, 74, 0.1);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid rgba(74, 93, 74, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
         .admin-card {
             background-color: #FFFFFF;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: none;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(74, 93, 74, 0.05);
+            transition: all 0.3s ease;
+        }
+        .admin-card:hover {
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
         }
         .btn-admin-primary {
             background-color: #5A6B4F;
@@ -133,13 +140,32 @@ if (!empty($params)) {
             padding: 0.5rem 1.25rem;
             font-size: 0.875rem;
         }
+        .table {
+            margin-bottom: 0;
+        }
+        .table thead {
+            background: linear-gradient(135deg, rgba(74, 93, 74, 0.05) 0%, rgba(74, 93, 74, 0.02) 100%);
+        }
         .table th {
             font-weight: 600;
             color: #1A1A1A;
-            border-bottom: 2px solid rgba(74, 93, 74, 0.1);
+            border-bottom: 2px solid rgba(74, 93, 74, 0.15);
+            padding: 1rem;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
         }
         .table td {
             vertical-align: middle;
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid rgba(74, 93, 74, 0.08);
+        }
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+        .table tbody tr:hover {
+            background-color: rgba(74, 93, 74, 0.03);
+            transform: scale(1.01);
         }
         .user-avatar {
             width: 45px;
@@ -202,16 +228,28 @@ if (!empty($params)) {
             border-radius: 50px;
         }
         .action-btn {
-            background: none;
+            background: rgba(74, 93, 74, 0.08);
             border: none;
             color: #4A5D4A;
-            padding: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
         }
         .action-btn:hover {
+            background: rgba(74, 93, 74, 0.15);
             color: #3a4a3a;
-            transform: scale(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .action-btn.text-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        .action-btn.text-danger:hover {
+            background: rgba(220, 53, 69, 0.2);
+            color: #c82333;
         }
         .toast-container {
             position: fixed;
@@ -223,15 +261,79 @@ if (!empty($params)) {
             background-color: #4A5D4A;
             border-color: #4A5D4A;
         }
+        .admin-sidebar a:not(.active):hover {
+            background: rgba(74, 93, 74, 0.05) !important;
+            color: #4A5D4A !important;
+            border-left-color: rgba(74, 93, 74, 0.3) !important;
+            transform: translateX(5px);
+        }
         @media (max-width: 991px) { 
             .admin-sidebar { 
                 width: 100%; 
                 position: relative;
                 height: auto;
+                display: none;
+            }
+            .admin-sidebar.show {
+                display: flex;
             }
             .admin-content {
                 margin-left: 0;
                 width: 100%;
+            }
+            .admin-wrapper {
+                flex-direction: column;
+            }
+            .filter-section {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .filter-section > div {
+                width: 100% !important;
+                min-width: 100% !important;
+            }
+        }
+        @media (max-width: 768px) {
+            .admin-top-nav {
+                padding: 0.75rem 1rem;
+                flex-wrap: wrap;
+            }
+            .admin-top-nav h4 {
+                font-size: 1.25rem;
+            }
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+            .table th,
+            .table td {
+                padding: 0.5rem;
+            }
+            .btn-admin-primary {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .admin-top-nav {
+                padding: 0.5rem;
+            }
+            .admin-top-nav > div {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            .table th,
+            .table td {
+                font-size: 0.75rem;
+                padding: 0.4rem;
+            }
+            .table th:nth-child(3),
+            .table td:nth-child(3) {
+                display: none;
+            }
+            .search-input,
+            .role-filter {
+                font-size: 0.875rem;
             }
         }
     </style>
@@ -240,17 +342,31 @@ if (!empty($params)) {
 <body>
     <div class="d-flex admin-wrapper">
         <!-- Sidebar -->
-        <div class="d-flex flex-column admin-sidebar p-4" style="background-color: #F9F7F2;">
-            <div class="d-flex align-items-center mb-4">
-                <div class="luxury-logo"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></div>
+        <div class="d-flex flex-column admin-sidebar p-4" style="background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%);">
+            <div class="d-flex align-items-center mb-5" style="padding: 1rem 0;">
+                <div class="luxury-logo">
+                    <img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img" style="max-width: 180px;">
+                </div>
             </div>
             <div class="mb-4">
-                <div class="admin-card p-3">
-                    <div class="d-flex flex-column">
-                        <a href="admin.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-home"></i></span> Dashboard</a>
-                        <a href="eventManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-calendar-alt"></i></span> Event Management</a>
-                        <a href="reservationsManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-clipboard-list"></i></span> Reservations</a>
-                        <a href="userManagement.php" class="nav-link active d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-users"></i></span> User Management</a>
+                <div style="background: transparent; box-shadow: none; border: none;">
+                    <div class="d-flex flex-column gap-2">
+                        <a href="admin.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-home"></i></span> 
+                            <span style="font-weight: 500;">Dashboard</span>
+                        </a>
+                        <a href="eventManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-calendar-alt"></i></span> 
+                            <span style="font-weight: 500;">Event Management</span>
+                        </a>
+                        <a href="reservationsManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-clipboard-list"></i></span> 
+                            <span style="font-weight: 500;">Reservations</span>
+                        </a>
+                        <a href="userManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3 active" style="background: linear-gradient(135deg, rgba(90, 107, 79, 0.15) 0%, rgba(90, 107, 79, 0.08) 100%); color: #5A6B4F; font-weight: 600; text-decoration: none; border-left: 3px solid #5A6B4F;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
+                            <span>User Management</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -279,7 +395,7 @@ if (!empty($params)) {
                 </div>
             </div>
 
-            <div class="p-4">
+            <div class="p-4" style="padding: 2rem !important;">
                 <!-- Controls Section -->
                 <!-- Search & Filter Bar -->
                 <div class="admin-card p-4 mb-4">
@@ -445,9 +561,9 @@ if (!empty($params)) {
             const sidebarToggle = document.getElementById('adminSidebarToggle');
             const sidebar = document.querySelector('.admin-sidebar');
             
-            if (sidebarToggle) {
+            if (sidebarToggle && sidebar) {
                 sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('d-none');
+                    sidebar.classList.toggle('show');
                 });
             }
         });

@@ -83,32 +83,39 @@ if (!empty($searchQuery)) {
     <style>
         .admin-wrapper { 
             min-height: 100vh; 
-            background-color: #F9F7F2;
+            background: linear-gradient(135deg, #F9F7F2 0%, #F5F3ED 100%);
         }
         .admin-sidebar { 
-            width: 260px; 
+            width: 240px; 
             position: fixed;
             left: 0;
             top: 0;
             height: 100vh;
             overflow-y: auto;
             z-index: 1000;
+            background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
         }
         .admin-content {
-            margin-left: 260px;
-            width: calc(100% - 260px);
+            margin-left: 240px;
+            width: calc(100% - 240px);
         }
         .admin-top-nav {
             background-color: #FFFFFF;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(74, 93, 74, 0.1);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            padding: 1.25rem 2rem;
+            border-bottom: 1px solid rgba(74, 93, 74, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
         .admin-card {
             background-color: #FFFFFF;
-            border-radius: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            border: none;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(74, 93, 74, 0.05);
+            transition: all 0.3s ease;
+        }
+        .admin-card:hover {
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
         }
         .btn-admin-primary {
             background-color: #5A6B4F;
@@ -130,45 +137,85 @@ if (!empty($searchQuery)) {
             padding: 0.5rem 1.25rem;
             font-size: 0.875rem;
         }
+        .table {
+            margin-bottom: 0;
+        }
+        .table thead {
+            background: linear-gradient(135deg, rgba(74, 93, 74, 0.05) 0%, rgba(74, 93, 74, 0.02) 100%);
+        }
         .table th {
             font-weight: 600;
             color: #1A1A1A;
-            border-bottom: 2px solid rgba(74, 93, 74, 0.1);
+            border-bottom: 2px solid rgba(74, 93, 74, 0.15);
+            padding: 1rem;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
         }
         .table td {
             vertical-align: middle;
+            padding: 1.25rem 1rem;
+            border-bottom: 1px solid rgba(74, 93, 74, 0.08);
+        }
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+        .table tbody tr:hover {
+            background-color: rgba(74, 93, 74, 0.03);
+            transform: scale(1.01);
         }
         .event-thumbnail {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .event-thumbnail:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         .status-badge {
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 500;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
         }
         .status-active {
-            background-color: #d4edda;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
             color: #155724;
+            box-shadow: 0 2px 4px rgba(21, 87, 36, 0.2);
         }
         .status-inactive {
-            background-color: #f8d7da;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
             color: #721c24;
+            box-shadow: 0 2px 4px rgba(114, 28, 36, 0.2);
         }
         .action-btn {
-            background: none;
+            background: rgba(74, 93, 74, 0.08);
             border: none;
             color: #4A5D4A;
-            padding: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            margin: 0 0.25rem;
         }
         .action-btn:hover {
+            background: rgba(74, 93, 74, 0.15);
             color: #3a4a3a;
-            transform: scale(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .action-btn.text-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+        .action-btn.text-danger:hover {
+            background: rgba(220, 53, 69, 0.2);
+            color: #c82333;
         }
         .toast-container {
             position: fixed;
@@ -176,15 +223,94 @@ if (!empty($searchQuery)) {
             right: 20px;
             z-index: 9999;
         }
+        #confirmDeleteBtn:hover {
+            background-color: #c82333 !important;
+            border-color: #c82333 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+        .modal-footer .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .admin-sidebar a:not(.active):hover {
+            background: rgba(74, 93, 74, 0.05) !important;
+            color: #4A5D4A !important;
+            border-left-color: rgba(74, 93, 74, 0.3) !important;
+            transform: translateX(5px);
+        }
         @media (max-width: 991px) { 
             .admin-sidebar { 
                 width: 100%; 
                 position: relative;
                 height: auto;
+                display: none;
+            }
+            .admin-sidebar.show {
+                display: flex;
             }
             .admin-content {
                 margin-left: 0;
                 width: 100%;
+            }
+            .admin-wrapper {
+                flex-direction: column;
+            }
+            .filter-section {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .filter-section > div {
+                width: 100% !important;
+            }
+            .p-4[style*="padding: 2rem"] {
+                padding: 1rem !important;
+            }
+        }
+        @media (max-width: 768px) {
+            .admin-top-nav {
+                padding: 0.75rem 1rem;
+                flex-wrap: wrap;
+            }
+            .admin-top-nav h4 {
+                font-size: 1.25rem;
+            }
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+            .table th,
+            .table td {
+                padding: 0.5rem;
+            }
+            .table img {
+                width: 40px;
+                height: 40px;
+            }
+            .btn-admin-primary {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .admin-top-nav {
+                padding: 0.5rem;
+            }
+            .admin-top-nav > div {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            .table th,
+            .table td {
+                font-size: 0.75rem;
+                padding: 0.4rem;
+            }
+            .table th:nth-child(2),
+            .table td:nth-child(2) {
+                display: none;
+            }
+            .search-input {
+                font-size: 0.875rem;
             }
         }
     </style>
@@ -193,17 +319,31 @@ if (!empty($searchQuery)) {
 <body>
     <div class="d-flex admin-wrapper">
         <!-- Sidebar -->
-        <div class="d-flex flex-column admin-sidebar p-4" style="background-color: #F9F7F2;">
-            <div class="d-flex align-items-center mb-4">
-                <div class="luxury-logo"><img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></div>
+        <div class="d-flex flex-column admin-sidebar p-4" style="background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%);">
+            <div class="d-flex align-items-center mb-5" style="padding: 1rem 0;">
+                <div class="luxury-logo">
+                    <img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img" style="max-width: 180px;">
+                </div>
             </div>
             <div class="mb-4">
-                <div class="admin-card p-3">
-                    <div class="d-flex flex-column">
-                        <a href="admin.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-home"></i></span> Dashboard</a>
-                        <a href="eventManagement.php" class="nav-link active d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-calendar-alt"></i></span> Event Management</a>
-                        <a href="reservationsManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-clipboard-list"></i></span> Reservations</a>
-                        <a href="userManagement.php" class="nav-link d-flex align-items-center py-2"><span class="me-2"><i class="fas fa-users"></i></span> User Management</a>
+                <div style="background: transparent; box-shadow: none; border: none;">
+                    <div class="d-flex flex-column gap-2">
+                        <a href="admin.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-home"></i></span> 
+                            <span style="font-weight: 500;">Dashboard</span>
+                        </a>
+                        <a href="eventManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3 active" style="background: linear-gradient(135deg, rgba(90, 107, 79, 0.15) 0%, rgba(90, 107, 79, 0.08) 100%); color: #5A6B4F; font-weight: 600; text-decoration: none; border-left: 3px solid #5A6B4F;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-calendar-alt"></i></span> 
+                            <span>Event Management</span>
+                        </a>
+                        <a href="reservationsManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-clipboard-list"></i></span> 
+                            <span style="font-weight: 500;">Reservations</span>
+                        </a>
+                        <a href="userManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
+                            <span style="font-weight: 500;">User Management</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -232,40 +372,54 @@ if (!empty($searchQuery)) {
                 </div>
             </div>
 
-            <div class="p-4">
+            <div class="p-4" style="padding: 2rem !important;">
                 <!-- Controls Section -->
-                <div class="admin-card p-4 mb-4">
-                    <div class="row g-3 align-items-end">
-                        <div class="col-md-8">
-                            <label for="searchBar" class="form-label fw-semibold">Search Events</label>
+                <div class="admin-card p-4 mb-4" style="padding: 2rem !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="mb-1" style="font-family: 'Playfair Display', serif; color: #1A1A1A;">Event Management</h4>
+                            <p class="text-muted mb-0 small">Search and manage all events</p>
+                        </div>
+                        <button type="button" class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                            <i class="fas fa-plus me-2"></i> Add New Event
+                        </button>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12">
                             <form method="GET" action="eventManagement.php" class="d-flex gap-2">
-                                <input type="text" 
-                                       class="form-control" 
-                                       id="searchBar" 
-                                       name="search" 
-                                       placeholder="Search by event name or category..." 
-                                       value="<?php echo htmlspecialchars($searchQuery); ?>">
-                                <button type="submit" class="btn btn-admin-primary">
-                                    <i class="fas fa-search"></i> Search
+                                <div class="position-relative flex-grow-1">
+                                    <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #6c757d; z-index: 10;"></i>
+                                    <input type="text" 
+                                           class="form-control ps-5" 
+                                           id="searchBar" 
+                                           name="search" 
+                                           placeholder="Search by event name, category, or venue..." 
+                                           value="<?php echo htmlspecialchars($searchQuery); ?>"
+                                           style="border-radius: 50px; border: 2px solid rgba(74, 93, 74, 0.1); padding: 0.75rem 1.5rem;">
+                                </div>
+                                <button type="submit" class="btn btn-admin-primary" style="border-radius: 50px; padding: 0.75rem 2rem;">
+                                    <i class="fas fa-search me-2"></i> Search
                                 </button>
                                 <?php if (!empty($searchQuery)): ?>
-                                <a href="eventManagement.php" class="btn btn-outline-secondary">
-                                    <i class="fas fa-times"></i> Clear
+                                <a href="eventManagement.php" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 0.75rem 1.5rem;">
+                                    <i class="fas fa-times me-2"></i> Clear
                                 </a>
                                 <?php endif; ?>
                             </form>
-                        </div>
-                        <div class="col-md-4 text-md-end">
-                            <button type="button" class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
-                                <i class="fas fa-plus"></i> Add New Event
-                            </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Events Table -->
-                <div class="admin-card p-4">
-                    <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">All Events (<?php echo count($filteredEvents); ?>)</h5>
+                <div class="admin-card p-4" style="padding: 2rem !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0" style="font-family: 'Playfair Display', serif; color: #1A1A1A;">
+                            All Events 
+                            <span class="badge bg-light text-dark ms-2" style="font-size: 0.9rem; padding: 0.4rem 0.8rem; border-radius: 50px;">
+                                <?php echo count($filteredEvents); ?>
+                            </span>
+                        </h5>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead>
@@ -282,9 +436,23 @@ if (!empty($searchQuery)) {
                             <tbody>
                                 <?php if (empty($filteredEvents)): ?>
                                 <tr>
-                                    <td colspan="7" class="text-center text-muted py-5">
-                                        <i class="fas fa-search fa-2x mb-3 d-block"></i>
-                                        No events found matching your search.
+                                    <td colspan="7" class="text-center py-5">
+                                        <div class="py-5">
+                                            <div class="mb-4" style="font-size: 4rem; color: rgba(74, 93, 74, 0.2);">
+                                                <i class="fas fa-calendar-times"></i>
+                                            </div>
+                                            <h5 class="mb-2" style="font-family: 'Playfair Display', serif; color: #1A1A1A;">No Events Found</h5>
+                                            <p class="text-muted mb-4"><?php echo !empty($searchQuery) ? 'No events match your search criteria.' : 'Get started by adding your first event.'; ?></p>
+                                            <?php if (empty($searchQuery)): ?>
+                                            <button type="button" class="btn btn-admin-primary" data-bs-toggle="modal" data-bs-target="#addEventModal">
+                                                <i class="fas fa-plus me-2"></i> Add Your First Event
+                                            </button>
+                                            <?php else: ?>
+                                            <a href="eventManagement.php" class="btn btn-outline-secondary" style="border-radius: 50px;">
+                                                <i class="fas fa-times me-2"></i> Clear Search
+                                            </a>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
                                 </tr>
                                 <?php else: ?>
@@ -313,7 +481,9 @@ if (!empty($searchQuery)) {
                                         <div class="fw-semibold"><?php echo htmlspecialchars($event['name'] ?? $event['title']); ?></div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-light text-dark"><?php echo htmlspecialchars(!empty($event['category']) ? $event['category'] : 'Uncategorized'); ?></span>
+                                        <span class="badge" style="background: linear-gradient(135deg, rgba(74, 93, 74, 0.1) 0%, rgba(74, 93, 74, 0.05) 100%); color: #4A5D4A; padding: 0.5rem 1rem; border-radius: 50px; font-weight: 500;">
+                                            <?php echo htmlspecialchars(!empty($event['category']) ? $event['category'] : 'Uncategorized'); ?>
+                                        </span>
                                     </td>
                                     <td>
                                         <div class="text-muted small"><?php echo htmlspecialchars($event['venue']); ?></div>
@@ -352,6 +522,32 @@ if (!empty($searchQuery)) {
             </div>
             <div class="toast-body" id="toastMessage">
                 <!-- Message will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 20px; border: none; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(74, 93, 74, 0.1); padding: 1.5rem;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-exclamation-triangle me-3" style="font-size: 1.5rem; color: #dc3545;"></i>
+                        <h5 class="modal-title mb-0" id="deleteConfirmModalLabel" style="font-family: 'Playfair Display', serif; color: #1A1A1A;">Confirm Deletion</h5>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <p class="mb-0" id="deleteConfirmMessage" style="color: rgba(26, 26, 26, 0.8); line-height: 1.6;">
+                        <!-- Message will be inserted here -->
+                    </p>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid rgba(74, 93, 74, 0.1); padding: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius: 50px; padding: 0.6rem 1.5rem; font-weight: 500; transition: all 0.3s ease;">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn" style="border-radius: 50px; padding: 0.6rem 1.5rem; font-weight: 600; background-color: #dc3545; border-color: #dc3545; transition: all 0.3s ease;">
+                        <i class="fas fa-trash-alt me-2"></i>Delete Event
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -460,9 +656,9 @@ if (!empty($searchQuery)) {
             const sidebarToggle = document.getElementById('adminSidebarToggle');
             const sidebar = document.querySelector('.admin-sidebar');
             
-            if (sidebarToggle) {
+            if (sidebarToggle && sidebar) {
                 sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('d-none');
+                    sidebar.classList.toggle('show');
                 });
             }
         });
@@ -552,10 +748,33 @@ if (!empty($searchQuery)) {
         }
 
         // Delete event function
+        let pendingDeleteEventId = null;
+        let pendingDeleteEventName = null;
+
         function deleteEvent(eventId, eventName) {
-            if (confirm('Are you sure you want to delete "' + eventName + '"? This action cannot be undone.')) {
+            pendingDeleteEventId = eventId;
+            pendingDeleteEventName = eventName;
+            
+            // Set the confirmation message
+            document.getElementById('deleteConfirmMessage').textContent = 
+                'Are you sure you want to delete "' + eventName + '"? This action cannot be undone.';
+            
+            // Show the confirmation modal
+            const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            modal.show();
+        }
+
+        // Handle confirm delete button click
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+            if (pendingDeleteEventId && pendingDeleteEventName) {
                 const formData = new FormData();
-                formData.append('eventId', eventId);
+                formData.append('eventId', pendingDeleteEventId);
+                
+                // Hide the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+                if (modal) {
+                    modal.hide();
+                }
                 
                 fetch('api/deleteEvent.php', {
                     method: 'POST',
@@ -569,7 +788,7 @@ if (!empty($searchQuery)) {
                 })
                 .then(data => {
                     if (data.success) {
-                        showFeedback('Event "' + eventName + '" has been deleted successfully.', 'success');
+                        showFeedback('Event "' + pendingDeleteEventName + '" has been deleted successfully.', 'success');
                         setTimeout(function() {
                             window.location.reload();
                         }, 1000);
@@ -580,9 +799,14 @@ if (!empty($searchQuery)) {
                 .catch(error => {
                     console.error('Error:', error);
                     showFeedback('An error occurred while deleting the event. Please check the console for details.', 'error');
+                })
+                .finally(() => {
+                    // Reset pending delete variables
+                    pendingDeleteEventId = null;
+                    pendingDeleteEventName = null;
                 });
             }
-        }
+        });
 
         // Save new event
         function saveNewEvent() {

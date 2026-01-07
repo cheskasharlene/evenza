@@ -97,6 +97,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             max-width: 450px;
             width: 100%;
         }
+        @media (max-width: 768px) {
+            .admin-login-wrapper {
+                padding: 1rem;
+            }
+            .admin-login-card {
+                padding: 2rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .admin-login-wrapper {
+                padding: 0.5rem;
+            }
+            .admin-login-card {
+                padding: 1.5rem;
+            }
+        }
         .admin-login-header {
             text-align: center;
             margin-bottom: 2.5rem;

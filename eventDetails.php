@@ -1,6 +1,7 @@
 <?php
 session_start();
-require_once 'connect.php'; 
+require_once 'connect.php';
+require_once 'includes/helpers.php';
 $eventId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 function getEventImagePath($imagePath) {
@@ -67,6 +68,144 @@ if ($eventId > 0) {
     }
 }
 
+// Function to get category-specific package features (each tier builds on previous)
+function getPackageFeatures($category, $tier) {
+    $category = strtolower(trim($category ?? ''));
+    
+    // Normalize category
+    if (stripos($category, 'business') !== false || stripos($category, 'conference') !== false) {
+        $category = 'business';
+    } elseif (stripos($category, 'wedding') !== false) {
+        $category = 'wedding';
+    } elseif (stripos($category, 'art') !== false || stripos($category, 'exhibition') !== false) {
+        $category = 'art';
+    } elseif (stripos($category, 'social') !== false || stripos($category, 'gala') !== false) {
+        $category = 'social';
+    } else {
+        $category = 'business'; // Default
+    }
+    
+    $tier = strtolower($tier);
+    
+    $features = [
+        'business' => [
+            'bronze' => [
+                'Basic seating',
+                'Digital handouts',
+                'Event access'
+            ],
+            'silver' => [
+                'Basic seating',
+                'Digital handouts',
+                'Event access',
+                'Networking lunch',
+                'Physical workbooks'
+            ],
+            'gold' => [
+                'Basic seating',
+                'Digital handouts',
+                'Event access',
+                'Networking lunch',
+                'Physical workbooks',
+                'VIP lounge access',
+                'Private speaker Q&A'
+            ]
+        ],
+        'wedding' => [
+            'bronze' => [
+                'Venue rental',
+                'Basic seating',
+                'Standard decorations'
+            ],
+            'silver' => [
+                'Venue rental',
+                'Basic seating',
+                'Standard decorations',
+                'Standard catering',
+                'Floral arrangements'
+            ],
+            'gold' => [
+                'Venue rental',
+                'Basic seating',
+                'Standard decorations',
+                'Standard catering',
+                'Floral arrangements',
+                'Premium seating',
+                'Premium open bar',
+                '5-course meal',
+                'Professional photography'
+            ]
+        ],
+        'art' => [
+            'bronze' => [
+                'Gallery Entry',
+                'Digital Catalog'
+            ],
+            'silver' => [
+                'Gallery Entry',
+                'Digital Catalog',
+                '1 Welcome Drink',
+                'Physical Brochure'
+            ],
+            'gold' => [
+                'Gallery Entry',
+                'Digital Catalog',
+                '1 Welcome Drink',
+                'Physical Brochure',
+                'Private Auction Preview',
+                'Open Bar'
+            ]
+        ],
+        'social' => [
+            'bronze' => [
+                'Event access',
+                'Basic seating',
+                'Standard refreshments'
+            ],
+            'silver' => [
+                'Event access',
+                'Basic seating',
+                'Standard refreshments',
+                'Premium seating',
+                'Networking opportunities',
+                'Event program'
+            ],
+            'gold' => [
+                'Event access',
+                'Basic seating',
+                'Standard refreshments',
+                'Premium seating',
+                'Networking opportunities',
+                'Event program',
+                'VIP event access',
+                'Premium open bar',
+                'Gourmet catering',
+                'Exclusive networking',
+                'VIP lounge access'
+            ]
+        ]
+    ];
+    
+    return $features[$category][$tier] ?? $features['business'][$tier] ?? [];
+}
+
+// Fetch packages from database
+$packages = [];
+$packagesQuery = "SELECT packageId, packageName, price FROM packages ORDER BY packageId ASC";
+$packagesResult = mysqli_query($conn, $packagesQuery);
+if ($packagesResult) {
+    while ($row = mysqli_fetch_assoc($packagesResult)) {
+        $tier = strtolower(str_replace(' Package', '', $row['packageName']));
+        $packages[] = [
+            'id' => $row['packageId'],
+            'name' => $row['packageName'],
+            'tier' => $tier,
+            'price' => floatval($row['price'])
+        ];
+    }
+    mysqli_free_result($packagesResult);
+}
+
 if (!$event) {
     header('Location: events.php');
     exit;
@@ -83,6 +222,185 @@ if (!$event) {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .pricing-section {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .packages-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        .package-card {
+            flex: 1;
+            min-width: 200px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(74, 93, 74, 0.15);
+            border-radius: 20px;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .package-card:hover {
+            background-color: #FFFFFF;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .package-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .package-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin: 0;
+        }
+        .package-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #4A5D4A;
+            font-family: 'Playfair Display', serif;
+        }
+        /* Modal Styles */
+        .package-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .package-modal-overlay.show {
+            display: flex;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .package-modal {
+            background-color: #FFFFFF;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        .package-modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(74, 93, 74, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .package-modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin: 0;
+        }
+        .package-modal-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #4A5D4A;
+            font-family: 'Playfair Display', serif;
+        }
+        .package-modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            color: #4A5D4A;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            line-height: 1;
+            padding: 0;
+        }
+        .package-modal-close:hover {
+            background-color: rgba(74, 93, 74, 0.1);
+            color: #1A1A1A;
+            transform: rotate(90deg);
+        }
+        .package-modal-body {
+            padding: 1.5rem;
+        }
+        .package-modal-features {
+            margin-bottom: 2rem;
+        }
+        .package-modal-features h6 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1A1A1A;
+            margin-bottom: 1rem;
+        }
+        .modal-feature-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .modal-feature-list li {
+            padding: 0.75rem 0;
+            color: rgba(26, 26, 26, 0.8);
+            font-size: 0.95rem;
+            position: relative;
+            padding-left: 2rem;
+            border-bottom: 1px solid rgba(74, 93, 74, 0.08);
+        }
+        .modal-feature-list li:last-child {
+            border-bottom: none;
+        }
+        .modal-feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4A5D4A;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        @media (max-width: 768px) {
+            .packages-container {
+                flex-direction: column;
+            }
+            .package-card {
+                min-width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
@@ -103,15 +421,18 @@ if (!$event) {
                     <li class="nav-item">
                         <a class="nav-link" href="about.php">About</a>
                     </li>
+                    <li class="nav-item nav-divider">
+                        <span class="nav-separator"></span>
+                    </li>
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item ms-3">
+                        <li class="nav-item">
                             <a class="nav-link" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
                             <a class="nav-link btn-register" href="logout.php">Logout</a>
                         </li>
                     <?php else: ?>
-                        <li class="nav-item ms-3">
+                        <li class="nav-item">
                             <a class="nav-link btn-login" href="login.php">Login</a>
                         </li>
                         <li class="nav-item ms-2">
@@ -180,6 +501,29 @@ if (!$event) {
                             <?php endif; ?>
                         </div>
 
+                        <!-- Dynamic Tiered Pricing Section -->
+                        <div class="pricing-section mt-4 mb-4">
+                            <h5 class="detail-label mb-4">Package Options</h5>
+                            <div class="packages-container">
+                                <?php 
+                                $eventCategory = $event['category'] ?? 'Business';
+                                foreach ($packages as $package): 
+                                    $features = getPackageFeatures($eventCategory, $package['tier']);
+                                ?>
+                                    <div class="package-card" 
+                                         data-package-id="<?php echo $package['id']; ?>"
+                                         data-package-name="<?php echo htmlspecialchars($package['name']); ?>"
+                                         data-package-price="<?php echo $package['price']; ?>"
+                                         data-package-features='<?php echo json_encode($features); ?>'>
+                                        <div class="package-header">
+                                            <h6 class="package-name"><?php echo htmlspecialchars($package['name']); ?></h6>
+                                            <div class="package-price">₱ <?php echo number_format($package['price'], 2); ?></div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+
                         <div class="reservation-section inquiry-section p-4 text-center mt-4">
                             <?php $link = isset($_SESSION['user_id']) ? 'reservation.php?eventId=' . $eventId : 'login.php?redirect=' . urlencode('reservation.php?eventId=' . $eventId); ?>
                             <div class="d-flex justify-content-center">
@@ -217,46 +561,69 @@ if (!$event) {
                         <div class="faq-list">
                             <div class="faq-item mb-3">
                                 <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
-                                    What is included in the ticket price?
+                                    Can I request additional customizations for my chosen package?
                                 </button>
                                 <div class="collapse" id="faq1">
                                     <div class="faq-answer">
-                                        The ticket price includes full access to the event, all sessions and workshops, refreshments, and networking opportunities. Additional services may be available at extra cost.
+                                        Absolutely. While our Bronze, Silver, and Gold tiers provide a comprehensive foundation, our team is happy to discuss bespoke add-ons such as floral upgrades or specific technical requirements during your consultation.
                                     </div>
                                 </div>
                             </div>
                             <div class="faq-item mb-3">
                                 <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
-                                    Can I cancel or refund my reservation?
+                                    What is the timeframe for modifying or canceling a reservation?
                                 </button>
                                 <div class="collapse" id="faq2">
                                     <div class="faq-answer">
-                                        Cancellations made 48 hours before the event will receive a full refund. Cancellations made within 48 hours are non-refundable but may be transferable.
+                                        Reservations can be modified up to 14 days before the event date. Cancellations made within this window are subject to our standard refund policy as outlined in your confirmation email.
                                     </div>
                                 </div>
                             </div>
                             <div class="faq-item mb-3">
                                 <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
-                                    Is parking available at the venue?
+                                    Are parking and accessibility services included at the venue?
                                 </button>
                                 <div class="collapse" id="faq3">
                                     <div class="faq-answer">
-                                        Yes, complimentary valet parking is available for all event attendees. Please arrive 15 minutes early to allow time for parking.
+                                        Yes, all our partner venues offer complimentary valet parking for Gold package holders and accessible entry points for all guests to ensure a seamless experience.
                                     </div>
                                 </div>
                             </div>
                             <div class="faq-item mb-3">
                                 <button class="faq-question" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
-                                    What should I bring to the event?
+                                    What technical equipment is provided for business or gala events?
                                 </button>
                                 <div class="collapse" id="faq4">
                                     <div class="faq-answer">
-                                        Please bring a valid ID, your confirmation email or ticket, and any materials specified in the event details. Notepads and pens will be provided.
+                                        Our venues are equipped with high-speed WiFi and standard AV setups. Silver and Gold packages include dedicated technical support and advanced projection systems if required.
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Package Modal -->
+    <div id="packageModal" class="package-modal-overlay">
+        <div class="package-modal">
+            <div class="package-modal-header">
+                <div>
+                    <h5 class="package-modal-title" id="modalPackageName">Package Name</h5>
+                    <div class="package-modal-price" id="modalPackagePrice">₱ 0.00</div>
+                </div>
+                <button type="button" class="package-modal-close" onclick="closePackageModal()" aria-label="Close">
+                    ×
+                </button>
+            </div>
+            <div class="package-modal-body">
+                <div class="package-modal-features">
+                    <h6>What's Included</h6>
+                    <ul class="modal-feature-list" id="modalFeatureList">
+                        <!-- Features will be populated by JavaScript -->
+                    </ul>
                 </div>
             </div>
         </div>
@@ -310,20 +677,20 @@ if (!$event) {
         ],
         "faqs": [
             {
-                "question": "What is included in the ticket price?",
-                "answer": "The ticket price includes full access to the event, all sessions and workshops, refreshments, and networking opportunities. Additional services may be available at extra cost."
+                "question": "Can I request additional customizations for my chosen package?",
+                "answer": "Absolutely. While our Bronze, Silver, and Gold tiers provide a comprehensive foundation, our team is happy to discuss bespoke add-ons such as floral upgrades or specific technical requirements during your consultation."
             },
             {
-                "question": "Can I cancel or refund my reservation?",
-                "answer": "Cancellations made 48 hours before the event will receive a full refund. Cancellations made within 48 hours are non-refundable but may be transferable."
+                "question": "What is the timeframe for modifying or canceling a reservation?",
+                "answer": "Reservations can be modified up to 14 days before the event date. Cancellations made within this window are subject to our standard refund policy as outlined in your confirmation email."
             },
             {
-                "question": "Is parking available at the venue?",
-                "answer": "Yes, complimentary valet parking is available for all event attendees. Please arrive 15 minutes early to allow time for parking."
+                "question": "Are parking and accessibility services included at the venue?",
+                "answer": "Yes, all our partner venues offer complimentary valet parking for Gold package holders and accessible entry points for all guests to ensure a seamless experience."
             },
             {
-                "question": "What should I bring to the event?",
-                "answer": "Please bring a valid ID, your confirmation email or ticket, and any materials specified in the event details. Notepads and pens will be provided."
+                "question": "What technical equipment is provided for business or gala events?",
+                "answer": "Our venues are equipped with high-speed WiFi and standard AV setups. Silver and Gold packages include dedicated technical support and advanced projection systems if required."
             }
         ]
     }
@@ -332,6 +699,94 @@ if (!$event) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.js"></script>
     <script src="assets/js/main.js"></script>
     <script src="assets/js/event-details.js"></script>
+    <script>
+        function openPackageModal(packageId, packageName, packagePrice, features) {
+            const modal = document.getElementById('packageModal');
+            if (!modal) {
+                console.error('Modal element not found!');
+                return;
+            }
+            
+            const modalTitle = document.getElementById('modalPackageName');
+            const modalPrice = document.getElementById('modalPackagePrice');
+            const modalFeatures = document.getElementById('modalFeatureList');
+            
+            if (!modalTitle || !modalPrice || !modalFeatures) {
+                console.error('Modal elements not found!');
+                return;
+            }
+            
+            // Set modal content
+            modalTitle.textContent = packageName;
+            modalPrice.textContent = '₱ ' + parseFloat(packagePrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            // Clear and populate features
+            modalFeatures.innerHTML = '';
+            if (Array.isArray(features) && features.length > 0) {
+                features.forEach(feature => {
+                    const li = document.createElement('li');
+                    li.textContent = feature;
+                    modalFeatures.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'No features available';
+                modalFeatures.appendChild(li);
+            }
+            
+            // Show modal
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closePackageModal() {
+            const modal = document.getElementById('packageModal');
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Initialize event listeners when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers to package cards
+            const packageCards = document.querySelectorAll('.package-card');
+            packageCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const packageId = this.getAttribute('data-package-id');
+                    const packageName = this.getAttribute('data-package-name');
+                    const packagePrice = parseFloat(this.getAttribute('data-package-price'));
+                    const featuresJson = this.getAttribute('data-package-features');
+                    
+                    let features = [];
+                    try {
+                        features = JSON.parse(featuresJson);
+                    } catch(e) {
+                        console.error('Error parsing features:', e);
+                    }
+                    
+                    openPackageModal(packageId, packageName, packagePrice, features);
+                });
+            });
+            
+            const modal = document.getElementById('packageModal');
+            if (modal) {
+                // Close modal when clicking overlay
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closePackageModal();
+                    }
+                });
+            }
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closePackageModal();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
 

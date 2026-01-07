@@ -18,44 +18,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
     $confirmPassword = isset($_POST['confirmPassword']) ? trim($_POST['confirmPassword']) : '';
 
-    // Password validation function
-    function validatePassword($password) {
-        if (strlen($password) < 8) {
-            return 'Password must be at least 8 characters long.';
-        }
-        if (!preg_match('/[A-Z]/', $password)) {
-            return 'Password must contain at least one uppercase letter.';
-        }
-        if (!preg_match('/[a-z]/', $password)) {
-            return 'Password must contain at least one lowercase letter.';
-        }
-        if (!preg_match('/[0-9]/', $password)) {
-            return 'Password must contain at least one number.';
-        }
-        return true;
-    }
-
     if (empty($firstName) || empty($lastName) || empty($email) || empty($phoneNumber) || empty($password)) {
         $error = 'All fields are required.';
     } elseif ($password !== $confirmPassword) {
         $error = 'Passwords do not match.';
-    } elseif (($passwordValidation = validatePassword($password)) !== true) {
-        $error = $passwordValidation;
+    } elseif (strlen($password) < 6) {
+        $error = 'Password must be at least 6 characters long.';
     } else {
         try {
-            // Check if email already exists
             $stmt = $pdo->prepare("SELECT userId FROM users WHERE email = ?");
             $stmt->execute([$email]);
             if ($stmt->fetch()) {
                 $error = 'Email already registered';
             } else {
-                // Calculate fullName from firstName and lastName
                 $fullName = trim($firstName . ' ' . $lastName);
                 
-                // Hash the password
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 
-                // Insert user with default role 'user'
                 $stmt = $pdo->prepare("INSERT INTO users (firstName, lastName, fullName, email, phoneNumber, password, role) VALUES (?, ?, ?, ?, ?, ?, 'user')");
                 if ($stmt->execute([$firstName, $lastName, $fullName, $email, $phoneNumber, $hashedPassword])) {
                     $userId = $pdo->lastInsertId();
@@ -108,19 +87,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <li class="nav-item">
                         <a class="nav-link" href="about.php">About</a>
                     </li>
+                    <li class="nav-item nav-divider">
+                        <span class="nav-separator"></span>
+                    </li>
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item ms-3">
+                        <li class="nav-item">
                             <a class="nav-link" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
                             <a class="nav-link btn-register" href="logout.php">Logout</a>
                         </li>
                     <?php else: ?>
-                        <li class="nav-item ms-3">
+                        <li class="nav-item">
                             <a class="nav-link btn-login" href="login.php">Login</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="register.php">Register</a>
+                            <a class="nav-link btn-register active" href="register.php">Register</a>
                         </li>
                     <?php endif; ?>
                 </ul>
@@ -162,13 +144,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                             <div class="form-group mb-4">
                                 <label for="phoneNumber" class="form-label">Phone Number</label>
-                                <input id="phoneNumber" name="phoneNumber" type="tel" class="form-control luxury-input" required placeholder="0921 123 4567">
+                                <input id="phoneNumber" name="phoneNumber" type="tel" class="form-control luxury-input" required placeholder="+1 (555) 123-4567">
                             </div>
 
                             <div class="form-group mb-4">
                                 <label for="password" class="form-label">Password</label>
                                 <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password">
-                                <small class="text-muted">Must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number.</small>
                             </div>
 
                             <div class="form-group mb-4">
