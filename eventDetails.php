@@ -60,7 +60,7 @@ if ($eventId > 0) {
             }
             
             if (empty($event['venueAddress'])) {
-                $event['venueAddress'] = '123 Luxury Avenue, Suite 100, City, State 12345';
+                $event['venueAddress'] = 'Ambulong, Tanauan City, Batangas';
             }
         }
     } else {
@@ -68,11 +68,9 @@ if ($eventId > 0) {
     }
 }
 
-// Function to get category-specific package features (each tier builds on previous)
 function getPackageFeatures($category, $tier) {
     $category = strtolower(trim($category ?? ''));
     
-    // Normalize category
     if (stripos($category, 'business') !== false || stripos($category, 'conference') !== false) {
         $category = 'business';
     } elseif (stripos($category, 'wedding') !== false) {
@@ -82,7 +80,7 @@ function getPackageFeatures($category, $tier) {
     } elseif (stripos($category, 'social') !== false || stripos($category, 'gala') !== false) {
         $category = 'social';
     } else {
-        $category = 'business'; // Default
+        $category = 'business';
     }
     
     $tier = strtolower($tier);
@@ -189,7 +187,6 @@ function getPackageFeatures($category, $tier) {
     return $features[$category][$tier] ?? $features['business'][$tier] ?? [];
 }
 
-// Fetch packages from database
 $packages = [];
 $packagesQuery = "SELECT packageId, packageName, price FROM packages ORDER BY packageId ASC";
 $packagesResult = mysqli_query($conn, $packagesQuery);
@@ -268,7 +265,6 @@ if (!$event) {
             color: #4A5D4A;
             font-family: 'Playfair Display', serif;
         }
-        /* Modal Styles */
         .package-modal-overlay {
             display: none;
             position: fixed;
@@ -648,7 +644,7 @@ if (!$event) {
                 <div class="col-md-4 mb-4">
                     <h6 class="footer-heading mb-3">Hotel Partner</h6>
                     <p class="footer-text">
-                        <strong>Grand Luxe Hotels</strong><br>
+                        <strong>TravelMates Hotel</strong><br>
                         Your trusted partner for premium event hosting
                     </p>
                 </div>
@@ -716,11 +712,9 @@ if (!$event) {
                 return;
             }
             
-            // Set modal content
             modalTitle.textContent = packageName;
             modalPrice.textContent = '₱ ' + parseFloat(packagePrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
             
-            // Clear and populate features
             modalFeatures.innerHTML = '';
             if (Array.isArray(features) && features.length > 0) {
                 features.forEach(feature => {
@@ -734,7 +728,6 @@ if (!$event) {
                 modalFeatures.appendChild(li);
             }
             
-            // Show modal
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
         }
@@ -747,9 +740,7 @@ if (!$event) {
             }
         }
         
-        // Initialize event listeners when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
-            // Add click handlers to package cards
             const packageCards = document.querySelectorAll('.package-card');
             packageCards.forEach(card => {
                 card.addEventListener('click', function() {
@@ -771,7 +762,6 @@ if (!$event) {
             
             const modal = document.getElementById('packageModal');
             if (modal) {
-                // Close modal when clicking overlay
                 modal.addEventListener('click', function(e) {
                     if (e.target === this) {
                         closePackageModal();
@@ -779,7 +769,6 @@ if (!$event) {
                 });
             }
             
-            // Close modal with Escape key
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     closePackageModal();

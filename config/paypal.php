@@ -23,6 +23,4 @@ function getPayPalBaseUrl() {
         : 'https://api-m.paypal.com';
 }
 
-define('PAYPAL_CURRENCY', 'PHP'); 
-?>
-
+define('PAYPAL_CURRENCY', 'PHP');

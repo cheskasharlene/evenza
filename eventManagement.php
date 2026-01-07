@@ -1,5 +1,4 @@
 <?php
-// Prevent caching to ensure fresh data
 header("Cache-Control: no-cache, no-store, must-revalidate");
 header("Pragma: no-cache");
 header("Expires: 0");
@@ -583,7 +582,7 @@ if (!empty($searchQuery)) {
                         </div>
                         <div class="mb-3">
                             <label for="addEventVenue" class="form-label">Venue <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="addEventVenue" placeholder="e.g., Grand Luxe Hotel - Main Ballroom" required>
+                            <input type="text" class="form-control" id="addEventVenue" placeholder="e.g., TravelMates Hotel - Main Ballroom" required>
                         </div>
                         <div class="mb-3">
                             <label for="addEventImagePath" class="form-label">Image Path <span class="text-danger">*</span></label>
@@ -632,7 +631,7 @@ if (!empty($searchQuery)) {
                         </div>
                         <div class="mb-3">
                             <label for="editEventVenue" class="form-label">Venue <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="editEventVenue" placeholder="e.g., Grand Luxe Hotel - Main Ballroom" required>
+                            <input type="text" class="form-control" id="editEventVenue" placeholder="e.g., TravelMates Hotel - Main Ballroom" required>
                         </div>
                         <div class="mb-3">
                             <label for="editEventImagePath" class="form-label">Image Path <span class="text-danger">*</span></label>

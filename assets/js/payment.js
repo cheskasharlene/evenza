@@ -37,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Creating PayPal order...');
             showPaymentStatus('Creating your order...', 'processing');
             
-            // Call our server to create the order
             return fetch('api/paypal-create-order.php', {
                 method: 'POST',
                 headers: {
@@ -50,12 +49,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             })
             .then(function(response) {
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(function(text) {
+                        console.error('Non-JSON response:', text);
+                        throw new Error('Server returned an invalid response. Please try again.');
+                    });
+                }
+                
                 if (!response.ok) {
                     return response.json().then(function(err) {
                         throw new Error(err.error || 'Failed to create order');
+                    }).catch(function(parseError) {
+                        console.error('JSON parse error:', parseError);
+                        throw new Error('Failed to process order creation. Please try again.');
                     });
                 }
-                return response.json();
+                return response.json().catch(function(parseError) {
+                    console.error('JSON parse error:', parseError);
+                    throw new Error('Invalid response from server. Please try again.');
+                });
             })
             .then(function(orderData) {
                 console.log('Order created:', orderData.id);
@@ -83,12 +96,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             })
             .then(function(response) {
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(function(text) {
+                        console.error('Non-JSON response:', text);
+                        throw new Error('Server returned an invalid response. Please try again.');
+                    });
+                }
+                
                 if (!response.ok) {
                     return response.json().then(function(err) {
                         throw new Error(err.error || 'Failed to capture payment');
+                    }).catch(function(parseError) {
+                        console.error('JSON parse error:', parseError);
+                        throw new Error('Failed to process payment response. Please try again.');
                     });
                 }
-                return response.json();
+                return response.json().catch(function(parseError) {
+                    console.error('JSON parse error:', parseError);
+                    throw new Error('Invalid response from server. Please try again.');
+                });
             })
             .then(function(captureData) {
                 console.log('Payment captured:', captureData);
@@ -96,7 +123,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (captureData.status === 'COMPLETED') {
                     showPaymentStatus('Payment successful! Redirecting...', 'success');
                     
-                    // Redirect to confirmation page
                     setTimeout(function() {
                         window.location.href = captureData.redirectUrl;
                     }, 1000);
@@ -138,7 +164,6 @@ function showPaymentStatus(message, type) {
     let statusContainer = document.getElementById('statusMessages');
     
     if (!statusContainer) {
-        // Create status container if it doesn't exist
         const paymentSection = document.querySelector('.payment-button-section');
         if (paymentSection) {
             statusContainer = document.createElement('div');

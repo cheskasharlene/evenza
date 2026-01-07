@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Load fresh user info from database to avoid stale/empty session data
 $userId = $_SESSION['user_id'];
 $userData = [
     'name' => $_SESSION['user_name'] ?? 'User',
@@ -190,8 +189,6 @@ if ($stmt) {
                                             <div class="col-md-6 mb-3 mb-md-0">
                                                 <h5 class="reservation-event-name mb-2"><?php echo htmlspecialchars($reservation['eventName']); ?></h5>
                                                 
-                                                <!-- category removed -->
-                                                
                                                 <div class="reservation-date mb-2">
                                                     <?php if (!empty($reservation['date'])): ?>
                                                         <span><?php echo date('F j, Y', strtotime($reservation['date'])); ?></span>
@@ -318,7 +315,7 @@ if ($stmt) {
                 <div class="col-md-4 mb-4">
                     <h6 class="footer-heading mb-3">Hotel Partner</h6>
                     <p class="footer-text">
-                        <strong>Grand Luxe Hotels</strong><br>
+                        <strong>TravelMates Hotel</strong><br>
                         Your trusted partner for premium event hosting
                     </p>
                 </div>
@@ -332,7 +329,6 @@ if ($stmt) {
         </div>
     </div>
 
-    <!-- Reservation Details Modal -->
     <div class="modal fade" id="reservationDetailsModal" tabindex="-1" aria-labelledby="reservationDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
@@ -373,7 +369,6 @@ if ($stmt) {
                                 <div id="modalReservationId"></div>
                             </div>
 
-                            <!-- Contact details -->
                             <div class="border-top pt-4 mt-5">
                                 <div class="mb-3 fw-semibold" style="font-family: 'Playfair Display', serif; font-size: 1.1rem;">Contact Details</div>
                                 <div class="contact-details-grid">
@@ -400,7 +395,6 @@ if ($stmt) {
                                     <div class="h3" style="color: #4A5D4A; font-family: 'Playfair Display', serif;" id="modalAmount"></div>
                                 </div>
                                 
-                                <!-- Status Messages -->
                                 <div id="pendingMessage" class="alert alert-warning text-center" style="display: none;">
                                     <i class="fas fa-clock me-2"></i>
                                     <strong>Awaiting Confirmation</strong>
@@ -447,12 +441,10 @@ if ($stmt) {
         function openReservationDetails(reservation) {
             currentReservation = reservation;
             
-            // Populate modal fields
             document.getElementById('modalEventName').textContent = reservation.eventName || 'N/A';
             document.getElementById('modalVenue').textContent = reservation.venue || 'N/A';
             document.getElementById('modalDate').textContent = reservation.date ? new Date(reservation.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A';
             
-            // Format time in 12-hour format
             let timeDisplay = 'N/A';
             if (reservation.time && reservation.time !== ' - ') {
                 const timeParts = reservation.time.split(' - ');
@@ -460,11 +452,9 @@ if ($stmt) {
                     const startTime = timeParts[0].trim();
                     const endTime = timeParts[1].trim();
                     
-                    // Convert to 12-hour format
                     function formatTo12Hour(timeStr) {
                         if (!timeStr || timeStr === '') return '';
-                        // Handle formats like "11:00:00" or "11:00"
-                        const timeOnly = timeStr.split(' ')[0]; // Remove any extra text
+                        const timeOnly = timeStr.split(' ')[0];
                         const [hours, minutes] = timeOnly.split(':');
                         const hour = parseInt(hours);
                         const min = minutes || '00';
@@ -486,35 +476,26 @@ if ($stmt) {
             document.getElementById('modalReservationId').textContent = '#' + reservation.reservationId;
             document.getElementById('modalAmount').textContent = '₱ ' + parseFloat(reservation.totalAmount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             
-            // Set status badge - Different colors for Completed vs Confirmed
             const statusEl = document.getElementById('modalStatus');
             const status = (reservation.status || 'pending').toLowerCase();
             
-            // Standardized status colors - Light background with dark text
             if (status === 'completed') {
-                // Completed = Light Blue Background, Dark Blue Text
                 statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #e0f2fe; color: #0284c7; border-radius: 50px;">Completed</span>';
             } else if (status === 'confirmed') {
-                // Confirmed = Light Green Background, Dark Green Text
                 statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #d1fae5; color: #059669; border-radius: 50px;">Confirmed</span>';
             } else if (status === 'cancelled') {
-                // Cancelled = Light Red Background, Dark Red Text
                 statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #fee2e2; color: #dc2626; border-radius: 50px;">Cancelled</span>';
             } else if (status === 'paid') {
-                // Paid = Completed status
                 statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #e0f2fe; color: #0284c7; border-radius: 50px;">Completed</span>';
             } else {
-                // Pending = Light Yellow Background, Dark Amber Text
                 statusEl.innerHTML = '<span class="badge fs-6 px-3 py-2" style="background-color: #fef3c7; color: #d97706; border-radius: 50px;">Pending</span>';
             }
             
-            // Hide all message/payment sections first
             document.getElementById('pendingMessage').style.display = 'none';
             document.getElementById('cancelledMessage').style.display = 'none';
             document.getElementById('paidMessage').style.display = 'none';
             document.getElementById('paymentSection').style.display = 'none';
             
-            // Show appropriate section based on status
             if (status === 'pending') {
                 document.getElementById('pendingMessage').style.display = 'block';
             } else if (status === 'cancelled') {
@@ -522,16 +503,13 @@ if ($stmt) {
             } else if (status === 'completed') {
                 document.getElementById('paidMessage').style.display = 'block';
             } else if (status === 'confirmed') {
-                // Show PayPal payment section
                 document.getElementById('paymentSection').style.display = 'block';
                 
-                // Render PayPal buttons
                 if (!paypalButtonsRendered) {
                     renderPayPalButtons();
                 }
             }
             
-            // Open modal
             const modal = new bootstrap.Modal(document.getElementById('reservationDetailsModal'));
             modal.show();
         }
@@ -543,7 +521,6 @@ if ($stmt) {
                 return;
             }
             
-            // Clear existing buttons
             document.getElementById('paypal-button-container-modal').innerHTML = '';
             
             paypal.Buttons({
@@ -573,12 +550,26 @@ if ($stmt) {
                         })
                     })
                     .then(function(response) {
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            return response.text().then(function(text) {
+                                console.error('Non-JSON response:', text);
+                                throw new Error('Server returned an invalid response. Please try again.');
+                            });
+                        }
+                        
                         if (!response.ok) {
                             return response.json().then(function(err) {
                                 throw new Error(err.error || 'Failed to create order');
+                            }).catch(function(parseError) {
+                                console.error('JSON parse error:', parseError);
+                                throw new Error('Failed to process order creation. Please try again.');
                             });
                         }
-                        return response.json();
+                        return response.json().catch(function(parseError) {
+                            console.error('JSON parse error:', parseError);
+                            throw new Error('Invalid response from server. Please try again.');
+                        });
                     })
                     .then(function(orderData) {
                         return orderData.id;
@@ -597,16 +588,29 @@ if ($stmt) {
                         })
                     })
                     .then(function(response) {
+                        const contentType = response.headers.get('content-type');
+                        if (!contentType || !contentType.includes('application/json')) {
+                            return response.text().then(function(text) {
+                                console.error('Non-JSON response:', text);
+                                throw new Error('Server returned an invalid response. Please try again.');
+                            });
+                        }
+                        
                         if (!response.ok) {
                             return response.json().then(function(err) {
                                 throw new Error(err.error || 'Failed to capture payment');
+                            }).catch(function(parseError) {
+                                console.error('JSON parse error:', parseError);
+                                throw new Error('Failed to process payment response. Please try again.');
                             });
                         }
-                        return response.json();
+                        return response.json().catch(function(parseError) {
+                            console.error('JSON parse error:', parseError);
+                            throw new Error('Invalid response from server. Please try again.');
+                        });
                     })
                     .then(function(captureData) {
                         if (captureData.status === 'COMPLETED') {
-                            // Close modal and redirect to confirmation
                             const modal = bootstrap.Modal.getInstance(document.getElementById('reservationDetailsModal'));
                             if (modal) modal.hide();
                             

@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once 'connect.php';
+require_once 'includes/helpers.php';
 
 $successToken = isset($_GET['success']) ? trim($_GET['success']) : '';
 $transactionId = isset($_GET['tx']) ? trim($_GET['tx']) : '';
@@ -41,6 +42,21 @@ $paymentSaved = false;
 
 $event = null;
 $package = null;
+$reservationCode = null;
+
+if ($reservationId > 0) {
+    $resCodeQuery = "SELECT reservationCode FROM reservations WHERE reservationId = ?";
+    $resCodeStmt = mysqli_prepare($conn, $resCodeQuery);
+    if ($resCodeStmt) {
+        mysqli_stmt_bind_param($resCodeStmt, "i", $reservationId);
+        mysqli_stmt_execute($resCodeStmt);
+        $resCodeResult = mysqli_stmt_get_result($resCodeStmt);
+        if ($resCodeRow = mysqli_fetch_assoc($resCodeResult)) {
+            $reservationCode = $resCodeRow['reservationCode'];
+        }
+        mysqli_stmt_close($resCodeStmt);
+    }
+}
 
 if ($eventId > 0) {
     $eventQuery = "SELECT eventId, title, venue, description FROM events WHERE eventId = ?";
@@ -80,13 +96,15 @@ if ($reservationId <= 0 && $userId > 0 && $eventId > 0 && $packageId > 0 && $res
     $endTime = $reservationData['endTime'] ?? null;
     $totalAmount = $reservationData['totalAmount'] ?? $amount;
     
-    $reservationQuery = "INSERT INTO reservations (userId, eventId, packageId, reservationDate, startTime, endTime, totalAmount, status) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, 'confirmed')";
+    $reservationCode = generateUniqueReservationCode($conn);
+    
+    $reservationQuery = "INSERT INTO reservations (userId, eventId, packageId, reservationDate, startTime, endTime, totalAmount, status, reservationCode) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, 'completed', ?)";
     
     $reservationStmt = mysqli_prepare($conn, $reservationQuery);
     
     if ($reservationStmt) {
-        mysqli_stmt_bind_param($reservationStmt, "iissssd", $userId, $eventId, $packageId, $reservationDate, $startTime, $endTime, $totalAmount);
+        mysqli_stmt_bind_param($reservationStmt, "iisssdss", $userId, $eventId, $packageId, $reservationDate, $startTime, $endTime, $totalAmount, $reservationCode);
         
         if (mysqli_stmt_execute($reservationStmt)) {
             $reservationId = mysqli_insert_id($conn);
@@ -104,13 +122,38 @@ if ($reservationId <= 0 && $userId > 0 && $eventId > 0 && $packageId > 0 && $res
         $transactionReference = $transactionId;
     }
 } elseif ($reservationId > 0) {
-    $updateQuery = "UPDATE reservations SET status = 'completed' WHERE reservationId = ?";
-    $updateStmt = mysqli_prepare($conn, $updateQuery);
-    if ($updateStmt) {
-        mysqli_stmt_bind_param($updateStmt, "i", $reservationId);
-        mysqli_stmt_execute($updateStmt);
-        mysqli_stmt_close($updateStmt);
+    $checkCodeQuery = "SELECT reservationCode FROM reservations WHERE reservationId = ?";
+    $checkCodeStmt = mysqli_prepare($conn, $checkCodeQuery);
+    $existingCode = null;
+    if ($checkCodeStmt) {
+        mysqli_stmt_bind_param($checkCodeStmt, "i", $reservationId);
+        mysqli_stmt_execute($checkCodeStmt);
+        $checkCodeResult = mysqli_stmt_get_result($checkCodeStmt);
+        if ($codeRow = mysqli_fetch_assoc($checkCodeResult)) {
+            $existingCode = $codeRow['reservationCode'];
+        }
+        mysqli_stmt_close($checkCodeStmt);
     }
+    
+        if (empty($existingCode)) {
+            $reservationCode = generateUniqueReservationCode($conn);
+            $updateQuery = "UPDATE reservations SET status = 'completed', reservationCode = ? WHERE reservationId = ?";
+            $updateStmt = mysqli_prepare($conn, $updateQuery);
+            if ($updateStmt) {
+                mysqli_stmt_bind_param($updateStmt, "si", $reservationCode, $reservationId);
+                mysqli_stmt_execute($updateStmt);
+                mysqli_stmt_close($updateStmt);
+            }
+        } else {
+            $reservationCode = $existingCode;
+            $updateQuery = "UPDATE reservations SET status = 'completed' WHERE reservationId = ?";
+            $updateStmt = mysqli_prepare($conn, $updateQuery);
+            if ($updateStmt) {
+                mysqli_stmt_bind_param($updateStmt, "i", $reservationId);
+                mysqli_stmt_execute($updateStmt);
+                mysqli_stmt_close($updateStmt);
+            }
+        }
     
     if ($amount <= 0) {
         $resQuery = "SELECT totalAmount FROM reservations WHERE reservationId = ?";
@@ -172,6 +215,22 @@ if ($reservationSaved && !$errorOccurred && $reservationId > 0) {
         }
     } else {
         $paymentSaved = true;
+    }
+    
+    if ($reservationSaved && $paymentSaved && $reservationId > 0) {
+        $statusCheckQuery = "SELECT status FROM reservations WHERE reservationId = ?";
+        $statusCheckStmt = mysqli_prepare($conn, $statusCheckQuery);
+        if ($statusCheckStmt) {
+            mysqli_stmt_bind_param($statusCheckStmt, "i", $reservationId);
+            mysqli_stmt_execute($statusCheckStmt);
+            $statusResult = mysqli_stmt_get_result($statusCheckStmt);
+            if ($statusRow = mysqli_fetch_assoc($statusResult)) {
+                if ($statusRow['status'] === 'completed') {
+                    sendReservationConfirmationEmail($conn, $reservationId);
+                }
+            }
+            mysqli_stmt_close($statusCheckStmt);
+        }
     }
 }
 
@@ -467,6 +526,15 @@ if (!$package) {
                             </div>
 
                             <div class="confirmation-details">
+                                <?php if (!empty($reservationCode)): ?>
+                                <div class="detail-row">
+                                    <span class="detail-label">Reservation Code</span>
+                                    <span class="detail-value">
+                                        <span class="transaction-id" style="font-size: 1.2rem; font-weight: bold; letter-spacing: 2px;"><?php echo htmlspecialchars($reservationCode); ?></span>
+                                    </span>
+                                </div>
+                                <?php endif; ?>
+                                
                                 <div class="detail-row">
                                     <span class="detail-label">Package Tier</span>
                                     <span class="detail-value">
@@ -548,7 +616,7 @@ if (!$package) {
                 <div class="col-md-4 mb-4">
                     <h6 class="footer-heading mb-3">Hotel Partner</h6>
                     <p class="footer-text">
-                        <strong>Grand Luxe Hotels</strong><br>
+                        <strong>TravelMates Hotel</strong><br>
                         Your trusted partner for premium event hosting
                     </p>
                 </div>

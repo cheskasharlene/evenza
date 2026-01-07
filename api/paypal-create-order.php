@@ -1,9 +1,24 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 0);
+ini_set('log_errors', 1);
+
+ob_start();
+
 session_start();
 header('Content-Type: application/json');
 
-require_once '../config/paypal.php';
-require_once '../connect.php';
+try {
+    require_once '../config/paypal.php';
+    require_once '../connect.php';
+    
+    ob_clean();
+} catch (Exception $e) {
+    ob_end_clean();
+    http_response_code(500);
+    echo json_encode(['error' => 'Server configuration error']);
+    exit;
+}
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
@@ -105,17 +120,21 @@ if ($httpCode >= 200 && $httpCode < 300 && isset($orderResult['id'])) {
     $_SESSION['paypal_order_package_id'] = $packageId;
     $_SESSION['paypal_order_reservation_id'] = $reservationId;
     
+    ob_end_clean();
     echo json_encode([
         'id' => $orderResult['id'],
         'status' => $orderResult['status']
     ]);
+    exit;
 } else {
+    ob_end_clean();
     error_log('PayPal Create Order Error: ' . $response);
     http_response_code(500);
     echo json_encode([
         'error' => 'Failed to create PayPal order',
         'details' => $orderResult['details'] ?? null
     ]);
+    exit;
 }
 
 function getPayPalAccessToken() {
@@ -151,5 +170,10 @@ function getBaseUrl() {
     $path = dirname($path);
     return $protocol . '://' . $host . $path;
 }
-?>
 
+set_exception_handler(function($exception) {
+    ob_end_clean();
+    http_response_code(500);
+    echo json_encode(['error' => 'An unexpected error occurred']);
+    exit;
+});

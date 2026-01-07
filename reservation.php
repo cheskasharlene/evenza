@@ -31,7 +31,6 @@ if ($packagesResult) {
     mysqli_free_result($packagesResult);
 }
 
-// Fetch event from database
 $event = null;
 if ($eventId > 0) {
     $eventQuery = "SELECT eventId, title, category, venue, description FROM events WHERE eventId = ?";
@@ -44,8 +43,6 @@ if ($eventId > 0) {
         mysqli_stmt_close($eventStmt);
         
         if ($eventRow) {
-            // Date and time are not stored in events table, so set as TBA
-            // Users will select their preferred date/time in the reservation form
             $event = [
                 'name' => $eventRow['title'],
                 'category' => $eventRow['category'] ?? '',
@@ -58,13 +55,11 @@ if ($eventId > 0) {
     }
 }
 
-// Redirect to events page if event not found
 if (!$event) {
     header('Location: events.php');
     exit;
 }
 
-// Price calculation function using switch statement (for reference, but we'll use DB prices)
 function calculatePackagePrice($packageTier) {
     switch(strtolower($packageTier)) {
         case 'bronze':
@@ -155,7 +150,6 @@ $totalAmount = $selectedPackage['price'];
             </div>
 
             <div class="reservation-layout">
-                <!-- Left Column: Form -->
                 <div class="reservation-form-column">
                     <div class="luxury-card p-4">
                         <h2 class="page-title mb-4">Reservation Form</h2>
@@ -176,7 +170,6 @@ $totalAmount = $selectedPackage['price'];
                         
                         <form id="reservationForm" method="POST" action="reserve.php">
                             <input type="hidden" name="eventId" value="<?php echo $eventId; ?>">
-                            <!-- Package selection hidden fields -->
                             <input type="hidden" name="packageId" id="packageId" value="<?php echo $selectedPackage['id']; ?>">
                             <input type="hidden" name="packageTier" id="packageTier" value="<?php echo htmlspecialchars($selectedPackage['tier']); ?>">
                             <input type="hidden" name="packageName" id="packageName" value="<?php echo htmlspecialchars($selectedPackage['name']); ?>">
@@ -333,7 +326,7 @@ $totalAmount = $selectedPackage['price'];
                 <div class="col-md-4 mb-4">
                     <h6 class="footer-heading mb-3">Hotel Partner</h6>
                     <p class="footer-text">
-                        <strong>Grand Luxe Hotels</strong><br>
+                        <strong>TravelMates Hotel</strong><br>
                         Your trusted partner for premium event hosting
                     </p>
                 </div>

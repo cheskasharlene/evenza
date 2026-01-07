@@ -50,7 +50,6 @@ if ($result) {
         $event['imagePath'] = getEventImagePath($event['imagePath']);
         
         if (stripos($event['title'], 'wine') !== false && !file_exists($event['imagePath']) && $event['imagePath'] === 'assets/images/event_images/placeholder.jpg') {
-            // Try wineCellar.jpg if the original path doesn't work
             if (file_exists('assets/images/event_images/wineCellar.jpg')) {
                 $event['imagePath'] = 'assets/images/event_images/wineCellar.jpg';
             }
@@ -261,7 +260,7 @@ function getCategoryFilter($category) {
                 <div class="col-md-4 mb-4">
                     <h6 class="footer-heading mb-3">Hotel Partner</h6>
                     <p class="footer-text">
-                        <strong>Grand Luxe Hotels</strong><br>
+                        <strong>TravelMates Hotel</strong><br>
                         Your trusted partner for premium event hosting
                     </p>
                 </div>
@@ -279,7 +278,6 @@ function getCategoryFilter($category) {
     <script src="assets/js/main.js"></script>
     <script src="assets/js/events.js"></script>
     <script>
-        // Event filtering and search functionality
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchInput');
             const categoryFilter = document.getElementById('categoryFilter');
@@ -304,14 +302,12 @@ function getCategoryFilter($category) {
                 });
             }
 
-            // Initialize: show all events on page load
             if (eventCards.length > 0) {
                 eventCards.forEach(card => {
                     card.style.display = '';
                 });
             }
 
-            // Event listeners for real-time filtering
             if (searchInput) {
                 searchInput.addEventListener('input', filterEvents);
             }

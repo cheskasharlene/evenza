@@ -150,8 +150,6 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                 <div class="payment-value"><?php echo htmlspecialchars($event['name']); ?></div>
                             </div>
 
-                            <!-- category removed -->
-
                             <div class="payment-summary-item mb-4">
                                 <div class="payment-label">Package</div>
                                 <div class="payment-value"><?php echo htmlspecialchars($packageName); ?> - ₱ <?php echo number_format($packagePrice, 2); ?></div>
@@ -276,7 +274,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                 <div class="col-md-4 mb-4">
                     <h6 class="footer-heading mb-3">Hotel Partner</h6>
                     <p class="footer-text">
-                        <strong>Grand Luxe Hotels</strong><br>
+                        <strong>TravelMates Hotel</strong><br>
                         Your trusted partner for premium event hosting
                     </p>
                 </div>

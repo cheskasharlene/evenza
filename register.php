@@ -25,32 +25,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (strlen($password) < 6) {
         $error = 'Password must be at least 6 characters long.';
     } else {
-        try {
-            $stmt = $pdo->prepare("SELECT userId FROM users WHERE email = ?");
-            $stmt->execute([$email]);
-            if ($stmt->fetch()) {
+        $checkQuery = "SELECT userId FROM users WHERE email = ?";
+        $checkStmt = mysqli_prepare($conn, $checkQuery);
+        
+        if ($checkStmt) {
+            mysqli_stmt_bind_param($checkStmt, "s", $email);
+            mysqli_stmt_execute($checkStmt);
+            $result = mysqli_stmt_get_result($checkStmt);
+            
+            if (mysqli_fetch_assoc($result)) {
                 $error = 'Email already registered';
+                mysqli_stmt_close($checkStmt);
             } else {
-                $fullName = trim($firstName . ' ' . $lastName);
+                mysqli_stmt_close($checkStmt);
                 
+                $fullName = trim($firstName . ' ' . $lastName);
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
                 
-                $stmt = $pdo->prepare("INSERT INTO users (firstName, lastName, fullName, email, phoneNumber, password, role) VALUES (?, ?, ?, ?, ?, ?, 'user')");
-                if ($stmt->execute([$firstName, $lastName, $fullName, $email, $phoneNumber, $hashedPassword])) {
-                    $userId = $pdo->lastInsertId();
-                    $_SESSION['user_id'] = $userId;
-                    $_SESSION['user_name'] = $fullName;
-                    $_SESSION['user_email'] = $email;
-                    $_SESSION['user_mobile'] = $phoneNumber;
-                    $_SESSION['user_role'] = 'user';
+                $insertQuery = "INSERT INTO users (firstName, lastName, fullName, email, phone, password, role) VALUES (?, ?, ?, ?, ?, ?, 'user')";
+                $insertStmt = mysqli_prepare($conn, $insertQuery);
+                
+                if ($insertStmt) {
+                    mysqli_stmt_bind_param($insertStmt, "ssssss", $firstName, $lastName, $fullName, $email, $phoneNumber, $hashedPassword);
                     
-                    header('Location: profile.php');
-                    exit;
+                    if (mysqli_stmt_execute($insertStmt)) {
+                        $userId = mysqli_insert_id($conn);
+                        $_SESSION['user_id'] = $userId;
+                        $_SESSION['user_name'] = $fullName;
+                        $_SESSION['user_email'] = $email;
+                        $_SESSION['user_mobile'] = $phoneNumber;
+                        $_SESSION['user_role'] = 'user';
+                        
+                        mysqli_stmt_close($insertStmt);
+                        header('Location: profile.php');
+                        exit;
+                    } else {
+                        $error = 'Failed to create account. Please try again.';
+                    }
+                    mysqli_stmt_close($insertStmt);
                 } else {
-                    $error = 'Failed to create account. Please try again.';
+                    $error = 'Database error. Please try again later.';
                 }
             }
-        } catch(PDOException $e) {
+        } else {
             $error = 'Database error. Please try again later.';
         }
     }
