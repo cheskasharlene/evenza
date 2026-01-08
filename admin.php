@@ -443,6 +443,10 @@ try {
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
                             <span style="font-weight: 500;">User Management</span>
                         </a>
+                        <a href="smsInbox.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-sms"></i></span> 
+                            <span style="font-weight: 500;">SMS Inbox</span>
+                        </a>
                     </div>
                 </div>
             </div>

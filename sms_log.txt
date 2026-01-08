@@ -1,0 +1,29 @@
+[2026-01-08 02:47:58] {
+  "from":"123456789",
+  "text":"test message",
+  "sentStamp":1767836878776,
+  "receivedStamp":1767836878777,
+  "sim":"sim1"
+}
+[2026-01-08 02:51:01] {
+  "from":"+639701319849",
+  "text":"L",
+  "sentStamp":1767837057000,
+  "receivedStamp":1767837060830,
+  "sim":"sim2"
+}
+[2026-01-08 03:43:04] {
+  "from":"+639701319849",
+  "text":"Thankyou!",
+  "sentStamp":1767868981000,
+  "receivedStamp":1767840183996,
+  "sim":"sim1"
+}
+[2026-01-08 03:51:18] {
+  "from":"+639701319849",
+  "text":"Ty",
+  "sentStamp":1767869475000,
+  "receivedStamp":1767840678587,
+  "sim":"sim1"
+}
+[2026-01-08 03:51:18] SMS STORED: From=639701319849, Message=Ty

@@ -15,6 +15,7 @@ if (!$isAdmin) {
 }
 
 require_once '../connect.php';
+require_once '../includes/helpers.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
@@ -41,6 +42,19 @@ if (!$conn) {
     exit;
 }
 
+$currentStatusQuery = "SELECT status FROM reservations WHERE reservationId = ?";
+$currentStmt = mysqli_prepare($conn, $currentStatusQuery);
+$oldStatus = '';
+if ($currentStmt) {
+    mysqli_stmt_bind_param($currentStmt, "i", $reservationId);
+    mysqli_stmt_execute($currentStmt);
+    $currentResult = mysqli_stmt_get_result($currentStmt);
+    if ($currentRow = mysqli_fetch_assoc($currentResult)) {
+        $oldStatus = strtolower($currentRow['status']);
+    }
+    mysqli_stmt_close($currentStmt);
+}
+
 $query = "UPDATE reservations SET status = ? WHERE reservationId = ?";
 $stmt = mysqli_prepare($conn, $query);
 
@@ -50,6 +64,10 @@ if ($stmt) {
     if (mysqli_stmt_execute($stmt)) {
         $affectedRows = mysqli_stmt_affected_rows($stmt);
         if ($affectedRows > 0) {
+            if ($oldStatus !== $status && ($status === 'confirmed' || $status === 'cancelled')) {
+                sendReservationStatusSMS($conn, $reservationId, $status);
+            }
+            
             echo json_encode(['success' => true, 'message' => 'Reservation status updated successfully']);
         } else {
             echo json_encode(['success' => false, 'message' => 'Reservation not found or status unchanged']);

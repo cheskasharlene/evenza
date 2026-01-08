@@ -7,7 +7,6 @@ $packageFilter = isset($_GET['package']) ? $_GET['package'] : '';
 $dateFilter = isset($_GET['date']) ? $_GET['date'] : '';
 $filterDate = isset($_GET['filter_date']) ? $_GET['filter_date'] : '';
 
-// Pagination
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $perPage = 5;
 $offset = ($page - 1) * $perPage;
@@ -49,16 +48,13 @@ if (!empty($dateFilter)) {
     $params[] = $dateFilter;
     $types .= 's';
 } elseif (!empty($filterDate)) {
-    // Filter by specific date from date box click
     $query .= " AND DATE(r.reservationDate) = ?";
     $params[] = $filterDate;
     $types .= 's';
 } else {
-    // Only show future or today's reservations when no date filter is applied
     $query .= " AND DATE(r.reservationDate) >= CURDATE()";
 }
 
-// Get total count for pagination (before adding ORDER BY and LIMIT)
 $countQuery = "SELECT COUNT(*) as total FROM reservations r
           INNER JOIN users u ON r.userId = u.userid
           INNER JOIN events e ON r.eventId = e.eventId
@@ -102,7 +98,6 @@ if ($countStmt) {
 
 $totalPages = ceil($totalCount / $perPage);
 
-// Add pagination to main query
 $query .= " ORDER BY r.reservationDate DESC, r.createdAt DESC LIMIT " . intval($perPage) . " OFFSET " . intval($offset);
 
 $reservations = [];
@@ -562,6 +557,10 @@ foreach ($reservations as $reservation) {
                         <a href="userManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
                             <span style="font-weight: 500;">User Management</span>
+                        </a>
+                        <a href="smsInbox.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-sms"></i></span> 
+                            <span style="font-weight: 500;">SMS Inbox</span>
                         </a>
                     </div>
                 </div>

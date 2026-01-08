@@ -3,11 +3,9 @@ require_once 'adminAuth.php';
 require_once 'connect.php';
 require_once 'includes/helpers.php';
 
-// Get search and role filter parameters
 $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
 $roleFilter = isset($_GET['role']) ? trim($_GET['role']) : '';
 
-// Build query with filters
 $query = "SELECT userid, firstName, lastName, fullName, email, phone, role FROM users WHERE 1=1";
 $params = [];
 $types = '';
@@ -367,6 +365,10 @@ if (!empty($params)) {
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
                             <span>User Management</span>
                         </a>
+                        <a href="smsInbox.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-sms"></i></span> 
+                            <span style="font-weight: 500;">SMS Inbox</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -622,7 +624,6 @@ if (!empty($params)) {
             modal.show();
         }
 
-        // Save user function
         function saveUser() {
             const fullName = document.getElementById('userFullName').value.trim();
             const email = document.getElementById('userEmail').value.trim();
@@ -640,11 +641,9 @@ if (!empty($params)) {
                 return;
             }
             
-            // In a real implementation, this would make an AJAX call to save the user
             const action = isEditMode ? 'updated' : 'added';
             showFeedback('User "' + fullName + '" has been ' + action + ' successfully.', 'success');
             
-            // Close modal and reload after a short delay
             const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
             modal.hide();
             
@@ -653,20 +652,15 @@ if (!empty($params)) {
             }, 1500);
         }
 
-        // Delete user function
         function deleteUser(userId, userName) {
             if (confirm('Are you sure you want to delete user "' + userName + '"? This action cannot be undone.')) {
-                // In a real implementation, this would make an AJAX call to delete the user
                 showFeedback('User "' + userName + '" has been deleted successfully.', 'success');
-                // Reload page after a short delay to show the feedback
                 setTimeout(function() {
                     location.reload();
                 }, 1500);
             }
         }
 
-        // Show feedback on page load if there's a message in URL
-        // Live search functionality
         let searchTimeout;
         const searchInput = document.getElementById('searchInput');
         const roleFilter = document.getElementById('roleFilter');
@@ -676,7 +670,6 @@ if (!empty($params)) {
             const searchQuery = searchInput.value.trim();
             const roleValue = roleFilter.value;
             
-            // Update URL without page reload
             const url = new URL(window.location.href);
             if (searchQuery) {
                 url.searchParams.set('search', searchQuery);
@@ -690,7 +683,6 @@ if (!empty($params)) {
             }
             window.history.pushState({}, '', url);
             
-            // Fetch filtered users
             fetch(`api/searchUsers.php?search=${encodeURIComponent(searchQuery)}&role=${encodeURIComponent(roleValue)}`)
                 .then(response => response.json())
                 .then(data => {
@@ -769,13 +761,11 @@ if (!empty($params)) {
             return div.innerHTML;
         }
 
-        // Search input event listener with debounce
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(performSearch, 300);
         });
 
-        // Role filter change event listener
         roleFilter.addEventListener('change', function() {
             performSearch();
         });

@@ -73,7 +73,6 @@ function formatTime12Hour($timeString) {
         return '';
     }
     
-    // Handle time range (e.g., "11:00:00 - 16:00:00")
     if (strpos($timeString, ' - ') !== false) {
         $parts = explode(' - ', $timeString);
         $start = formatTime12Hour($parts[0]);
@@ -81,7 +80,6 @@ function formatTime12Hour($timeString) {
         return $start && $end ? $start . ' - ' . $end : $timeString;
     }
     
-    // Extract time part (handle formats like "11:00:00" or "11:00")
     $timeOnly = trim(explode(' ', $timeString)[0]);
     $timeParts = explode(':', $timeOnly);
     
@@ -136,7 +134,6 @@ function generateUniqueReservationCode($conn) {
 }
 
 /**
- * Send reservation confirmation email using PHPMailer with SMTP
  * @param mysqli $conn - Database connection
  * @param int $reservationId - Reservation ID
  * @return bool - True if email sent successfully, false otherwise
@@ -307,7 +304,6 @@ function buildReservationEmailHTML($reservation, $reservationDate, $timeRange) {
 }
 
 /**
- * Build plain text email body for reservation confirmation
  */
 function buildReservationEmailText($reservation, $reservationDate, $timeRange) {
     $text = "Reservation Confirmed!\n\n";
@@ -329,6 +325,118 @@ function buildReservationEmailText($reservation, $reservationDate, $timeRange) {
     $text .= "© " . date('Y') . " EVENZA. All rights reserved.";
     
     return $text;
+}
+
+/**
+ * @param mysqli $conn - Database connection
+ * @param int $reservationId - Reservation ID
+ * @param string $status - New status ('confirmed' or 'cancelled')
+ * @return bool - True if SMS sent successfully, false otherwise
+ */
+function sendReservationStatusSMS($conn, $reservationId, $status) {
+    $query = "SELECT 
+                r.reservationId,
+                r.reservationDate,
+                r.startTime,
+                r.endTime,
+                r.status,
+                u.fullName AS customerName,
+                u.phone AS customerPhone,
+                e.title AS eventName,
+                e.venue AS eventVenue,
+                p.packageName
+              FROM reservations r
+              INNER JOIN users u ON r.userId = u.userid
+              INNER JOIN events e ON r.eventId = e.eventId
+              INNER JOIN packages p ON r.packageId = p.packageId
+              WHERE r.reservationId = ?";
+    
+    $stmt = mysqli_prepare($conn, $query);
+    if (!$stmt) {
+        error_log("SMS Error: Failed to prepare query - " . mysqli_error($conn));
+        return false;
+    }
+    
+    mysqli_stmt_bind_param($stmt, "i", $reservationId);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    $reservation = mysqli_fetch_assoc($result);
+    mysqli_stmt_close($stmt);
+    
+    if (!$reservation || empty($reservation['customerPhone'])) {
+        error_log("SMS Error: Reservation not found or no phone number");
+        return false;
+    }
+    
+    $phoneNumber = preg_replace('/[^0-9]/', '', $reservation['customerPhone']);
+    if (empty($phoneNumber)) {
+        error_log("SMS Error: Invalid phone number");
+        return false;
+    }
+    
+    $reservationDate = date('F d, Y', strtotime($reservation['reservationDate']));
+    
+    $timeRange = '';
+    if (!empty($reservation['startTime']) && !empty($reservation['endTime'])) {
+        $timeRange = formatTime12Hour($reservation['startTime']) . ' - ' . formatTime12Hour($reservation['endTime']);
+    } elseif (!empty($reservation['startTime'])) {
+        $timeRange = formatTime12Hour($reservation['startTime']);
+    }
+    
+    $message = '';
+    if (strtolower($status) === 'confirmed') {
+        $message = "Hello " . $reservation['customerName'] . "! Your reservation for " . $reservation['eventName'] . " has been CONFIRMED. ";
+        $message .= "Date: " . $reservationDate;
+        if (!empty($timeRange)) {
+            $message .= " | Time: " . $timeRange;
+        }
+        $message .= " | Venue: " . $reservation['eventVenue'] . " | Package: " . $reservation['packageName'] . ". ";
+        $message .= "We look forward to seeing you! - EVENZA";
+    } elseif (strtolower($status) === 'cancelled') {
+        $message = "Hello " . $reservation['customerName'] . ", we regret to inform you that your reservation for " . $reservation['eventName'] . " on " . $reservationDate;
+        if (!empty($timeRange)) {
+            $message .= " (" . $timeRange . ")";
+        }
+        $message .= " has been CANCELLED. The selected date and time are already occupied. ";
+        $message .= "Please contact us for alternative dates. - EVENZA";
+    } else {
+        return false;
+    }
+    
+    $smsApiUrl = 'http://localhost/evenza/api/sendSMS.php';
+    
+    $ch = curl_init($smsApiUrl);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+        'phone' => $phoneNumber,
+        'message' => $message
+    ]));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_COOKIE, session_name() . '=' . session_id());
+    
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    curl_close($ch);
+    
+    if ($error) {
+        error_log("SMS Error: cURL error - " . $error);
+        return false;
+    }
+    
+    if ($httpCode === 200) {
+        $result = json_decode($response, true);
+        if (isset($result['success']) && $result['success']) {
+            return true;
+        } else {
+            error_log("SMS Error: " . ($result['message'] ?? 'Unknown error'));
+            return false;
+        }
+    }
+    
+    error_log("SMS Error: HTTP Code " . $httpCode);
+    return false;
 }
 ?>
 
