@@ -104,8 +104,8 @@ try {
     $eventId = !empty($reservation['eventId']) ? intval($reservation['eventId']) : null;
     
     if ($eventId !== null) {
-        $insertQuery = "INSERT INTO reviews (reservationId, userId, eventId, rating, comment, status) 
-                        VALUES (?, ?, ?, ?, ?, 'approved')";
+        $insertQuery = "INSERT INTO reviews (reservationId, userId, eventId, rating, comment) 
+                        VALUES (?, ?, ?, ?, ?)";
         $insertStmt = mysqli_prepare($conn, $insertQuery);
         if (!$insertStmt) {
             ob_end_clean();
@@ -115,8 +115,8 @@ try {
         }
         mysqli_stmt_bind_param($insertStmt, "iiiis", $reservationId, $userId, $eventId, $rating, $comment);
     } else {
-        $insertQuery = "INSERT INTO reviews (reservationId, userId, rating, comment, status) 
-                        VALUES (?, ?, ?, ?, 'approved')";
+        $insertQuery = "INSERT INTO reviews (reservationId, userId, rating, comment) 
+                        VALUES (?, ?, ?, ?)";
         $insertStmt = mysqli_prepare($conn, $insertQuery);
         if (!$insertStmt) {
             ob_end_clean();

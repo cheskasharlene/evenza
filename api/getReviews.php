@@ -29,7 +29,7 @@ try {
               FROM reviews r
               INNER JOIN users u ON r.userId = u.userId
               INNER JOIN reservations res ON r.reservationId = res.reservationId
-              WHERE r.eventId = ? AND r.status = 'approved'
+              WHERE r.eventId = ?
               ORDER BY r.createdAt DESC
               LIMIT 50";
     

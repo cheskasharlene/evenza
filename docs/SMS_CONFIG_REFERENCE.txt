@@ -1,0 +1,61 @@
+================================================================================
+SMS CONFIGURATION REFERENCE
+================================================================================
+
+This file contains the current SMS configuration settings for reference.
+These settings need to be configured in the Android SMS Forwarder/Gateway apps.
+
+================================================================================
+WEBHOOK URL (For Receiving SMS)
+================================================================================
+
+Current Server IP: 192.168.1.5
+Webhook URL: http://192.168.1.5/evenza/webhook.php
+
+WHERE TO CONFIGURE:
+- Open your Android SMS Forwarder app
+- Go to Settings/Configuration
+- Find "Webhook URL" or "Callback URL" field
+- Enter: http://192.168.1.5/evenza/webhook.php
+- Save the configuration
+
+NOTE: If your server IP changes, update this URL in the Android app.
+
+================================================================================
+SMS GATEWAY URL (For Sending SMS)
+================================================================================
+
+Current Android Device IP: 192.168.1.8
+SMS Gateway URL: http://192.168.1.8:8080
+
+WHERE IT'S CONFIGURED:
+- File: api/sendSMS.php
+- Variable: $smsGatewayBaseUrl = 'http://192.168.1.8:8080';
+
+NOTE: If your Android device IP changes, update the $smsGatewayBaseUrl in api/sendSMS.php
+
+================================================================================
+TESTING
+================================================================================
+
+1. Test Webhook (Receiving SMS):
+   - Send a test SMS to the phone number configured in SMS Forwarder
+   - Check sms_log.txt file in project root
+   - Check SMS Inbox in admin panel
+
+2. Test SMS Sending:
+   - Update a reservation status to "Confirmed" or "Cancelled"
+   - Check if SMS is sent successfully
+   - Check error logs if it fails
+
+================================================================================
+IMPORTANT NOTES
+================================================================================
+
+- Webhook URL is configured in Android SMS Forwarder app (NOT in code)
+- SMS Gateway URL is configured in api/sendSMS.php (in code)
+- Both devices must be on the same network
+- Server IP may change if you restart your router or change network
+
+Last Updated: 2026-01-08
+

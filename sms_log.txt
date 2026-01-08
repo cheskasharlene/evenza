@@ -35,3 +35,11 @@
   "sim":"sim1"
 }
 [2026-01-08 04:58:48] SMS STORED: From=639701319849, Message=Thanks
+[2026-01-08 11:17:57] {
+  "from":"+639701319849",
+  "text":"Thank you euhe",
+  "sentStamp":1767896275000,
+  "receivedStamp":1767867478129,
+  "sim":"sim1"
+}
+[2026-01-08 11:17:57] SMS STORED: From=639701319849, Message=Thank you euhe
