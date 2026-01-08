@@ -3340,19 +3340,25 @@ html {
 
 .star-rating-display {
     display: inline-flex;
-    gap: 0.2rem;
+    gap: 2px;
+    align-items: center;
 }
 
 .star-rating-display .fa-star {
-    font-size: 1rem;
+    font-size: 19px;
+    width: 19px;
+    height: 19px;
 }
 
-.star-rating-display .fa-star.text-warning {
-    color: #ffc107;
+.star-rating-display .fa-star.text-warning,
+.star-rating-display .fas.fa-star {
+    color: #FFD700;
+    font-weight: 900;
 }
 
-.star-rating-display .fa-star.text-muted {
-    color: #ddd;
+.star-rating-display .fa-star.text-muted,
+.star-rating-display .far.fa-star {
+    color: #e0e0e0;
 }
 
 .reviews-list {
@@ -3367,6 +3373,36 @@ html {
 .review-item:last-child {
     border-bottom: none !important;
     padding-bottom: 0;
+}
+
+/* Review Card Star Ratings - High Contrast Golden Yellow */
+.review-item .star-rating-display,
+.review-card .star-rating-display {
+    margin-bottom: 0.75rem;
+    margin-top: 0;
+}
+
+.review-item .star-rating-display .fa-star,
+.review-card .star-rating-display .fa-star {
+    font-size: 19px;
+    width: 19px;
+    height: 19px;
+    line-height: 19px;
+}
+
+.review-item .star-rating-display .fas.fa-star,
+.review-card .star-rating-display .fas.fa-star,
+.review-item .star-rating-display .fa-star.text-warning,
+.review-card .star-rating-display .fa-star.text-warning {
+    color: #FFD700 !important;
+    font-weight: 900;
+}
+
+.review-item .star-rating-display .far.fa-star,
+.review-card .star-rating-display .far.fa-star,
+.review-item .star-rating-display .fa-star.text-muted,
+.review-card .star-rating-display .fa-star.text-muted {
+    color: #e0e0e0 !important;
 }
 
 #reviewsContainer {

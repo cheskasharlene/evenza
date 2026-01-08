@@ -119,15 +119,11 @@ $totalPages = ceil($totalCount / $perPage);
         .sms-message-item {
             background-color: #FFFFFF;
             border: 1px solid rgba(74, 93, 74, 0.1);
-            border-radius: 10px;
+            border-radius: 20px;
             padding: 1.25rem;
             margin-bottom: 1rem;
-            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             cursor: pointer;
-        }
-        .sms-message-item:hover {
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
         }
         .sms-message-item.unread {
             background-color: #F0F7F0;

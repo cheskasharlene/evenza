@@ -17,7 +17,7 @@ $stats = [
 try {
     $revenueQuery = "SELECT COALESCE(SUM(totalAmount), 0) as totalRevenue 
                      FROM reservations 
-                     WHERE LOWER(status) IN ('completed', 'confirmed')";
+                     WHERE LOWER(status) IN ('completed', 'confirmed', 'pending')";
     $revenueResult = mysqli_query($conn, $revenueQuery);
     if ($revenueResult) {
         $revenueRow = mysqli_fetch_assoc($revenueResult);
@@ -139,7 +139,7 @@ try {
     $lastMonthQuery = "
         SELECT COALESCE(SUM(totalAmount), 0) as lastMonthRevenue 
         FROM reservations 
-        WHERE LOWER(status) IN ('completed', 'confirmed')
+        WHERE LOWER(status) IN ('completed', 'confirmed', 'pending')
         AND MONTH(createdAt) = MONTH(DATE_SUB(NOW(), INTERVAL 1 MONTH))
         AND YEAR(createdAt) = YEAR(DATE_SUB(NOW(), INTERVAL 1 MONTH))
     ";
@@ -154,7 +154,7 @@ try {
     $currentMonthQuery = "
         SELECT COALESCE(SUM(totalAmount), 0) as currentMonthRevenue 
         FROM reservations 
-        WHERE LOWER(status) IN ('completed', 'confirmed')
+        WHERE LOWER(status) IN ('completed', 'confirmed', 'pending')
         AND MONTH(createdAt) = MONTH(NOW())
         AND YEAR(createdAt) = YEAR(NOW())
     ";
