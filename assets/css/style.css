@@ -46,21 +46,21 @@ h1, h2, h3, h4, h5, h6 {
     text-decoration: none;
     transition: all 0.3s ease;
 }
-/* Evenza logo image sizing: larger on desktop, responsive for smaller screens */
+
 .luxury-logo img.evenza-logo-img {
     height: 45px;
     width: auto;
     display: block;
 }
-/* Slightly smaller at medium widths */
+
 @media (max-width: 991px) {
     .luxury-logo img.evenza-logo-img { height: 44px; }
 }
-/* Small screens */
+
 @media (max-width: 576px) {
     .luxury-logo img.evenza-logo-img { height: 32px; }
 }
-/* Admin sidebar logo slightly larger to fill the sidebar header */
+
 .admin-sidebar .luxury-logo img.evenza-logo-img { height: 64px; }
 
 .luxury-logo:hover {
@@ -197,7 +197,6 @@ h1, h2, h3, h4, h5, h6 {
     animation: fadeInUp 0.8s ease;
     letter-spacing: 3px;
 }
-/* Hero logo */
 .hero-logo {
     height: 140px;
     max-width: 480px;
@@ -431,7 +430,6 @@ input[type="submit"].btn:not(.btn-admin-primary):not(.btn-close) {
     justify-content: center;
 }
 
-/* Hotel Partners Section Styles */
 .hotel-partners-section {
     background: linear-gradient(135deg, var(--bg-warm-beige) 0%, var(--bg-off-white) 100%);
 }
@@ -2912,5 +2910,102 @@ html {
 @media (max-width: 991px) {
     .admin-sidebar { position: relative; width: 100%; border-right: none; }
     .admin-wrapper { flex-direction: column; }
+}
+
+.review-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+}
+
+.review-form-container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.star-rating {
+    display: flex !important;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.star-icon {
+    font-size: 2rem !important;
+    color: #ddd !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: auto !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.star-icon:hover {
+    transform: scale(1.15);
+}
+
+.star-icon:active {
+    transform: scale(1.05);
+}
+
+.star-icon.fas.text-warning {
+    color: #ffc107;
+}
+
+.star-icon.far.text-muted {
+    color: #ddd;
+}
+
+.star-rating-display {
+    display: inline-flex;
+    gap: 0.2rem;
+}
+
+.star-rating-display .fa-star {
+    font-size: 1rem;
+}
+
+.star-rating-display .fa-star.text-warning {
+    color: #ffc107;
+}
+
+.star-rating-display .fa-star.text-muted {
+    color: #ddd;
+}
+
+.reviews-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.review-item {
+    padding: 1rem 0;
+}
+
+.review-item:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0;
+}
+
+#reviewsContainer {
+    min-height: 100px;
+}
+
+#reviewsContainer .text-center {
+    padding: 2rem;
+}
+
+#ratingError {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: none;
+}
+
+#ratingError.d-block {
+    display: block !important;
 }
 

@@ -8,6 +8,7 @@ $stats = [
     'totalTicketsSold' => 0,
     'activeEvents' => 0,
     'newUsers' => 0,
+    'averageRating' => 0,
     'topEvents' => [],
     'recentActivity' => [],
     'revenueTrend' => 0
@@ -58,6 +59,17 @@ try {
         mysqli_free_result($newUsersResult);
     } else {
         error_log("New users query error: " . mysqli_error($conn));
+    }
+
+    $averageRatingQuery = "SELECT COALESCE(AVG(rating), 0) as averageRating 
+                           FROM reviews";
+    $averageRatingResult = mysqli_query($conn, $averageRatingQuery);
+    if ($averageRatingResult) {
+        $averageRatingRow = mysqli_fetch_assoc($averageRatingResult);
+        $stats['averageRating'] = floatval($averageRatingRow['averageRating'] ?? 0);
+        mysqli_free_result($averageRatingResult);
+    } else {
+        error_log("Average rating query error: " . mysqli_error($conn));
     }
 
     $topEventsQuery = "
@@ -443,6 +455,10 @@ try {
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
                             <span style="font-weight: 500;">User Management</span>
                         </a>
+                        <a href="reviewsManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-star"></i></span>
+                            <span style="font-weight: 500;">Reviews & Feedback</span>
+                        </a>
                         <a href="smsInbox.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-sms"></i></span> 
                             <span style="font-weight: 500;">SMS Inbox</span>
@@ -469,7 +485,7 @@ try {
                             <i class="fas fa-user text-muted"></i>
                         </div>
                     </div>
-                    <a href="logout.php" class="btn btn-admin-primary btn-sm">Logout</a>
+                    <a href="logout.php?type=admin" class="btn btn-admin-primary btn-sm">Logout</a>
                 </div>
             </div>
 
@@ -487,7 +503,7 @@ try {
                 ?>
 
                 <div class="row g-3 mb-4">
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-lg col-md-4">
                         <div class="admin-card p-4 h-100">
                             <div class="d-flex flex-column">
                                 <div class="stat-label mb-2">Total Revenue</div>
@@ -498,7 +514,7 @@ try {
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-lg col-md-4">
                         <div class="admin-card p-4 h-100">
                             <div class="d-flex flex-column">
                                 <div class="stat-label mb-2">Total Tickets Sold</div>
@@ -507,7 +523,7 @@ try {
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-lg col-md-4">
                         <div class="admin-card p-4 h-100">
                             <div class="d-flex flex-column">
                                 <div class="stat-label mb-2">Active Events</div>
@@ -516,12 +532,29 @@ try {
                             </div>
                         </div>
                     </div>
-                    <div class="col-6 col-md-3">
+                    <div class="col-6 col-lg col-md-4">
                         <div class="admin-card p-4 h-100">
                             <div class="d-flex flex-column">
                                 <div class="stat-label mb-2">New User Sign-ups</div>
                                 <div class="stat-number" id="newUsers"><?php echo isset($stats['newUsers']) ? $stats['newUsers'] : '0'; ?></div>
                                 <div class="text-muted small mt-2">Last 30 days</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-lg col-md-4">
+                        <div class="admin-card p-4 h-100">
+                            <div class="d-flex flex-column">
+                                <div class="stat-label mb-2">Average Rating</div>
+                                <div class="stat-number" id="averageRating">
+                                    <?php 
+                                    $avgRating = isset($stats['averageRating']) ? floatval($stats['averageRating']) : 0;
+                                    echo number_format($avgRating, 1);
+                                    ?>
+                                    <span style="font-size: 1.5rem; color: #ffc107; margin-left: 0.25rem;">
+                                        <i class="fas fa-star"></i>
+                                    </span>
+                                </div>
+                                <div class="text-muted small mt-2">From all reviews</div>
                             </div>
                         </div>
                     </div>

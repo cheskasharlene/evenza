@@ -27,3 +27,11 @@
   "sim":"sim1"
 }
 [2026-01-08 03:51:18] SMS STORED: From=639701319849, Message=Ty
+[2026-01-08 04:58:48] {
+  "from":"+639701319849",
+  "text":"Thanks",
+  "sentStamp":1767873524000,
+  "receivedStamp":1767844727669,
+  "sim":"sim1"
+}
+[2026-01-08 04:58:48] SMS STORED: From=639701319849, Message=Thanks

@@ -268,6 +268,7 @@ if (!$package) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Confirmation - EVENZA</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -474,7 +475,7 @@ if (!$package) {
                             <a class="nav-link" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="logout.php">Logout</a>
+                            <a class="nav-link btn-register" href="logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
@@ -572,6 +573,90 @@ if (!$package) {
                                     <i class="fas fa-ticket-alt me-2"></i>View My Tickets
                                 </a>
                             </div>
+
+                            <?php
+                            // Check if review already exists for this reservation
+                            $reviewExists = false;
+                            $existingReview = null;
+                            if ($reservationId > 0) {
+                                $reviewCheckQuery = "SELECT reviewId, rating, comment FROM reviews WHERE reservationId = ?";
+                                $reviewCheckStmt = mysqli_prepare($conn, $reviewCheckQuery);
+                                if ($reviewCheckStmt) {
+                                    mysqli_stmt_bind_param($reviewCheckStmt, "i", $reservationId);
+                                    mysqli_stmt_execute($reviewCheckStmt);
+                                    $reviewCheckResult = mysqli_stmt_get_result($reviewCheckStmt);
+                                    $existingReview = mysqli_fetch_assoc($reviewCheckResult);
+                                    mysqli_stmt_close($reviewCheckStmt);
+                                    $reviewExists = !empty($existingReview);
+                                }
+                            }
+                            ?>
+
+                            <?php if (!$reviewExists && $reservationId > 0): ?>
+                            <div class="review-section mt-5 pt-4 border-top">
+                                <h4 class="text-center mb-4">Share Your Experience</h4>
+                                <p class="text-center text-muted mb-4">We'd love to hear about your experience with our reservation process!</p>
+                                
+                                <div class="review-form-container">
+                                    <form id="reviewForm" class="review-form">
+                                        <input type="hidden" id="reviewReservationId" value="<?php echo $reservationId; ?>">
+                                        
+                                        <div class="mb-4">
+                                            <label class="form-label text-center d-block mb-3">
+                                                <strong>Rate your experience <span class="text-danger">*</span></strong>
+                                            </label>
+                                            <div class="star-rating d-flex justify-content-center" id="starRating" style="display: flex !important; gap: 0.5rem; margin: 1rem 0;">
+                                                <i class="far fa-star star-icon" data-rating="1" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
+                                                <i class="far fa-star star-icon" data-rating="2" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
+                                                <i class="far fa-star star-icon" data-rating="3" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
+                                                <i class="far fa-star star-icon" data-rating="4" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
+                                                <i class="far fa-star star-icon" data-rating="5" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
+                                            </div>
+                                            <input type="hidden" id="reviewRating" name="rating" required>
+                                            <div class="invalid-feedback text-center d-block" id="ratingError" style="display: none !important;"></div>
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label for="reviewComment" class="form-label">
+                                                <strong>Your Feedback (Optional)</strong>
+                                            </label>
+                                            <textarea class="form-control luxury-input" id="reviewComment" name="comment" rows="4" placeholder="Tell us about your experience with our reservation process..."></textarea>
+                                        </div>
+
+                                        <div class="text-center">
+                                            <button type="submit" class="btn btn-primary-luxury" id="submitReviewBtn">
+                                                <i class="fas fa-paper-plane me-2"></i>Submit Review
+                                            </button>
+                                        </div>
+
+                                        <div id="reviewMessage" class="mt-3 text-center"></div>
+                                    </form>
+                                </div>
+                            </div>
+                            <?php elseif ($reviewExists): ?>
+                            <div class="review-section mt-5 pt-4 border-top">
+                                <h4 class="text-center mb-4">Your Review</h4>
+                                <div class="alert alert-success text-center">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <strong>Thank you for your review!</strong>
+                                    <div class="mt-2">
+                                        <?php
+                                        $rating = intval($existingReview['rating']);
+                                        for ($i = 1; $i <= 5; $i++) {
+                                            if ($i <= $rating) {
+                                                echo '<i class="fas fa-star text-warning"></i>';
+                                            } else {
+                                                echo '<i class="far fa-star text-muted"></i>';
+                                            }
+                                        }
+                                        ?>
+                                    </div>
+                                    <?php if (!empty($existingReview['comment'])): ?>
+                                        <p class="mt-2 mb-0"><?php echo htmlspecialchars($existingReview['comment']); ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
 
@@ -631,7 +716,7 @@ if (!$package) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous"></script>
     <script src="assets/js/main.js"></script>
+    <script src="assets/js/review.js"></script>
 </body>
 </html>

@@ -234,6 +234,10 @@ $totalPages = ceil($totalCount / $perPage);
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
                             <span style="font-weight: 500;">User Management</span>
                         </a>
+                        <a href="reviewsManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
+                            <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-star"></i></span>
+                            <span style="font-weight: 500;">Reviews & Feedback</span>
+                        </a>
                         <a href="smsInbox.php" class="d-flex align-items-center py-3 px-3 rounded-3 active" style="background: linear-gradient(135deg, rgba(90, 107, 79, 0.15) 0%, rgba(90, 107, 79, 0.08) 100%); color: #5A6B4F; font-weight: 600; text-decoration: none; border-left: 3px solid #5A6B4F;">
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-sms"></i></span> 
                             <span>SMS Inbox</span>
@@ -263,7 +267,7 @@ $totalPages = ceil($totalCount / $perPage);
                             <i class="fas fa-user text-muted"></i>
                         </div>
                     </div>
-                    <a href="logout.php" class="btn btn-admin-primary btn-sm">Logout</a>
+                    <a href="logout.php?type=admin" class="btn btn-admin-primary btn-sm">Logout</a>
                 </div>
             </div>
 

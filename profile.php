@@ -99,7 +99,7 @@ if ($stmt) {
                             <a class="nav-link active" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="logout.php">Logout</a>
+                            <a class="nav-link btn-register" href="logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
