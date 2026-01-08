@@ -108,13 +108,8 @@ if (!empty($searchQuery)) {
         .admin-card {
             background-color: #FFFFFF;
             border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(74, 93, 74, 0.05);
-            transition: all 0.3s ease;
-        }
-        .admin-card:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
-            transform: translateY(-2px);
         }
         .btn-admin-primary {
             background-color: #5A6B4F;
@@ -157,11 +152,7 @@ if (!empty($searchQuery)) {
             border-bottom: 1px solid rgba(74, 93, 74, 0.08);
         }
         .table tbody tr {
-            transition: all 0.2s ease;
-        }
-        .table tbody tr:hover {
-            background-color: rgba(74, 93, 74, 0.03);
-            transform: scale(1.01);
+            background-color: transparent;
         }
         .event-thumbnail {
             width: 70px;
@@ -169,11 +160,6 @@ if (!empty($searchQuery)) {
             object-fit: cover;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .event-thumbnail:hover {
-            transform: scale(1.1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         .status-badge {
             padding: 0.4rem 1rem;
@@ -428,7 +414,7 @@ if (!empty($searchQuery)) {
                         </h5>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                        <table class="table align-middle">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -464,10 +450,8 @@ if (!empty($searchQuery)) {
                                 </tr>
                                 <?php else: ?>
                                 <?php foreach ($filteredEvents as $id => $event): 
-                                    // Handle image path with proper processing
                                     $imageSrc = getEventImagePath($event['imagePath']);
                                     
-                                    // Special handling for Wine Tasting - ensure correct image
                                     if (stripos($event['title'], 'wine') !== false || stripos($event['name'], 'wine') !== false) {
                                         if (file_exists('assets/images/event_images/wineCellar.jpg')) {
                                             $imageSrc = 'assets/images/event_images/wineCellar.jpg';

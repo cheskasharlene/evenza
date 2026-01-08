@@ -76,12 +76,12 @@ try {
         SELECT 
             e.eventId,
             e.title,
-            COUNT(r.reservationId) as ticketsSold,
+            COUNT(r.reservationId) as packagesReserved,
             COALESCE(SUM(r.totalAmount), 0) as revenue
         FROM events e
         LEFT JOIN reservations r ON e.eventId = r.eventId AND LOWER(r.status) != 'cancelled'
         GROUP BY e.eventId, e.title
-        ORDER BY ticketsSold DESC, revenue DESC
+        ORDER BY COUNT(r.reservationId) DESC, revenue DESC
         LIMIT 5
     ";
     $topEventsResult = mysqli_query($conn, $topEventsQuery);
@@ -90,9 +90,8 @@ try {
             $stats['topEvents'][] = [
                 'eventId' => intval($row['eventId']),
                 'title' => $row['title'],
-                'ticketsSold' => intval($row['ticketsSold']),
-                'revenue' => floatval($row['revenue']),
-                'capacity' => intval($row['ticketsSold'])
+                'packagesReserved' => intval($row['packagesReserved']),
+                'revenue' => floatval($row['revenue'])
             ];
         }
         mysqli_free_result($topEventsResult);
@@ -254,17 +253,12 @@ try {
         .admin-card {
             background-color: #FFFFFF;
             border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(74, 93, 74, 0.05);
             padding: 24px;
             height: 100%;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
-        }
-        .admin-card:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
-            transform: translateY(-2px);
         }
         .dashboard-grid {
             display: flex;
@@ -273,14 +267,12 @@ try {
             margin-bottom: 2rem;
         }
         .top-events-card {
-            flex: 0 0 67.5%;
-            max-width: 67.5%;
+            flex: 1;
             display: flex;
             flex-direction: column;
         }
         .recent-activity-card {
-            flex: 0 0 30%;
-            max-width: 30%;
+            flex: 1;
             display: flex;
             flex-direction: column;
         }
@@ -517,7 +509,7 @@ try {
                     <div class="col-6 col-lg col-md-4">
                         <div class="admin-card p-4 h-100">
                             <div class="d-flex flex-column">
-                                <div class="stat-label mb-2">Total Tickets Sold</div>
+                                <div class="stat-label mb-2">Total Packages Reserved</div>
                                 <div class="stat-number" id="ticketsSold"><?php echo isset($stats['totalTicketsSold']) ? number_format($stats['totalTicketsSold']) : '0'; ?></div>
                                 <div class="text-muted small mt-2">All-time</div>
                             </div>
@@ -566,7 +558,7 @@ try {
                             <div class="card-header">
                                 <div>
                                     <h5 class="mb-1" style="font-family: 'Playfair Display', serif;">Top Performing Events</h5>
-                                    <div class="text-muted small">Top 5 events by tickets sold & capacity%</div>
+                                    <div class="text-muted small">Top 5 events by total packages reserved</div>
                                 </div>
                                 <div class="text-muted small">Updated just now</div>
                             </div>
@@ -576,35 +568,24 @@ try {
                                     <thead>
                                         <tr style="border-bottom: 2px solid rgba(74, 93, 74, 0.1);">
                                             <th style="font-weight: 600; color: #1A1A1A;">Event Name</th>
-                                            <th style="font-weight: 600; color: #1A1A1A;">Tickets Sold</th>
-                                            <th style="font-weight: 600; color: #1A1A1A;">Capacity</th>
+                                            <th style="font-weight: 600; color: #1A1A1A;">Reservations</th>
                                             <th style="font-weight: 600; color: #1A1A1A;">Revenue</th>
                                         </tr>
                                     </thead>
                                     <tbody id="topEventsBody">
                                         <?php if (empty($stats['topEvents'])): ?>
                                             <tr>
-                                                <td colspan="4" class="text-center text-muted">No events with reservations yet</td>
+                                                <td colspan="3" class="text-center text-muted">No events with reservations yet</td>
                                             </tr>
                                         <?php else: ?>
-                                            <?php foreach ($stats['topEvents'] as $event): 
-                                                $capacityPercent = $event['ticketsSold'] > 0 ? min(100, round(($event['ticketsSold'] / max($event['ticketsSold'], 1)) * 100)) : 0;
-                                            ?>
+                                            <?php foreach ($stats['topEvents'] as $event): ?>
                                                 <tr>
                                                     <td>
                                                         <div class="d-flex flex-column">
                                                             <div class="fw-semibold" style="font-family: 'Playfair Display', serif;"><?php echo htmlspecialchars($event['title']); ?></div>
                                                         </div>
                                                     </td>
-                                                    <td><?php echo number_format($event['ticketsSold']); ?></td>
-                                                    <td>
-                                                        <div class="d-flex flex-column">
-                                                            <div class="mb-1"><?php echo $capacityPercent; ?>%</div>
-                                                            <div class="progress" style="height: 8px; width: 100px;">
-                                                                <div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $capacityPercent; ?>%"></div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
+                                                    <td><?php echo number_format($event['packagesReserved']); ?></td>
                                                     <td>₱ <?php echo number_format($event['revenue'], 2); ?></td>
                                                 </tr>
                                             <?php endforeach; ?>

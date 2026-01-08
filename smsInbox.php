@@ -97,13 +97,8 @@ $totalPages = ceil($totalCount / $perPage);
         .admin-card {
             background-color: #FFFFFF;
             border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(74, 93, 74, 0.05);
-            transition: all 0.3s ease;
-        }
-        .admin-card:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
-            transform: translateY(-2px);
         }
         .btn-admin-primary {
             background-color: #5A6B4F;

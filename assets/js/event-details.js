@@ -45,7 +45,6 @@
             context += `Time: ${eventContext.eventTime}\n`;
         }
         
-        // Add package information
         if (eventContext.packages && eventContext.packages.length > 0) {
             context += '\n=== AVAILABLE PACKAGES ===\n';
             eventContext.packages.forEach((pkg, index) => {

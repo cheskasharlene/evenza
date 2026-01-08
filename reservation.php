@@ -9,8 +9,6 @@ if (isset($_SESSION['success_message'])) {
     unset($_SESSION['success_message']);
 }
 if (isset($_SESSION['error_message'])) {
-    // Only show error message if it's not related to payment confirmation
-    // Payment confirmation errors should not appear on the reservation form
     $session_error = $_SESSION['error_message'];
     if (strpos($session_error, 'payment confirmation') === false && strpos($session_error, 'Invalid or expired') === false) {
         $error_message = $session_error;
@@ -263,7 +261,6 @@ $totalAmount = $selectedPackage['price'];
                     </div>
                 </div>
 
-                <!-- Right Column: Sticky Summary -->
                 <div class="reservation-summary-column">
                     <div class="luxury-card reservation-summary p-4 sticky-summary">
                         <h4 class="mb-4">Reservation Summary</h4>
@@ -272,8 +269,6 @@ $totalAmount = $selectedPackage['price'];
                             <div class="summary-label">Event Name</div>
                             <div class="summary-value"><?php echo htmlspecialchars($event['name']); ?></div>
                         </div>
-
-                        <!-- category removed -->
 
                         <div class="summary-item mb-3">
                             <div class="summary-label">Date & Time</div>
@@ -334,7 +329,6 @@ $totalAmount = $selectedPackage['price'];
         </div>
     </div>
 
-    <!-- Success Modal -->
     <div class="modal fade" id="reservationSuccessModal" tabindex="-1" aria-labelledby="reservationSuccessModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">

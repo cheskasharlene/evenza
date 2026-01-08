@@ -8,7 +8,7 @@ $ratingFilter = isset($_GET['rating']) ? intval($_GET['rating']) : 0;
 $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
 
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$perPage = 10;
+$perPage = 5;
 $offset = ($page - 1) * $perPage;
 
 // Build query
@@ -179,13 +179,8 @@ mysqli_free_result($statsResult);
         .admin-card {
             background-color: #FFFFFF;
             border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(74, 93, 74, 0.05);
-            transition: all 0.3s ease;
-        }
-        .admin-card:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
-            transform: translateY(-2px);
         }
         .btn-admin-primary {
             background-color: #5A6B4F;
@@ -210,14 +205,10 @@ mysqli_free_result($statsResult);
         .review-card {
             background-color: #FFFFFF;
             border: 1px solid rgba(74, 93, 74, 0.1);
-            border-radius: 12px;
+            border-radius: 20px;
             padding: 1.5rem;
             margin-bottom: 1rem;
-            transition: all 0.3s ease;
-        }
-        .review-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            border-color: rgba(74, 93, 74, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
         .star-rating-display {
             color: #ffc107;
@@ -327,11 +318,11 @@ mysqli_free_result($statsResult);
                         <form method="GET" action="" class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold" style="color: #1A1A1A;">Search</label>
-                                <input type="text" class="form-control" name="search" placeholder="Name, email, or comment..." value="<?php echo htmlspecialchars($searchQuery); ?>" style="border-radius: 10px; border: 1px solid rgba(74, 93, 74, 0.2);">
+                                <input type="text" class="form-control" name="search" placeholder="Name, email, or comment..." value="<?php echo htmlspecialchars($searchQuery); ?>" style="border-radius: 50px; padding: 0.6rem 1.25rem; border: 1px solid rgba(74, 93, 74, 0.2);">
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-semibold" style="color: #1A1A1A;">Rating</label>
-                                <select class="form-select" name="rating" style="border-radius: 10px; border: 1px solid rgba(74, 93, 74, 0.2);">
+                                <select class="form-select" name="rating" style="border-radius: 50px; padding: 0.6rem 1.25rem; border: 1px solid rgba(74, 93, 74, 0.2);">
                                     <option value="">All Ratings</option>
                                     <option value="5" <?php echo $ratingFilter == 5 ? 'selected' : ''; ?>>5 Stars</option>
                                     <option value="4" <?php echo $ratingFilter == 4 ? 'selected' : ''; ?>>4 Stars</option>
@@ -344,7 +335,7 @@ mysqli_free_result($statsResult);
                                 <button type="submit" class="btn btn-admin-primary w-100 me-2">
                                     <i class="fas fa-filter me-2"></i>Filter
                                 </button>
-                                <a href="reviewsManagement.php" class="btn btn-outline-secondary" style="border-radius: 10px;">
+                                <a href="reviewsManagement.php" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 0.6rem 1.25rem;">
                                     <i class="fas fa-times"></i>
                                 </a>
                             </div>
@@ -389,7 +380,7 @@ mysqli_free_result($statsResult);
                                 </div>
                                 
                                 <?php if (!empty($review['comment'])): ?>
-                                    <div class="mb-3 p-3" style="background: #F9F7F2; border-radius: 10px; border-left: 3px solid #5A6B4F;">
+                                    <div class="mb-3 p-3" style="background: #F9F7F2; border-radius: 15px; border-left: 3px solid #5A6B4F;">
                                         <p class="mb-0" style="color: #1A1A1A; line-height: 1.6;"><?php echo nl2br(htmlspecialchars($review['comment'])); ?></p>
                                     </div>
                                 <?php endif; ?>
@@ -411,19 +402,19 @@ mysqli_free_result($statsResult);
                                     <ul class="pagination justify-content-center mt-4">
                                         <?php if ($page > 1): ?>
                                             <li class="page-item">
-                                                <a class="page-link" href="?page=<?php echo $page - 1; ?>&rating=<?php echo $ratingFilter; ?>&search=<?php echo urlencode($searchQuery); ?>" style="border-radius: 10px; margin: 0 2px; border: 1px solid rgba(74, 93, 74, 0.2); color: #5A6B4F;">Previous</a>
+                                                <a class="page-link" href="?page=<?php echo $page - 1; ?>&rating=<?php echo $ratingFilter; ?>&search=<?php echo urlencode($searchQuery); ?>" style="border-radius: 50px; margin: 0 2px; border: 1px solid rgba(74, 93, 74, 0.2); color: #5A6B4F; padding: 0.5rem 1rem;">Previous</a>
                                             </li>
                                         <?php endif; ?>
                                         
                                         <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
                                             <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                                                <a class="page-link" href="?page=<?php echo $i; ?>&rating=<?php echo $ratingFilter; ?>&search=<?php echo urlencode($searchQuery); ?>" style="border-radius: 10px; margin: 0 2px; border: 1px solid rgba(74, 93, 74, 0.2); color: #5A6B4F; <?php echo $i == $page ? 'background-color: #5A6B4F; border-color: #5A6B4F; color: white;' : ''; ?>"><?php echo $i; ?></a>
+                                                <a class="page-link" href="?page=<?php echo $i; ?>&rating=<?php echo $ratingFilter; ?>&search=<?php echo urlencode($searchQuery); ?>" style="border-radius: 50px; margin: 0 2px; border: 1px solid rgba(74, 93, 74, 0.2); color: #5A6B4F; padding: 0.5rem 1rem; <?php echo $i == $page ? 'background-color: #5A6B4F; border-color: #5A6B4F; color: white;' : ''; ?>"><?php echo $i; ?></a>
                                             </li>
                                         <?php endfor; ?>
                                         
                                         <?php if ($page < $totalPages): ?>
                                             <li class="page-item">
-                                                <a class="page-link" href="?page=<?php echo $page + 1; ?>&rating=<?php echo $ratingFilter; ?>&search=<?php echo urlencode($searchQuery); ?>" style="border-radius: 10px; margin: 0 2px; border: 1px solid rgba(74, 93, 74, 0.2); color: #5A6B4F;">Next</a>
+                                                <a class="page-link" href="?page=<?php echo $page + 1; ?>&rating=<?php echo $ratingFilter; ?>&search=<?php echo urlencode($searchQuery); ?>" style="border-radius: 50px; margin: 0 2px; border: 1px solid rgba(74, 93, 74, 0.2); color: #5A6B4F; padding: 0.5rem 1rem;">Next</a>
                                             </li>
                                         <?php endif; ?>
                                     </ul>

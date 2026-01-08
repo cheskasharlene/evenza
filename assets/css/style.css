@@ -10,7 +10,6 @@
     --card-cream: #FDFCF9;
     --shadow-soft: rgba(0, 0, 0, 0.08);
     --shadow-medium: rgba(0, 0, 0, 0.12);
-    /* Package Tier Colors - Refined to match EVENZA branding */
     --tier-bronze: #B8956A;
     --tier-silver: #D4D4D4;
     --tier-gold: #D4AF37;
@@ -950,7 +949,6 @@ html {
     background: linear-gradient(135deg, #B8A082 0%, #A6907A 100%);
 }
 
-/* Category badges removed — UI no longer shows category pills */
 
 .event-content-grid {
     flex: 1;
@@ -973,7 +971,6 @@ html {
     gap: 0.5rem;
 }
 
-/* Category pills removed — styling disabled */
 
 .event-date-time {
     display: flex;
@@ -1124,7 +1121,6 @@ html {
     min-height: 100vh;
 }
 
-/* Two-Column Layout for Event Details */
 .event-details-layout {
     display: flex;
     gap: 2rem;
@@ -1141,7 +1137,6 @@ html {
     min-width: 280px;
 }
 
-/* Responsive: Stack on mobile and tablet */
 @media (max-width: 992px) {
     .event-details-layout {
         flex-direction: column;
@@ -1224,7 +1219,6 @@ html {
     border: 2px solid rgba(107, 127, 90, 0.1);
 }
 
-/* Inquiry variant: remove the outline box and tighten spacing for the single CTA */
 .reservation-section.inquiry-section {
     background: transparent;
     border: none;
@@ -1232,7 +1226,6 @@ html {
     padding-bottom: 0.75rem;
 }
 
-/* Narrow, centered CTA button inside event details */
 .reservation-section.inquiry-section .btn-narrow {
     display: inline-block;
     width: auto;
@@ -1303,7 +1296,6 @@ html {
     color: var(--accent-olive);
 }
 
-/* AI Assistant Container */
 .ai-assistant-container {
     border-radius: 20px;
     box-shadow: 0 8px 30px var(--shadow-soft);
@@ -1358,7 +1350,6 @@ html {
     min-height: 120px;
 }
 
-/* Custom Scrollbar for Chat Box */
 .ai-chat-box::-webkit-scrollbar {
     width: 6px;
 }
@@ -1438,7 +1429,6 @@ html {
     font-weight: 600;
 }
 
-/* AI Input Container - Pill Design */
 .ai-input-container {
     display: flex;
     align-items: center;
@@ -1654,7 +1644,6 @@ html {
     min-height: 100vh;
 }
 
-/* Two-Column Layout for Reservation */
 .reservation-layout {
     display: flex;
     gap: 2rem;
@@ -1676,7 +1665,6 @@ html {
     top: 120px;
 }
 
-/* Responsive: Stack on mobile */
 @media (max-width: 992px) {
     .reservation-layout {
         flex-direction: column;
@@ -1845,7 +1833,6 @@ html {
     margin-top: 2rem;
 }
 
-/* PayPal SDK Button Container */
 #paypal-button-container {
     min-height: 55px;
     display: flex;
@@ -1889,7 +1876,6 @@ html {
     fill: currentColor;
 }
 
-/* Status Messages */
 .status-message {
     display: flex;
     align-items: flex-start;
@@ -2110,7 +2096,6 @@ html {
     margin-top: 2rem;
 }
 
-/* Print Styles */
 @media print {
     .navbar,
     .footer,
@@ -2164,7 +2149,6 @@ html {
     min-height: 100vh;
 }
 
-/* Profile Content Wrapper - Balanced Columns */
 .profile-content-wrapper {
     display: flex;
     align-items: stretch;
@@ -2205,7 +2189,6 @@ html {
     margin-top: 0;
 }
 
-/* Responsive: Stack columns on mobile */
 @media (max-width: 992px) {
     .profile-content-wrapper {
         flex-direction: column;
@@ -2258,7 +2241,6 @@ html {
     }
 }
 
-/* Profile Header Section */
 .profile-header-section {
     text-align: center;
     margin-bottom: 2rem;
@@ -2291,7 +2273,6 @@ html {
     font-weight: 400;
 }
 
-/* Profile Info Container */
 .profile-info-container {
     margin-bottom: 2rem;
 }
@@ -2354,14 +2335,12 @@ html {
     font-family: 'Inter', sans-serif;
 }
 
-/* Profile Action Section */
 .profile-action-section {
     margin-top: auto;
     padding-top: 1.5rem;
     border-top: 1px solid rgba(107, 127, 90, 0.1);
 }
 
-/* Reservations List */
 .reservations-list-wrapper {
     margin-top: 1rem;
     position: relative;
@@ -2374,12 +2353,10 @@ html {
     overflow-x: hidden;
     padding-right: 0.5rem;
     padding-bottom: 1rem;
-    /* Custom scrollbar styling */
     scrollbar-width: thin;
     scrollbar-color: var(--accent-muted-gold) rgba(107, 127, 90, 0.1);
 }
 
-/* Custom scrollbar for Webkit browsers (Chrome, Safari, Edge) */
 .reservations-list::-webkit-scrollbar {
     width: 8px;
 }
@@ -2399,13 +2376,12 @@ html {
     background: var(--btn-dark-beige);
 }
 
-/* Fade-out effect at the bottom - overlay gradient */
 .reservations-list-wrapper::after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
-    right: 8px; /* Account for scrollbar width */
+    right: 8px;
     height: 50px;
     background: linear-gradient(to bottom, rgba(253, 252, 249, 0) 0%, rgba(253, 252, 249, 0.7) 50%, rgba(253, 252, 249, 0.95) 100%);
     pointer-events: none;
@@ -2450,7 +2426,6 @@ html {
     margin-top: 0.25rem;
 }
 
-/* Ticket Status */
 .ticket-status {
     margin-bottom: 0.5rem;
 }
@@ -2466,28 +2441,27 @@ html {
     letter-spacing: 0.5px;
 }
 
-/* Standardized Status Badge Colors - Light Background with Dark Text */
 .status-confirmed {
-    background-color: #d1fae5; /* Light Green Background */
-    color: #059669; /* Dark Green Text */
+    background-color: #d1fae5;
+    color: #059669;
     border: none;
 }
 
 .status-completed {
-    background-color: #e0f2fe; /* Light Blue Background */
-    color: #0284c7; /* Dark Blue Text */
+    background-color: #e0f2fe;
+    color: #0284c7;
     border: none;
 }
 
 .status-pending {
-    background-color: #fef3c7; /* Light Yellow Background */
-    color: #d97706; /* Dark Amber Text */
+    background-color: #fef3c7;
+    color: #d97706;
     border: none;
 }
 
 .status-cancelled {
-    background-color: #fee2e2; /* Light Red Background */
-    color: #dc2626; /* Dark Red Text */
+    background-color: #fee2e2;
+    color: #dc2626;
     border: none;
 }
 
@@ -2500,14 +2474,11 @@ html {
     line-height: 1.6;
 }
 
-/* Modal Styles */
 .modal-content.luxury-card {
     border: none;
     border-radius: 20px;
 }
 
-/* Reservation Details Modal - Non-scrollable, wider layout */
-/* Reservation Details Modal - Fit to screen, no scrolling */
 #reservationDetailsModal .modal-dialog {
     max-width: 950px;
     max-height: 90vh;
@@ -2557,7 +2528,6 @@ html {
     flex-shrink: 0;
 }
 
-/* Reservation Modal - Content Spacing */
 #reservationDetailsModal .col-md-7 > div {
     margin-bottom: 1.5rem;
 }
@@ -2566,13 +2536,11 @@ html {
     margin-bottom: 0;
 }
 
-/* Extra spacing before Contact Details */
 #reservationDetailsModal .border-top {
     margin-top: 2rem !important;
     padding-top: 2rem !important;
 }
 
-/* Reservation Modal - Contact Details Layout */
 #reservationDetailsModal .contact-details-grid {
     display: grid;
     grid-template-columns: auto 1fr;
@@ -2592,7 +2560,6 @@ html {
     font-weight: 400;
 }
 
-/* Ensure left column content aligns with right column */
 #reservationDetailsModal .row {
     align-items: flex-start;
 }
@@ -2608,7 +2575,6 @@ html {
     align-items: stretch;
 }
 
-/* Reservation Modal - Status Box Alignment */
 #reservationDetailsModal .status-payment-box {
     display: flex;
     flex-direction: column;
@@ -2620,19 +2586,16 @@ html {
     border-radius: 12px;
 }
 
-/* Ensure right column is vertically centered */
 #reservationDetailsModal .row {
     align-items: center;
 }
 
-/* Modal Badge Styles - Pill Shape */
 #reservationDetailsModal .badge {
     border-radius: 50px !important;
     padding: 0.5rem 1.25rem !important;
     font-weight: 600;
 }
 
-/* Package Tier Badge Colors - Pill Shape */
 .package-badge {
     display: inline-block;
     padding: 0.4rem 1rem;
@@ -2657,7 +2620,6 @@ html {
     color: #2C2C2C;
 }
 
-/* Responsive adjustments for reservation modal */
 @media (max-width: 992px) {
     #reservationDetailsModal .modal-dialog {
         max-width: 95%;
@@ -2704,7 +2666,7 @@ html {
     }
     
     .reservations-list-wrapper::after {
-        right: 4px; /* Account for thinner scrollbar on mobile */
+        right: 4px;
     }
     
     .reservation-item .row {
@@ -2723,7 +2685,6 @@ html {
         margin-bottom: 1rem;
     }
     
-    /* Ensure scrollbar is visible but not intrusive on mobile */
     .reservations-list::-webkit-scrollbar {
         width: 6px;
     }
@@ -2913,7 +2874,6 @@ html {
     }
 }
 
-/* Admin Dashboard Styles */
 .admin-wrapper {
     background-color: #F9F7F2;
 }
@@ -2947,7 +2907,6 @@ html {
     border: none;
 }
 
-/* Stat Cards */
 .stat-number { 
     color: var(--text-charcoal); 
     font-family: 'Playfair Display', serif; 
@@ -2958,7 +2917,6 @@ html {
     font-weight: 500;
 }
 
-/* Tables */
 .table thead th { 
     border-bottom: 2px solid rgba(74, 93, 74, 0.1); 
     color: var(--text-charcoal); 
@@ -2976,7 +2934,6 @@ html {
     border-radius: 6px; 
 }
 
-/* Recent Activity */
 .activity-item { 
     padding: 0.75rem 1rem; 
     border-radius: 8px; 
@@ -2988,7 +2945,6 @@ html {
     margin-top: 0.75rem; 
 }
 
-/* Admin Buttons */
 .btn-admin-primary,
 .btn-success {
     background-color: var(--btn-olive);
@@ -3014,7 +2970,6 @@ html {
     box-shadow: 0 0 0 0.2rem rgba(74, 93, 74, 0.25);
 }
 
-/* Package selection */
 .package-tile {
     flex: 1;
     min-width: 140px;
@@ -3029,7 +2984,6 @@ html {
     justify-content: center;
 }
 
-/* Bronze Package */
 .package-tile[data-tier="Bronze"],
 .package-tile[data-tier="bronze"] {
     border-color: var(--tier-bronze);
@@ -3038,7 +2992,6 @@ html {
     box-shadow: 0 4px 12px rgba(184, 149, 106, 0.3);
 }
 
-/* Silver Package */
 .package-tile[data-tier="Silver"],
 .package-tile[data-tier="silver"] {
     border-color: var(--tier-silver);
@@ -3047,7 +3000,6 @@ html {
     box-shadow: 0 4px 12px rgba(212, 212, 212, 0.3);
 }
 
-/* Gold Package */
 .package-tile[data-tier="Gold"],
 .package-tile[data-tier="gold"] {
     border-color: var(--tier-gold);
@@ -3125,12 +3077,7 @@ html {
     color: #2C2C2C;
 }
 
-/* Small helpers */
 .small-muted { font-size: 0.85rem; color: rgba(26,26,26,0.6); }
-
-/* ===== Events Page Styling ===== */
-
-/* Search and Filter Section - Duplicate removed, using main definition above */
 
 .search-box {
     position: relative;
@@ -3169,7 +3116,6 @@ html {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* Event Cards Grid */
 .events-grid-section {
     background-color: var(--bg-warm-beige);
 }
@@ -3190,7 +3136,6 @@ html {
     }
 }
 
-/* Event Card Styles */
 .event-card {
     border: none;
     border-radius: 20px;

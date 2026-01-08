@@ -125,9 +125,7 @@
         </div>
     </div>
 
-    <!-- Call to Action / Hotel Partners Section -->
     <?php if (!isset($_SESSION['user_id'])): ?>
-    <!-- Logged Out: Show CTA to Create Account -->
     <div class="cta-section py-5">
         <div class="container">
             <div class="luxury-card cta-card text-center p-5">
@@ -138,7 +136,6 @@
         </div>
     </div>
     <?php else: ?>
-    <!-- Logged In: Show Hotel Partners Section -->
     <div class="hotel-partners-section py-5">
         <div class="container">
             <div class="partners-header text-center mb-5">

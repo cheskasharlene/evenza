@@ -414,21 +414,24 @@ if (!$package) {
             padding-top: 2rem;
             border-top: 1px solid rgba(74, 93, 74, 0.1);
         }
-        .btn-view-tickets {
-            background: linear-gradient(135deg, #4A5D4A 0%, #6B8E6B 100%);
+        .btn-view-reservations {
+            background: linear-gradient(135deg, #4A5D4E 0%, #5A6B4F 100%);
             border: none;
             color: #FFFFFF;
             padding: 1rem 2.5rem;
             font-family: 'Inter', sans-serif;
             font-weight: 600;
             font-size: 1rem;
-            border-radius: 10px;
+            border-radius: 50px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(74, 93, 74, 0.2);
+            box-shadow: 0 4px 15px rgba(74, 93, 78, 0.2);
+            text-decoration: none;
+            display: inline-block;
         }
-        .btn-view-tickets:hover {
+        .btn-view-reservations:hover {
+            background: linear-gradient(135deg, #6B5D4A 0%, #8B7B5F 100%);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(74, 93, 74, 0.3);
+            box-shadow: 0 6px 20px rgba(107, 93, 74, 0.3);
             color: #FFFFFF;
         }
         @media (max-width: 768px) {
@@ -546,13 +549,6 @@ if (!$package) {
                                 </div>
                                 
                                 <div class="detail-row">
-                                    <span class="detail-label">Transaction ID</span>
-                                    <span class="detail-value">
-                                        <span class="transaction-id"><?php echo htmlspecialchars($transactionId); ?></span>
-                                    </span>
-                                </div>
-                                
-                                <div class="detail-row">
                                     <span class="detail-label">Event</span>
                                     <span class="detail-value"><?php echo htmlspecialchars($event['title']); ?></span>
                                 </div>
@@ -569,8 +565,8 @@ if (!$package) {
                             </div>
 
                             <div class="confirmation-actions text-center">
-                                <a href="profile.php" class="btn btn-view-tickets">
-                                    <i class="fas fa-ticket-alt me-2"></i>View My Tickets
+                                <a href="profile.php" class="btn btn-view-reservations">
+                                    <i class="fas fa-calendar-check me-2"></i>View Reservations
                                 </a>
                             </div>
 

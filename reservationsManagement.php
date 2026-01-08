@@ -6,6 +6,7 @@ require_once 'includes/helpers.php';
 $packageFilter = isset($_GET['package']) ? $_GET['package'] : '';
 $dateFilter = isset($_GET['date']) ? $_GET['date'] : '';
 $filterDate = isset($_GET['filter_date']) ? $_GET['filter_date'] : '';
+$statusFilter = isset($_GET['status']) ? trim($_GET['status']) : '';
 
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $perPage = 5;
@@ -43,6 +44,12 @@ if (!empty($packageFilter)) {
     $types .= 's';
 }
 
+if (!empty($statusFilter) && $statusFilter !== 'all') {
+    $query .= " AND LOWER(r.status) = ?";
+    $params[] = strtolower($statusFilter);
+    $types .= 's';
+}
+
 if (!empty($dateFilter)) {
     $query .= " AND DATE(r.reservationDate) = ?";
     $params[] = $dateFilter;
@@ -67,6 +74,12 @@ $countTypes = '';
 if (!empty($packageFilter)) {
     $countQuery .= " AND p.packageName LIKE ?";
     $countParams[] = $packageFilter . '%';
+    $countTypes .= 's';
+}
+
+if (!empty($statusFilter) && $statusFilter !== 'all') {
+    $countQuery .= " AND LOWER(r.status) = ?";
+    $countParams[] = strtolower($statusFilter);
     $countTypes .= 's';
 }
 
@@ -98,10 +111,153 @@ if ($countStmt) {
 
 $totalPages = ceil($totalCount / $perPage);
 
-$query .= " ORDER BY r.reservationDate DESC, r.createdAt DESC LIMIT " . intval($perPage) . " OFFSET " . intval($offset);
+// Calculate Total Revenue from all reservations (respecting filters, ignoring pagination)
+$revenueQuery = "SELECT 
+            COALESCE(SUM(r.totalAmount), 0) as totalRevenue
+          FROM reservations r
+          INNER JOIN users u ON r.userId = u.userid
+          INNER JOIN events e ON r.eventId = e.eventId
+          INNER JOIN packages p ON r.packageId = p.packageId
+          WHERE 1=1";
+
+$revenueParams = [];
+$revenueTypes = '';
+
+if (!empty($packageFilter)) {
+    $revenueQuery .= " AND p.packageName LIKE ?";
+    $revenueParams[] = $packageFilter . '%';
+    $revenueTypes .= 's';
+}
+
+if (!empty($statusFilter) && $statusFilter !== 'all') {
+    $revenueQuery .= " AND LOWER(r.status) = ?";
+    $revenueParams[] = strtolower($statusFilter);
+    $revenueTypes .= 's';
+}
+
+if (!empty($dateFilter)) {
+    $revenueQuery .= " AND DATE(r.reservationDate) = ?";
+    $revenueParams[] = $dateFilter;
+    $revenueTypes .= 's';
+} elseif (!empty($filterDate)) {
+    $revenueQuery .= " AND DATE(r.reservationDate) = ?";
+    $revenueParams[] = $filterDate;
+    $revenueTypes .= 's';
+} else {
+    $revenueQuery .= " AND DATE(r.reservationDate) >= CURDATE()";
+}
+
+// Only include confirmed and pending reservations for revenue calculation
+$revenueQuery .= " AND LOWER(r.status) IN ('confirmed', 'completed', 'pending')";
+
+$totalRevenue = 0;
+if (!empty($revenueParams)) {
+    $revenueStmt = mysqli_prepare($conn, $revenueQuery);
+    if ($revenueStmt) {
+        mysqli_stmt_bind_param($revenueStmt, $revenueTypes, ...$revenueParams);
+        if (mysqli_stmt_execute($revenueStmt)) {
+            $revenueResult = mysqli_stmt_get_result($revenueStmt);
+            if ($revenueRow = mysqli_fetch_assoc($revenueResult)) {
+                $totalRevenue = floatval($revenueRow['totalRevenue']);
+            }
+            mysqli_free_result($revenueResult);
+        }
+        mysqli_stmt_close($revenueStmt);
+    }
+} else {
+    $revenueResult = mysqli_query($conn, $revenueQuery);
+    if ($revenueResult) {
+        if ($revenueRow = mysqli_fetch_assoc($revenueResult)) {
+            $totalRevenue = floatval($revenueRow['totalRevenue']);
+        }
+        mysqli_free_result($revenueResult);
+    }
+}
+
+// Calculate Revenue by Package Tier from all reservations (respecting filters, ignoring pagination)
+$packageRevenueQuery = "SELECT 
+            CASE 
+                WHEN p.packageName LIKE 'Bronze%' THEN 'Bronze'
+                WHEN p.packageName LIKE 'Silver%' THEN 'Silver'
+                WHEN p.packageName LIKE 'Gold%' THEN 'Gold'
+                ELSE 'Unknown'
+            END as packageTier,
+            COALESCE(SUM(r.totalAmount), 0) as revenue
+          FROM reservations r
+          INNER JOIN users u ON r.userId = u.userid
+          INNER JOIN events e ON r.eventId = e.eventId
+          INNER JOIN packages p ON r.packageId = p.packageId
+          WHERE 1=1";
+
+$packageRevenueParams = [];
+$packageRevenueTypes = '';
+
+if (!empty($packageFilter)) {
+    $packageRevenueQuery .= " AND p.packageName LIKE ?";
+    $packageRevenueParams[] = $packageFilter . '%';
+    $packageRevenueTypes .= 's';
+}
+
+if (!empty($statusFilter) && $statusFilter !== 'all') {
+    $packageRevenueQuery .= " AND LOWER(r.status) = ?";
+    $packageRevenueParams[] = strtolower($statusFilter);
+    $packageRevenueTypes .= 's';
+}
+
+if (!empty($dateFilter)) {
+    $packageRevenueQuery .= " AND DATE(r.reservationDate) = ?";
+    $packageRevenueParams[] = $dateFilter;
+    $packageRevenueTypes .= 's';
+} elseif (!empty($filterDate)) {
+    $packageRevenueQuery .= " AND DATE(r.reservationDate) = ?";
+    $packageRevenueParams[] = $filterDate;
+    $packageRevenueTypes .= 's';
+} else {
+    $packageRevenueQuery .= " AND DATE(r.reservationDate) >= CURDATE()";
+}
+
+// Only include confirmed and pending reservations for revenue calculation
+$packageRevenueQuery .= " AND LOWER(r.status) IN ('confirmed', 'completed', 'pending')";
+$packageRevenueQuery .= " GROUP BY packageTier";
+
+$revenueByPackage = [
+    'Bronze' => 0,
+    'Silver' => 0,
+    'Gold' => 0
+];
+
+if (!empty($packageRevenueParams)) {
+    $packageRevenueStmt = mysqli_prepare($conn, $packageRevenueQuery);
+    if ($packageRevenueStmt) {
+        mysqli_stmt_bind_param($packageRevenueStmt, $packageRevenueTypes, ...$packageRevenueParams);
+        if (mysqli_stmt_execute($packageRevenueStmt)) {
+            $packageRevenueResult = mysqli_stmt_get_result($packageRevenueStmt);
+            while ($packageRevenueRow = mysqli_fetch_assoc($packageRevenueResult)) {
+                $tier = $packageRevenueRow['packageTier'];
+                if (isset($revenueByPackage[$tier])) {
+                    $revenueByPackage[$tier] = floatval($packageRevenueRow['revenue']);
+                }
+            }
+            mysqli_free_result($packageRevenueResult);
+        }
+        mysqli_stmt_close($packageRevenueStmt);
+    }
+} else {
+    $packageRevenueResult = mysqli_query($conn, $packageRevenueQuery);
+    if ($packageRevenueResult) {
+        while ($packageRevenueRow = mysqli_fetch_assoc($packageRevenueResult)) {
+            $tier = $packageRevenueRow['packageTier'];
+            if (isset($revenueByPackage[$tier])) {
+                $revenueByPackage[$tier] = floatval($packageRevenueRow['revenue']);
+            }
+        }
+        mysqli_free_result($packageRevenueResult);
+    }
+}
+
+$query .= " ORDER BY r.reservationDate ASC, r.createdAt ASC LIMIT " . intval($perPage) . " OFFSET " . intval($offset);
 
 $reservations = [];
-$totalRevenue = 0;
 
 // Execute query with pagination
 if (!empty($params)) {
@@ -119,7 +275,6 @@ if (!empty($params)) {
                 $row['packageTier'] = $packageTier;
                 
                 $reservations[] = $row;
-                $totalRevenue += floatval($row['totalAmount']);
             }
             
             mysqli_free_result($result);
@@ -140,8 +295,7 @@ if (!empty($params)) {
             }
             $row['packageTier'] = $packageTier;
             
-            $reservations[] = $row;
-            $totalRevenue += floatval($row['totalAmount']);
+                $reservations[] = $row;
         }
         mysqli_free_result($result);
     } else {
@@ -166,19 +320,6 @@ foreach ($reservations as $reservation) {
 uksort($groupedReservations, function($a, $b) {
     return strtotime($a) - strtotime($b);
 });
-
-$revenueByPackage = [
-    'Bronze' => 0,
-    'Silver' => 0,
-    'Gold' => 0
-];
-
-foreach ($reservations as $reservation) {
-    $tier = $reservation['packageTier'];
-    if (isset($revenueByPackage[$tier])) {
-        $revenueByPackage[$tier] += floatval($reservation['totalAmount']);
-    }
-}
 ?>
 <!doctype html>
 <html lang="en">
@@ -220,13 +361,8 @@ foreach ($reservations as $reservation) {
         .admin-card {
             background-color: #FFFFFF;
             border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(74, 93, 74, 0.05);
-            transition: all 0.3s ease;
-        }
-        .admin-card:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
-            transform: translateY(-2px);
         }
         .btn-admin-primary {
             background-color: #5A6B4F;
@@ -277,9 +413,8 @@ foreach ($reservations as $reservation) {
         }
         .status-toggle-btn {
             padding: 0.5rem 1rem;
-            border: none;
-            background-color: #FFFFFF;
-            color: #4A5D4A;
+            border: 1px solid;
+            background-color: transparent;
             border-radius: 50px;
             font-size: 0.85rem;
             font-weight: 600;
@@ -290,68 +425,52 @@ foreach ($reservations as $reservation) {
             align-items: center;
             gap: 0.5rem;
         }
-        .status-toggle-btn:hover {
-            background-color: #8B7A6B;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        .status-toggle-btn:hover:not(.active) {
+            opacity: 0.8;
         }
         .status-toggle-btn.active {
-            border: 2px solid currentColor;
-            box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+            color: #FFFFFF !important;
             font-weight: 700;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
+        .status-toggle-btn.active i {
+            color: #FFFFFF !important;
+        }
+        /* Pending - Amber/Orange */
         .status-pending {
-            background-color: rgba(217, 119, 6, 0.15);
-            color: #d97706;
-            border: 1px solid #d97706;
+            color: rgba(217, 119, 6, 0.6);
+            border-color: rgba(217, 119, 6, 0.4);
         }
         .status-pending.active {
-            background-color: rgba(217, 119, 6, 0.15);
-            color: #d97706;
-            border-color: #d97706;
+            background-color: #f59e0b;
+            border-color: #f59e0b;
         }
-        .status-pending:hover {
-            background-color: rgba(217, 119, 6, 0.25);
-        }
+        /* Confirmed - EVENZA Green */
         .status-confirmed {
-            background-color: rgba(5, 150, 105, 0.15);
-            color: #059669;
-            border: 1px solid #059669;
+            color: rgba(74, 93, 78, 0.6);
+            border-color: rgba(74, 93, 78, 0.4);
         }
         .status-confirmed.active {
-            background-color: rgba(5, 150, 105, 0.15);
-            color: #059669;
-            border-color: #059669;
+            background-color: #4A5D4E;
+            border-color: #4A5D4E;
         }
-        .status-confirmed:hover {
-            background-color: rgba(5, 150, 105, 0.25);
-        }
+        /* Cancelled - Soft Red */
         .status-cancelled {
-            background-color: rgba(220, 38, 38, 0.15);
-            color: #dc2626;
-            border: 1px solid #dc2626;
+            color: rgba(220, 38, 38, 0.6);
+            border-color: rgba(220, 38, 38, 0.4);
         }
         .status-cancelled.active {
-            background-color: rgba(220, 38, 38, 0.15);
-            color: #dc2626;
-            border-color: #dc2626;
+            background-color: #ef4444;
+            border-color: #ef4444;
         }
-        .status-cancelled:hover {
-            background-color: rgba(220, 38, 38, 0.25);
-        }
+        /* Completed - Light Blue */
         .status-completed {
-            background-color: rgba(2, 132, 199, 0.15);
-            color: #0284c7;
-            border: 1px solid #0284c7;
+            color: rgba(59, 130, 246, 0.6);
+            border-color: rgba(59, 130, 246, 0.4);
         }
         .status-completed.active {
-            background-color: rgba(2, 132, 199, 0.15);
-            color: #0284c7;
-            border-color: #0284c7;
-        }
-        .status-completed:hover {
-            background-color: rgba(2, 132, 199, 0.25);
+            background-color: #3b82f6;
+            border-color: #3b82f6;
         }
         .date-group-header {
             cursor: pointer;
@@ -596,24 +715,34 @@ foreach ($reservations as $reservation) {
                 <div class="admin-card p-4 mb-4">
                     <h5 class="mb-4" style="font-family: 'Playfair Display', serif;">Filter Reservations</h5>
                     <form method="GET" action="reservationsManagement.php" class="row g-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label for="packageFilter" class="form-label fw-semibold">Package Tier</label>
-                            <select class="form-select" id="packageFilter" name="package">
+                            <select class="form-select" id="packageFilter" name="package" style="border-radius: 50px; padding: 0.6rem 1.25rem;">
                                 <option value="">All Packages</option>
                                 <option value="Bronze" <?php echo $packageFilter === 'Bronze' ? 'selected' : ''; ?>>Bronze</option>
                                 <option value="Silver" <?php echo $packageFilter === 'Silver' ? 'selected' : ''; ?>>Silver</option>
                                 <option value="Gold" <?php echo $packageFilter === 'Gold' ? 'selected' : ''; ?>>Gold</option>
                             </select>
                         </div>
-                        <div class="col-md-4">
-                            <label for="dateFilter" class="form-label fw-semibold">Filter by Date</label>
-                            <input type="date" class="form-control" id="dateFilter" name="date" value="<?php echo htmlspecialchars($dateFilter); ?>">
+                        <div class="col-md-3">
+                            <label for="statusFilter" class="form-label fw-semibold">Filter by Status</label>
+                            <select class="form-select" id="statusFilter" name="status" style="border-radius: 50px; padding: 0.6rem 1.25rem;">
+                                <option value="all" <?php echo empty($statusFilter) || $statusFilter === 'all' ? 'selected' : ''; ?>>All Statuses</option>
+                                <option value="pending" <?php echo $statusFilter === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                <option value="confirmed" <?php echo $statusFilter === 'confirmed' ? 'selected' : ''; ?>>Confirmed</option>
+                                <option value="cancelled" <?php echo $statusFilter === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+                                <option value="completed" <?php echo $statusFilter === 'completed' ? 'selected' : ''; ?>>Completed</option>
+                            </select>
                         </div>
-                        <div class="col-md-4 d-flex align-items-end">
+                        <div class="col-md-3">
+                            <label for="dateFilter" class="form-label fw-semibold">Filter by Date</label>
+                            <input type="date" class="form-control" id="dateFilter" name="date" value="<?php echo htmlspecialchars($dateFilter); ?>" style="border-radius: 50px; padding: 0.6rem 1.25rem;">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
                             <button type="submit" class="btn btn-admin-primary me-2">
                                 <i class="fas fa-filter"></i> Apply Filters
                             </button>
-                            <?php if (!empty($packageFilter) || !empty($dateFilter)): ?>
+                            <?php if (!empty($packageFilter) || !empty($dateFilter) || (!empty($statusFilter) && $statusFilter !== 'all')): ?>
                             <a href="reservationsManagement.php" class="btn btn-outline-secondary">
                                 <i class="fas fa-times"></i> Clear
                             </a>

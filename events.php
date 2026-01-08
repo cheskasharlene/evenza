@@ -196,7 +196,6 @@ function getCategoryFilter($category) {
 
     <div class="events-grid-section" style="padding-top: 5px; padding-bottom: 3rem;">
         <div class="container">
-            <!-- No Results Found Message -->
             <div id="noResultsMessage" class="no-results-container" style="display: none;">
                 <div class="no-results-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -315,9 +314,7 @@ function getCategoryFilter($category) {
                     }
                 });
 
-                // Show/hide no results message
                 if (visibleCount === 0 && eventCards.length > 0) {
-                    // Build subtitle message with color-coded tier names
                     let subtitleHTML = "We couldn't find any events. Try adjusting your search or explore our ";
                     subtitleHTML += '<span class="tier-bronze">Bronze</span>, ';
                     subtitleHTML += '<span class="tier-silver">Silver</span>, and ';
@@ -325,22 +322,18 @@ function getCategoryFilter($category) {
                     
                     noResultsSubtitle.innerHTML = subtitleHTML;
                     
-                    // Hide grid, show message
                     eventsGrid.style.display = 'none';
                     noResultsMessage.style.display = 'flex';
-                    // Trigger fade-in animation
                     setTimeout(() => {
                         noResultsMessage.style.opacity = '1';
                     }, 10);
                 } else {
-                    // Show grid, hide message
                     eventsGrid.style.display = '';
                     noResultsMessage.style.display = 'none';
                     noResultsMessage.style.opacity = '0';
                 }
             }
             
-            // Clear filters button functionality
             const clearFiltersBtn = document.getElementById('clearFiltersBtn');
             if (clearFiltersBtn) {
                 clearFiltersBtn.addEventListener('click', function() {

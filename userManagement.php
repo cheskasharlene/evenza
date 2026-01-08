@@ -100,6 +100,7 @@ if (!empty($params)) {
         .admin-content {
             margin-left: 240px;
             width: calc(100% - 240px);
+            overflow-x: hidden;
         }
         .admin-top-nav {
             background-color: #FFFFFF;
@@ -110,13 +111,8 @@ if (!empty($params)) {
         .admin-card {
             background-color: #FFFFFF;
             border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(74, 93, 74, 0.05);
-            transition: all 0.3s ease;
-        }
-        .admin-card:hover {
-            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.12);
-            transform: translateY(-2px);
         }
         .btn-admin-primary {
             background-color: #5A6B4F;
@@ -157,13 +153,11 @@ if (!empty($params)) {
             vertical-align: middle;
             padding: 1.25rem 1rem;
             border-bottom: 1px solid rgba(74, 93, 74, 0.08);
+            white-space: normal;
+            word-wrap: break-word;
         }
         .table tbody tr {
-            transition: all 0.2s ease;
-        }
-        .table tbody tr:hover {
-            background-color: rgba(74, 93, 74, 0.03);
-            transform: scale(1.01);
+            background-color: transparent;
         }
         .user-avatar {
             width: 45px;
@@ -301,6 +295,8 @@ if (!empty($params)) {
             }
             .table-responsive {
                 font-size: 0.875rem;
+                overflow-x: visible;
+                width: 100%;
             }
             .table th,
             .table td {
@@ -401,7 +397,7 @@ if (!empty($params)) {
                 </div>
             </div>
 
-            <div class="p-4" style="padding: 2rem !important;">
+            <div class="p-4" style="padding: 2rem !important; width: 100%; overflow-x: hidden; box-sizing: border-box;">
                 <!-- Controls Section -->
                 <!-- Search & Filter Bar -->
                 <div class="admin-card p-4 mb-4">
@@ -432,8 +428,8 @@ if (!empty($params)) {
 
                 <!-- Users Table -->
                 <div class="admin-card p-4">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle">
+                    <div class="table-responsive" style="overflow-x: visible; width: 100%;">
+                        <table class="table align-middle" style="width: 100%; table-layout: auto;">
                             <thead>
                                 <tr>
                                     <th>User</th>
