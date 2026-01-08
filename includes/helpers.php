@@ -134,6 +134,54 @@ function generateUniqueReservationCode($conn) {
 }
 
 /**
+ * Logs an email to the database for record-keeping
+ * @param mysqli $conn - Database connection
+ * @param string $recipientEmail - Recipient email address
+ * @param string $recipientName - Recipient name
+ * @param string $subject - Email subject
+ * @param string $emailType - Type of email (e.g., 'reservation_confirmation')
+ * @param int|null $relatedId - Related record ID (e.g., reservationId)
+ * @param string|null $emailBodyHtml - HTML content of email
+ * @param string|null $emailBodyText - Plain text content of email
+ * @param string $status - Status: 'sent' or 'failed'
+ * @param string|null $errorMessage - Error message if failed
+ * @return bool - True if logged successfully, false otherwise
+ */
+function logEmailToDatabase($conn, $recipientEmail, $recipientName, $subject, $emailType, $relatedId = null, $emailBodyHtml = null, $emailBodyText = null, $status = 'sent', $errorMessage = null) {
+    $query = "INSERT INTO email_logs 
+              (recipient_email, recipient_name, subject, email_type, related_id, email_body_html, email_body_text, status, error_message, sent_at) 
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    
+    $stmt = mysqli_prepare($conn, $query);
+    if (!$stmt) {
+        error_log("Email Log Error: Failed to prepare query - " . mysqli_error($conn));
+        return false;
+    }
+    
+    mysqli_stmt_bind_param($stmt, "ssssissss", 
+        $recipientEmail, 
+        $recipientName, 
+        $subject, 
+        $emailType, 
+        $relatedId, 
+        $emailBodyHtml, 
+        $emailBodyText, 
+        $status, 
+        $errorMessage
+    );
+    
+    $result = mysqli_stmt_execute($stmt);
+    if (!$result) {
+        error_log("Email Log Error: Failed to execute query - " . mysqli_error($conn));
+        mysqli_stmt_close($stmt);
+        return false;
+    }
+    
+    mysqli_stmt_close($stmt);
+    return true;
+}
+
+/**
  * @param mysqli $conn - Database connection
  * @param int $reservationId - Reservation ID
  * @return bool - True if email sent successfully, false otherwise
@@ -208,14 +256,49 @@ function sendReservationConfirmationEmail($conn, $reservationId) {
         }
         
         $mail->Body = buildReservationEmailHTML($reservation, $reservationDate, $timeRange);
+        $emailBodyHtml = $mail->Body;
         
         $mail->AltBody = buildReservationEmailText($reservation, $reservationDate, $timeRange);
+        $emailBodyText = $mail->AltBody;
         
         $mail->send();
+        
+        // Log successful email to database
+        logEmailToDatabase(
+            $conn,
+            $reservation['customerEmail'],
+            $reservation['customerName'],
+            $mail->Subject,
+            'reservation_confirmation',
+            $reservationId,
+            $emailBodyHtml,
+            $emailBodyText,
+            'sent',
+            null
+        );
+        
         return true;
         
     } catch (\PHPMailer\PHPMailer\Exception $e) {
-        error_log("Email Error: {$mail->ErrorInfo}");
+        $errorMessage = $mail->ErrorInfo;
+        error_log("Email Error: {$errorMessage}");
+        
+        // Log failed email to database
+        if (isset($reservation) && !empty($reservation['customerEmail'])) {
+            logEmailToDatabase(
+                $conn,
+                $reservation['customerEmail'],
+                $reservation['customerName'] ?? null,
+                $mail->Subject ?? 'Reservation Confirmed - ' . ($reservation['eventName'] ?? 'Unknown Event'),
+                'reservation_confirmation',
+                $reservationId,
+                $emailBodyHtml ?? null,
+                $emailBodyText ?? null,
+                'failed',
+                $errorMessage
+            );
+        }
+        
         return false;
     }
 }

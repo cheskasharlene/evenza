@@ -162,19 +162,23 @@ function getCategoryFilter($category) {
     </div>
 
     <div class="page-header py-5 mt-5">
-        <div class="container">
+        <div class="container" style="padding-top: 40px;">
             <div class="row">
                 <div class="col-12">
                     <h1 class="page-title mb-4">Available Events</h1>
 
                     <div class="search-filter-section">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-md-8">
+                        <div class="row g-3 align-items-end search-filter-row">
+                            <div class="col-md-8 search-input-col">
                                 <div class="search-box">
+                                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <path d="m21 21-4.35-4.35"></path>
+                                    </svg>
                                     <input type="text" class="form-control luxury-input" id="searchInput" placeholder="Search by event name or venue...">
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4 category-select-col">
                                 <select class="form-select luxury-input" id="categoryFilter">
                                     <option value="all">All Categories</option>
                                     <option value="business">Business</option>
@@ -190,8 +194,23 @@ function getCategoryFilter($category) {
         </div>
     </div>
 
-    <div class="events-grid-section py-5">
+    <div class="events-grid-section" style="padding-top: 5px; padding-bottom: 3rem;">
         <div class="container">
+            <!-- No Results Found Message -->
+            <div id="noResultsMessage" class="no-results-container" style="display: none;">
+                <div class="no-results-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                        <line x1="9" y1="9" x2="13" y2="13"></line>
+                        <line x1="13" y1="9" x2="9" y2="13"></line>
+                    </svg>
+                </div>
+                <h2 class="no-results-title">No Events Found</h2>
+                <p class="no-results-subtitle" id="noResultsSubtitle">We couldn't find any events matching your search. Please try a different keyword or browse all categories.</p>
+                <button class="btn btn-clear-filters" id="clearFiltersBtn">Clear All Filters</button>
+            </div>
+            
             <div class="row g-4" id="eventsGrid">
                 <?php if (!empty($errorMessage)): ?>
                     <div class="col-12">
@@ -243,33 +262,23 @@ function getCategoryFilter($category) {
 
     <div class="luxury-footer py-5">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="footer-logo mb-3">EVENZA</h5>
-                    <p class="footer-text">Premium event reservation and ticketing platform. Experience elegance, reserve with confidence.</p>
+            <div>
+                <div>
+                    <h5 class="footer-logo">EVENZA</h5>
+                    <p class="footer-text">EVENZA is a premier event reservation platform dedicated to seamless experiences. Elevate your occasions with our curated venues and sophisticated planning tools.</p>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="footer-heading mb-3">Contact Info</h6>
+                <div>
+                    <h6 class="footer-heading">Contact Info</h6>
                     <p class="footer-text">
-                        Email: info@evenza.com<br>
-                        Phone: +63-9123-456-7890<br>
-                        Address: 123 Luxury Avenue, Suite 100<br>
-                        City, State 12345
-                    </p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="footer-heading mb-3">Hotel Partner</h6>
-                    <p class="footer-text">
-                        <strong>TravelMates Hotel</strong><br>
-                        Your trusted partner for premium event hosting
+                        Email: <a href="mailto:evenzacompany@gmail.com">evenzacompany@gmail.com</a><br>
+                        Phone: 09916752007<br>
+                        Address: Ambulong, Tanauan City, Batangas.
                     </p>
                 </div>
             </div>
             <hr class="footer-divider">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="footer-copyright">&copy; <?php echo date('Y'); ?> EVENZA. All rights reserved.</p>
-                </div>
+            <div class="text-center">
+                <p class="footer-copyright">&copy; 2026 EVENZA</p>
             </div>
         </div>
     </div>
@@ -286,6 +295,10 @@ function getCategoryFilter($category) {
             function filterEvents() {
                 const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
                 const selectedCategory = categoryFilter ? categoryFilter.value : 'all';
+                const noResultsMessage = document.getElementById('noResultsMessage');
+                const eventsGrid = document.getElementById('eventsGrid');
+                const noResultsSubtitle = document.getElementById('noResultsSubtitle');
+                let visibleCount = 0;
 
                 eventCards.forEach(card => {
                     const cardCategory = card.getAttribute('data-category');
@@ -296,9 +309,48 @@ function getCategoryFilter($category) {
 
                     if (matchesSearch && matchesCategory) {
                         card.style.display = '';
+                        visibleCount++;
                     } else {
                         card.style.display = 'none';
                     }
+                });
+
+                // Show/hide no results message
+                if (visibleCount === 0 && eventCards.length > 0) {
+                    // Build subtitle message with color-coded tier names
+                    let subtitleHTML = "We couldn't find any events. Try adjusting your search or explore our ";
+                    subtitleHTML += '<span class="tier-bronze">Bronze</span>, ';
+                    subtitleHTML += '<span class="tier-silver">Silver</span>, and ';
+                    subtitleHTML += '<span class="tier-gold">Gold</span> curated tiers.';
+                    
+                    noResultsSubtitle.innerHTML = subtitleHTML;
+                    
+                    // Hide grid, show message
+                    eventsGrid.style.display = 'none';
+                    noResultsMessage.style.display = 'flex';
+                    // Trigger fade-in animation
+                    setTimeout(() => {
+                        noResultsMessage.style.opacity = '1';
+                    }, 10);
+                } else {
+                    // Show grid, hide message
+                    eventsGrid.style.display = '';
+                    noResultsMessage.style.display = 'none';
+                    noResultsMessage.style.opacity = '0';
+                }
+            }
+            
+            // Clear filters button functionality
+            const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', function() {
+                    if (searchInput) {
+                        searchInput.value = '';
+                    }
+                    if (categoryFilter) {
+                        categoryFilter.value = 'all';
+                    }
+                    filterEvents();
                 });
             }
 

@@ -90,8 +90,8 @@
         if (!chatBox) return;
 
         const userMessage = document.createElement('div');
-        userMessage.className = 'user-message mb-2';
-        userMessage.innerHTML = '<p class="mb-0"><strong>You:</strong> ' + escapeHtml(message) + '</p>';
+        userMessage.className = 'user-message';
+        userMessage.innerHTML = '<p><strong>You:</strong> ' + escapeHtml(message) + '</p>';
         chatBox.appendChild(userMessage);
         chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -104,9 +104,9 @@
         aiMessage.className = 'ai-message';
         if (isLoading) {
             aiMessage.id = 'aiLoadingIndicator';
-            aiMessage.innerHTML = '<p class="mb-0"><em>AI is thinking...</em></p>';
+            aiMessage.innerHTML = '<p><em>AI is thinking</em></p>';
         } else {
-            aiMessage.innerHTML = '<p class="mb-0"><strong>AI:</strong> ' + escapeHtml(message) + '</p>';
+            aiMessage.innerHTML = '<p><strong>AI:</strong> ' + escapeHtml(message) + '</p>';
         }
         chatBox.appendChild(aiMessage);
         chatBox.scrollTop = chatBox.scrollHeight;

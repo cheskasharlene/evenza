@@ -233,8 +233,7 @@ if (!$event) {
         .package-card {
             flex: 1;
             min-width: 200px;
-            background-color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(74, 93, 74, 0.15);
+            border: 2px solid;
             border-radius: 20px;
             padding: 1.25rem;
             display: flex;
@@ -242,9 +241,37 @@ if (!$event) {
             transition: all 0.3s ease;
             cursor: pointer;
         }
-        .package-card:hover {
-            background-color: #FFFFFF;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        .package-card[data-package-tier="bronze"] {
+            background: linear-gradient(135deg, #B8956A 0%, #9A7A52 100%);
+            border-color: #B8956A;
+            color: white;
+            box-shadow: 0 4px 12px rgba(184, 149, 106, 0.3);
+        }
+        .package-card[data-package-tier="silver"] {
+            background: linear-gradient(135deg, #E8E8E8 0%, #C8C8C8 100%);
+            border-color: #D4D4D4;
+            color: #2C2C2C;
+            box-shadow: 0 4px 12px rgba(212, 212, 212, 0.3);
+        }
+        .package-card[data-package-tier="gold"] {
+            background: linear-gradient(135deg, #F4D03F 0%, #D4AF37 100%);
+            border-color: #D4AF37;
+            color: #2C2C2C;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+        .package-card[data-package-tier="bronze"]:hover {
+            background: linear-gradient(135deg, #C4A575 0%, #A8855F 100%);
+            box-shadow: 0 6px 20px rgba(184, 149, 106, 0.4);
+            transform: translateY(-2px);
+        }
+        .package-card[data-package-tier="silver"]:hover {
+            background: linear-gradient(135deg, #F0F0F0 0%, #D8D8D8 100%);
+            box-shadow: 0 6px 20px rgba(212, 212, 212, 0.4);
+            transform: translateY(-2px);
+        }
+        .package-card[data-package-tier="gold"]:hover {
+            background: linear-gradient(135deg, #F8DC5F 0%, #E4C247 100%);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
             transform: translateY(-2px);
         }
         .package-header {
@@ -256,13 +283,21 @@ if (!$event) {
             font-family: 'Playfair Display', serif;
             font-size: 1.1rem;
             font-weight: 600;
-            color: #1A1A1A;
             margin: 0;
+        }
+        .package-card[data-package-tier="bronze"] .package-name,
+        .package-card[data-package-tier="bronze"] .package-price {
+            color: white;
+        }
+        .package-card[data-package-tier="silver"] .package-name,
+        .package-card[data-package-tier="silver"] .package-price,
+        .package-card[data-package-tier="gold"] .package-name,
+        .package-card[data-package-tier="gold"] .package-price {
+            color: #2C2C2C;
         }
         .package-price {
             font-size: 1.3rem;
             font-weight: 700;
-            color: #4A5D4A;
             font-family: 'Playfair Display', serif;
         }
         .package-modal-overlay {
@@ -510,6 +545,7 @@ if (!$event) {
                                          data-package-id="<?php echo $package['id']; ?>"
                                          data-package-name="<?php echo htmlspecialchars($package['name']); ?>"
                                          data-package-price="<?php echo $package['price']; ?>"
+                                         data-package-tier="<?php echo htmlspecialchars(strtolower($package['tier'])); ?>"
                                          data-package-features='<?php echo json_encode($features); ?>'>
                                         <div class="package-header">
                                             <h6 class="package-name"><?php echo htmlspecialchars($package['name']); ?></h6>
@@ -530,22 +566,23 @@ if (!$event) {
                 </div>
 
                 <div class="event-sidebar">
-                    <div class="luxury-card p-4 mb-4">
+                    <div class="luxury-card ai-assistant-container p-4 mb-4">
                         <div class="ai-assistant-header mb-3">
                             <div class="ai-icon">
+                                <span class="ai-logo">E</span>
                             </div>
                             <h5 class="mb-0">AI Assistant</h5>
                         </div>
-                        <p class="text-muted mb-3">Need help? Ask me anything about this event!</p>
+                        <p class="text-muted mb-4" style="font-size: 0.9rem; line-height: 1.5;">Need help? Ask me anything about this event!</p>
                         <div class="ai-chat-box mb-3">
                             <div class="ai-message">
                                 <p class="mb-0">Hello! I'm here to help you with any questions about this event. What would you like to know?</p>
                             </div>
                         </div>
-                        <div class="input-group">
-                            <input type="text" class="form-control luxury-input" id="aiQuestion" placeholder="Ask a question...">
-                            <button class="btn btn-primary-luxury" type="button" id="aiSendButton" onclick="askAI()">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <div class="ai-input-container">
+                            <input type="text" class="ai-input-field" id="aiQuestion" placeholder="Ask a question...">
+                            <button class="ai-send-button" type="button" id="aiSendButton" onclick="askAI()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="white" viewBox="0 0 16 16">
                                     <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576 6.636 10.07Zm-1.138-1.138L13.229 1.5 4.577 8.932l.921.001Z"/>
                                 </svg>
                             </button>
@@ -627,33 +664,23 @@ if (!$event) {
 
     <div class="luxury-footer py-5">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="footer-logo mb-3">EVENZA</h5>
-                    <p class="footer-text">Premium event reservation and ticketing platform. Experience elegance, reserve with confidence.</p>
+            <div>
+                <div>
+                    <h5 class="footer-logo">EVENZA</h5>
+                    <p class="footer-text">EVENZA is a premier event reservation platform dedicated to seamless experiences. Elevate your occasions with our curated venues and sophisticated planning tools.</p>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="footer-heading mb-3">Contact Info</h6>
+                <div>
+                    <h6 class="footer-heading">Contact Info</h6>
                     <p class="footer-text">
-                        Email: info@evenza.com<br>
-                        Phone: +1 (555) 123-4567<br>
-                        Address: 123 Luxury Avenue, Suite 100<br>
-                        City, State 12345
-                    </p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="footer-heading mb-3">Hotel Partner</h6>
-                    <p class="footer-text">
-                        <strong>TravelMates Hotel</strong><br>
-                        Your trusted partner for premium event hosting
+                        Email: <a href="mailto:evenzacompany@gmail.com">evenzacompany@gmail.com</a><br>
+                        Phone: 09916752007<br>
+                        Address: Ambulong, Tanauan City, Batangas.
                     </p>
                 </div>
             </div>
             <hr class="footer-divider">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="footer-copyright">&copy; <?php echo date('Y'); ?> EVENZA. All rights reserved.</p>
-                </div>
+            <div class="text-center">
+                <p class="footer-copyright">&copy; 2026 EVENZA</p>
             </div>
         </div>
     </div>

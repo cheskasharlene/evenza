@@ -731,7 +731,14 @@ foreach ($reservations as $reservation) {
                                         <?php echo htmlspecialchars($reservation['eventVenue'] ?? 'N/A'); ?>
                                     </div>
                                     <div class="mb-2">
-                                        <span class="badge bg-light text-dark">
+                                        <?php 
+                                        $tier = strtolower($reservation['packageTier'] ?? '');
+                                        $badgeClass = 'package-badge';
+                                        if (in_array($tier, ['bronze', 'silver', 'gold'])) {
+                                            $badgeClass .= ' ' . $tier;
+                                        }
+                                        ?>
+                                        <span class="<?php echo $badgeClass; ?>">
                                             <i class="fas fa-box me-1"></i>
                                             <?php echo htmlspecialchars($reservation['packageName'] ?? ($reservation['packageTier'] ?? 'N/A') . ' Package'); ?>
                                         </span>

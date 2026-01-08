@@ -54,12 +54,7 @@
     </div>
 
     <div class="about-page-section py-5 mt-5">
-        <div class="container">
-            <div class="page-header text-center mb-5">
-                <h1 class="page-title">About EVENZA</h1>
-                <p class="page-subtitle">Your trusted partner for premium event reservations</p>
-            </div>
-
+        <div class="container" style="padding-top: 2rem;">
             <div class="luxury-card p-5 mb-5">
                 <div class="what-is-evenza-content">
                     <h2 class="section-title text-center mb-5">What is EVENZA</h2>
@@ -82,8 +77,8 @@
                             <div class="step-icon mb-4">
 
                             </div>
-                            <h4 class="step-title mb-3">Browse & Select</h4>
-                            <p class="step-description">Explore our curated collection of premium events. Filter by category, date, or venue to find the perfect experience that matches your preferences.</p>
+                            <h4 class="step-title mb-3">Curate Your Experience</h4>
+                            <p class="step-description">Explore our handpicked collection of premium events. Refine your search by category, date, or venue to find an experience perfectly tailored to your lifestyle.</p>
                         </div>
                     </div>
 
@@ -93,8 +88,8 @@
                             <div class="step-icon mb-4">
 
                             </div>
-                            <h4 class="step-title mb-3">Reserve & Pay</h4>
-                            <p class="step-description">Complete your reservation with ease. Enter your details, select ticket quantity, and securely process payment through our integrated PayPal system.</p>
+                            <h4 class="step-title mb-3">Secure Your Placement</h4>
+                            <p class="step-description">Complete your reservation with ease through our secure, integrated payment gateway. Select your preferred tier and confirm your attendance in just a few clicks.</p>
                         </div>
                     </div>
 
@@ -104,66 +99,8 @@
                             <div class="step-icon mb-4">
 
                             </div>
-                            <h4 class="step-title mb-3">Receive Confirmation</h4>
-                            <p class="step-description">Get instant confirmation with your unique ticket ID and QR code. You'll receive email and SMS notifications with all event details and important information.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="benefits-section">
-                <div class="row g-4">
-                    <div class="col-lg-6">
-                        <div class="luxury-card p-5 h-100">
-                            <div class="benefits-header mb-4">
-                                <div class="benefits-icon mb-3">
-                                </div>
-                                <h3 class="benefits-title">Benefits for Guests</h3>
-                            </div>
-                            <ul class="benefits-list">
-                                <li>
-                                    <span><strong>Exclusive Access:</strong> Discover and reserve premium events at luxury hotels that aren't available elsewhere.</span>
-                                </li>
-                                <li>
-                                    <span><strong>Seamless Booking:</strong> Simple 3-step reservation process with secure payment and instant confirmation.</span>
-                                </li>
-                                <li>
-                                    <span><strong>Digital Tickets:</strong> Receive QR code tickets instantly via email and SMS for easy event entry.</span>
-                                </li>
-                                <li>
-                                    <span><strong>24/7 Support:</strong> Access to AI assistant and customer support whenever you need assistance.</span>
-                                </li>
-                                <li>
-                                    <span><strong>Event Management:</strong> View all your reservations in one place with easy access to tickets and details.</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-6">
-                        <div class="luxury-card p-5 h-100">
-                            <div class="benefits-header mb-4">
-                                <div class="benefits-icon mb-3">
-                                </div>
-                                <h3 class="benefits-title">Benefits for Hotels</h3>
-                            </div>
-                            <ul class="benefits-list">
-                                <li>
-                                    <span><strong>Increased Visibility:</strong> Showcase your events to a targeted audience of premium event seekers.</span>
-                                </li>
-                                <li>
-                                    <span><strong>Streamlined Reservations:</strong> Automated booking system reduces administrative workload and errors.</span>
-                                </li>
-                                <li>
-                                    <span><strong>Secure Payments:</strong> Integrated PayPal processing ensures reliable and secure payment collection.</span>
-                                </li>
-                                <li>
-                                    <span><strong>Real-time Analytics:</strong> Track reservations, attendance, and revenue through comprehensive dashboard insights.</span>
-                                </li>
-                                <li>
-                                    <span><strong>Brand Partnership:</strong> Join an exclusive network of luxury hotels and enhance your brand reputation.</span>
-                                </li>
-                            </ul>
+                            <h4 class="step-title mb-3">Receive Exclusive Access</h4>
+                            <p class="step-description">Instantly receive your digital pass and unique reservation details. Your confirmation will be sent via email and SMS, ensuring a seamless entry to your event.</p>
                         </div>
                     </div>
                 </div>
@@ -186,33 +123,23 @@
 
     <div class="luxury-footer py-5">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="footer-logo mb-3">EVENZA</h5>
-                    <p class="footer-text">Premium event reservation and ticketing platform. Experience elegance, reserve with confidence.</p>
+            <div>
+                <div>
+                    <h5 class="footer-logo">EVENZA</h5>
+                    <p class="footer-text">EVENZA is a premier event reservation platform dedicated to seamless experiences. Elevate your occasions with our curated venues and sophisticated planning tools.</p>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="footer-heading mb-3">Contact Info</h6>
+                <div>
+                    <h6 class="footer-heading">Contact Info</h6>
                     <p class="footer-text">
-                        Email: info@evenza.com<br>
-                        Phone: +1 (555) 123-4567<br>
-                        Address: 123 Luxury Avenue, Suite 100<br>
-                        City, State 12345
-                    </p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="footer-heading mb-3">Hotel Partner</h6>
-                    <p class="footer-text">
-                        <strong>TravelMates Hotel</strong><br>
-                        Your trusted partner for premium event hosting
+                        Email: <a href="mailto:evenzacompany@gmail.com">evenzacompany@gmail.com</a><br>
+                        Phone: 09916752007<br>
+                        Address: Ambulong, Tanauan City, Batangas.
                     </p>
                 </div>
             </div>
             <hr class="footer-divider">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="footer-copyright">&copy; <?php echo date('Y'); ?> EVENZA. All rights reserved.</p>
-                </div>
+            <div class="text-center">
+                <p class="footer-copyright">&copy; 2026 EVENZA</p>
             </div>
         </div>
     </div>

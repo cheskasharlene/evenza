@@ -367,16 +367,16 @@ if (!$package) {
             letter-spacing: 0.5px;
         }
         .package-badge.bronze {
-            background: linear-gradient(135deg, #CD7F32 0%, #B87333 100%);
-            color: #FFFFFF;
+            background: linear-gradient(135deg, #B8956A 0%, #9A7A52 100%);
+            color: white;
         }
         .package-badge.silver {
-            background: linear-gradient(135deg, #C0C0C0 0%, #A8A8A8 100%);
-            color: #1A1A1A;
+            background: linear-gradient(135deg, #E8E8E8 0%, #C8C8C8 100%);
+            color: #2C2C2C;
         }
         .package-badge.gold {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #1A1A1A;
+            background: linear-gradient(135deg, #F4D03F 0%, #D4AF37 100%);
+            color: #2C2C2C;
         }
         .error-message-box {
             background: #FFF5F5;
@@ -684,33 +684,23 @@ if (!$package) {
 
     <div class="luxury-footer py-5">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="footer-logo mb-3">EVENZA</h5>
-                    <p class="footer-text">Premium event reservation and ticketing platform. Experience elegance, reserve with confidence.</p>
+            <div>
+                <div>
+                    <h5 class="footer-logo">EVENZA</h5>
+                    <p class="footer-text">EVENZA is a premier event reservation platform dedicated to seamless experiences. Elevate your occasions with our curated venues and sophisticated planning tools.</p>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="footer-heading mb-3">Contact Info</h6>
+                <div>
+                    <h6 class="footer-heading">Contact Info</h6>
                     <p class="footer-text">
-                        Email: info@evenza.com<br>
-                        Phone: +1 (555) 123-4567<br>
-                        Address: 123 Luxury Avenue, Suite 100<br>
-                        City, State 12345
-                    </p>
-                </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="footer-heading mb-3">Hotel Partner</h6>
-                    <p class="footer-text">
-                        <strong>TravelMates Hotel</strong><br>
-                        Your trusted partner for premium event hosting
+                        Email: <a href="mailto:evenzacompany@gmail.com">evenzacompany@gmail.com</a><br>
+                        Phone: 09916752007<br>
+                        Address: Ambulong, Tanauan City, Batangas.
                     </p>
                 </div>
             </div>
             <hr class="footer-divider">
-            <div class="row">
-                <div class="col-12 text-center">
-                    <p class="footer-copyright">&copy; <?php echo date('Y'); ?> EVENZA. All rights reserved.</p>
-                </div>
+            <div class="text-center">
+                <p class="footer-copyright">&copy; 2026 EVENZA</p>
             </div>
         </div>
     </div>
