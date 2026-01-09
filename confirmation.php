@@ -224,10 +224,9 @@ if ($reservationSaved && !$errorOccurred && $reservationId > 0) {
             mysqli_stmt_bind_param($statusCheckStmt, "i", $reservationId);
             mysqli_stmt_execute($statusCheckStmt);
             $statusResult = mysqli_stmt_get_result($statusCheckStmt);
+            
             if ($statusRow = mysqli_fetch_assoc($statusResult)) {
-                if ($statusRow['status'] === 'completed') {
-                    sendReservationConfirmationEmail($conn, $reservationId);
-                }
+                
             }
             mysqli_stmt_close($statusCheckStmt);
         }

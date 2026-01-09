@@ -56,7 +56,7 @@ if (strlen($phoneNumber) == 10) {
 
 error_log("SMS Phone Number: Original=" . $originalPhoneNumber . ", Formatted=" . $phoneNumber);
 
-$smsGatewayBaseUrl = 'http://192.168.1.8:8080';
+$smsGatewayBaseUrl = 'http://192.168.18.28:8080';
 $smsGatewayUsername = 'sms';
 $smsGatewayPassword = 'admin123';
 
