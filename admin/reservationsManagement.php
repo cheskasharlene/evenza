@@ -143,12 +143,11 @@ if (!empty($dateFilter)) {
     $revenueQuery .= " AND DATE(r.reservationDate) = ?";
     $revenueParams[] = $filterDate;
     $revenueTypes .= 's';
-} else {
-    $revenueQuery .= " AND DATE(r.reservationDate) >= CURDATE()";
 }
+// Note: No default date filter for revenue - show all revenue to match Admin Overview
 
-// Only include confirmed and pending reservations for revenue calculation
-$revenueQuery .= " AND LOWER(r.status) IN ('confirmed', 'completed', 'pending')";
+// Only include completed reservations for revenue calculation (exclude pending and confirmed - only count fully completed)
+$revenueQuery .= " AND LOWER(r.status) = 'completed'";
 
 $totalRevenue = 0;
 if (!empty($revenueParams)) {
@@ -212,12 +211,11 @@ if (!empty($dateFilter)) {
     $packageRevenueQuery .= " AND DATE(r.reservationDate) = ?";
     $packageRevenueParams[] = $filterDate;
     $packageRevenueTypes .= 's';
-} else {
-    $packageRevenueQuery .= " AND DATE(r.reservationDate) >= CURDATE()";
 }
+// Note: No default date filter for revenue - show all revenue to match Admin Overview
 
-// Only include confirmed and pending reservations for revenue calculation
-$packageRevenueQuery .= " AND LOWER(r.status) IN ('confirmed', 'completed', 'pending')";
+// Only include completed reservations for revenue calculation (exclude pending and confirmed - only count fully completed)
+$packageRevenueQuery .= " AND LOWER(r.status) = 'completed'";
 $packageRevenueQuery .= " GROUP BY packageTier";
 
 $revenueByPackage = [

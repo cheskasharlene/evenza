@@ -7,25 +7,31 @@ require_once 'adminAuth.php';
 require_once '../core/connect.php';
 
 function getEventImagePath($imagePath) {
-    $imageDir = 'assets/images/event_images/';
+    $imageDir = '../assets/images/event_images/';
     $placeholder = $imageDir . 'placeholder.jpg';
-    
+
     if (empty($imagePath)) {
         return $placeholder;
     }
-    
+
     $imagePath = ltrim($imagePath, '/\\');
-    
-    if (strpos($imagePath, $imageDir) !== 0) {
-        $filename = basename($imagePath);
-        $filename = str_replace(['/', '\\'], '', $filename);
-        $imagePath = $imageDir . $filename;
+
+    if (strpos($imagePath, '../assets/images/event_images/') === 0) {
+        $imagePath = substr($imagePath, strlen('../assets/images/event_images/'));
     }
-    
-    if (file_exists($imagePath)) {
+    if (strpos($imagePath, 'assets/images/event_images/') === 0) {
+        $imagePath = substr($imagePath, strlen('assets/images/event_images/'));
+    }
+
+    $filename = basename($imagePath);
+    $filename = str_replace(['/', '\\'], '', $filename);
+    $imagePath = $imageDir . $filename;
+
+    $fullPath = realpath(__DIR__ . '/' . $imagePath);
+    if ($fullPath && file_exists($fullPath)) {
         return $imagePath;
     }
-    
+
     return $placeholder;
 }
 
