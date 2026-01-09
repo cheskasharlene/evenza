@@ -687,7 +687,7 @@ if (!empty($searchQuery)) {
             isEditEventMode = true;
             currentEventId = eventId;
             
-            fetch('api/getEvent.php?eventId=' + eventId)
+            fetch('/evenza/api/getEvent.php?eventId=' + eventId)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok: ' + response.status);
@@ -767,7 +767,7 @@ if (!empty($searchQuery)) {
                     modal.hide();
                 }
                 
-                fetch('api/deleteEvent.php', {
+                fetch('/evenza/api/deleteEvent.php', {
                     method: 'POST',
                     body: formData
                 })
@@ -820,7 +820,7 @@ if (!empty($searchQuery)) {
             formData.append('description', description);
             formData.append('imagePath', imagePath);
             
-            fetch('api/updateEvent.php', {
+            fetch('/evenza/api/updateEvent.php', {
                 method: 'POST',
                 body: formData
             })
@@ -880,7 +880,7 @@ if (!empty($searchQuery)) {
             formData.append('description', description);
             formData.append('imagePath', imagePath);
             
-            fetch('api/updateEvent.php', {
+            fetch('/evenza/api/updateEvent.php', {
                 method: 'POST',
                 body: formData
             })

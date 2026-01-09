@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Creating PayPal order...');
             showPaymentStatus('Creating your order...', 'processing');
             
-            return fetch('../api/paypal-create-order.php', {
+            return fetch('/evenza/api/paypal-create-order.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Payment approved, capturing...', data);
             showPaymentStatus('Processing your payment...', 'processing');
             
-            return fetch('../api/paypal-capture-order.php', {
+            return fetch('/evenza/api/paypal-capture-order.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

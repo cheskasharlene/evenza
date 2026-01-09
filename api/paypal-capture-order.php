@@ -199,7 +199,7 @@ try {
         echo json_encode([
             'status' => 'COMPLETED',
             'transactionId' => $transactionId,
-            'redirectUrl' => 'confirmation.php?success=' . urlencode($successToken) . '&tx=' . urlencode($transactionId)
+            'redirectUrl' => '/evenza/pages/confirmation.php?success=' . urlencode($successToken) . '&tx=' . urlencode($transactionId)
         ]);
         exit;
     } else {

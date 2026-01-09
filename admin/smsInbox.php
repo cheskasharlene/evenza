@@ -347,7 +347,7 @@ $totalPages = ceil($totalCount / $perPage);
         }
 
         function markAsRead(smsId) {
-            fetch('api/markSMSRead.php', {
+            fetch('/evenza/api/markSMSRead.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

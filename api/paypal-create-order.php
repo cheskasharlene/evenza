@@ -92,8 +92,8 @@ $orderData = [
         'brand_name' => 'EVENZA',
         'landing_page' => 'NO_PREFERENCE',
         'user_action' => 'PAY_NOW',
-        'return_url' => getBaseUrl() . '/paypalCallback.php',
-        'cancel_url' => getBaseUrl() . '/payment.php?eventId=' . $eventId . '&packageId=' . $packageId . '&cancelled=1'
+        'return_url' => getBaseUrl() . '/process/paypalCallback.php',
+        'cancel_url' => getBaseUrl() . '/pages/payment.php?eventId=' . $eventId . '&packageId=' . $packageId . '&cancelled=1'
     ]
 ];
 
@@ -166,9 +166,10 @@ function getPayPalAccessToken() {
 function getBaseUrl() {
     $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'];
-    $path = dirname($_SERVER['SCRIPT_NAME']);
-    $path = dirname($path);
-    return $protocol . '://' . $host . $path;
+    // Get the base path - remove /api from the script path
+    $scriptPath = dirname($_SERVER['SCRIPT_NAME']); // This gives /evenza/api
+    $basePath = dirname($scriptPath); // This gives /evenza
+    return $protocol . '://' . $host . $basePath;
 }
 
 set_exception_handler(function($exception) {

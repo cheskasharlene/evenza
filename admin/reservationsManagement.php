@@ -1035,14 +1035,27 @@ uksort($groupedReservations, function($a, $b) {
             showFeedback('Updating reservation status...', 'info');
             
             // Make AJAX call to update status in database
-            fetch('api/updateReservationStatus.php', {
+            fetch('/evenza/api/updateReservationStatus.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
                 body: 'reservationId=' + encodeURIComponent(reservationId) + '&status=' + encodeURIComponent(newStatus)
             })
-            .then(response => response.json())
+            .then(response => {
+                // Check if response is OK
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    return response.text().then(text => {
+                        throw new Error('Expected JSON but got: ' + text.substring(0, 100));
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     // Capitalize first letter for display

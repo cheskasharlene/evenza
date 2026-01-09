@@ -173,7 +173,7 @@ require_once '../core/connect.php';
                 <div class="col-md-4">
                     <div class="luxury-card event-card">
                         <div class="event-image position-relative">
-                            <img src="../assets/images/event_images/wineCellar.jpg" class="card-img-top featured-event-image" alt="Wine Tasting">
+                            <img src="../assets/images/event_images/wineTasting.jpg" class="card-img-top featured-event-image" alt="Wine Tasting">
                         </div>
                         <div class="event-content p-4">
                             <h3 class="event-title">Wine Tasting</h3>

@@ -683,7 +683,7 @@ if (!empty($params)) {
             }
             window.history.pushState({}, '', url);
             
-            fetch(`api/searchUsers.php?search=${encodeURIComponent(searchQuery)}&role=${encodeURIComponent(roleValue)}`)
+            fetch(`/evenza/api/searchUsers.php?search=${encodeURIComponent(searchQuery)}&role=${encodeURIComponent(roleValue)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {

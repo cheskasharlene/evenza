@@ -522,7 +522,7 @@ if ($stmt) {
                         throw new Error('No reservation selected');
                     }
                     
-                    return fetch('api/paypal-create-order.php', {
+                    return fetch('/evenza/api/paypal-create-order.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -562,7 +562,7 @@ if ($stmt) {
                 },
                 
                 onApprove: function(data, actions) {
-                    return fetch('api/paypal-capture-order.php', {
+                    return fetch('/evenza/api/paypal-capture-order.php', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

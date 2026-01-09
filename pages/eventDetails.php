@@ -54,8 +54,8 @@ if ($eventId > 0) {
             $eventImagePath = getEventImagePath($event['imagePath']);
             
             if (stripos($event['title'], 'wine') !== false || stripos($event['title'], 'tasting') !== false) {
-                if (file_exists('assets/images/event_images/wineCellar.jpg')) {
-                    $eventImagePath = 'assets/images/event_images/wineCellar.jpg';
+                if (file_exists('../assets/images/event_images/wineTasting.jpg')) {
+                    $eventImagePath = '../assets/images/event_images/wineTasting.jpg';
                 }
             }
             
