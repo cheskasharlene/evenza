@@ -1,4 +1,7 @@
-<?php session_start(); ?>
+<?php 
+session_start(); 
+require_once 'connect.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +12,81 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .reviews-section {
+            background: linear-gradient(135deg, #F9F7F2 0%, #FFFFFF 100%);
+            padding: 5rem 0;
+        }
+        .review-card {
+            background: #FFFFFF;
+            border-radius: 15px;
+            padding: 2rem;
+            height: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(74, 93, 74, 0.1);
+            transition: all 0.3s ease;
+        }
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+        .review-user-info {
+            flex: 1;
+        }
+        .review-user-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-charcoal);
+            margin-bottom: 0.5rem;
+        }
+        .review-event-name {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            color: var(--accent-olive);
+            font-weight: 500;
+        }
+        .review-rating {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        .review-rating i {
+            color: #FFD700;
+            font-size: 1rem;
+        }
+        .review-rating i.far {
+            color: #E0E0E0;
+        }
+        .review-comment {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-dark-gray);
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+        .review-date {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-dark-gray);
+            opacity: 0.6;
+        }
+        .reviews-empty {
+            text-align: center;
+            padding: 3rem 0;
+            color: var(--text-dark-gray);
+            opacity: 0.7;
+        }
+    </style>
 </head>
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
@@ -121,6 +198,81 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="reviews-section">
+        <div class="container">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title">What Our Guests Say</h2>
+                <p class="section-subtitle">Real experiences from our valued customers</p>
+            </div>
+            <div class="row g-4">
+                <?php
+                // Fetch recent reviews from database
+                $reviewsQuery = "SELECT r.reviewId, r.rating, r.comment, r.createdAt,
+                                       u.fullName AS userName,
+                                       e.title AS eventName
+                                FROM reviews r
+                                INNER JOIN users u ON r.userId = u.userId
+                                LEFT JOIN events e ON r.eventId = e.eventId
+                                ORDER BY r.createdAt DESC
+                                LIMIT 3";
+                
+                $reviewsResult = mysqli_query($conn, $reviewsQuery);
+                $reviews = [];
+                
+                if ($reviewsResult && mysqli_num_rows($reviewsResult) > 0) {
+                    while ($row = mysqli_fetch_assoc($reviewsResult)) {
+                        $reviews[] = $row;
+                    }
+                }
+                
+                if (empty($reviews)):
+                ?>
+                    <div class="col-12">
+                        <div class="reviews-empty">
+                            <i class="fas fa-comments fa-3x mb-3" style="opacity: 0.3;"></i>
+                            <p>No reviews yet. Be the first to share your experience!</p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($reviews as $review): ?>
+                        <div class="col-md-4">
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <div class="review-user-info">
+                                        <div class="review-user-name"><?php echo htmlspecialchars($review['userName']); ?></div>
+                                        <?php if (!empty($review['eventName'])): ?>
+                                            <div class="review-event-name"><?php echo htmlspecialchars($review['eventName']); ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                <div class="review-rating">
+                                    <?php
+                                    $rating = intval($review['rating']);
+                                    for ($i = 1; $i <= 5; $i++) {
+                                        if ($i <= $rating) {
+                                            echo '<i class="fas fa-star"></i>';
+                                        } else {
+                                            echo '<i class="far fa-star"></i>';
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                                <?php if (!empty($review['comment'])): ?>
+                                <div class="review-comment">
+                                    "<?php echo htmlspecialchars($review['comment']); ?>"
+                                </div>
+                                <?php endif; ?>
+                                <div class="review-date">
+                                    <?php echo date('F j, Y', strtotime($review['createdAt'])); ?>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>
