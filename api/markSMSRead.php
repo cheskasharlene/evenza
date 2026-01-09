@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-require_once '../connect.php';
+require_once '../core/connect.php';
 
 $smsId = isset($_POST['smsId']) ? intval($_POST['smsId']) : 0;
 

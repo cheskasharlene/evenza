@@ -7,7 +7,7 @@ ini_set('display_errors', 0);
 header('Content-Type: application/json');
 
 session_start();
-require_once '../connect.php';
+require_once '../core/connect.php';
 
 if (!isset($_SESSION['admin_id']) && !(isset($_SESSION['user_id']) && isset($_SESSION['role']) && (strtolower($_SESSION['role']) === 'admin'))) {
     ob_clean();

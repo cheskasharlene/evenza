@@ -14,7 +14,7 @@ if (!$isAdmin) {
     exit;
 }
 
-require_once '../connect.php';
+require_once '../core/connect.php';
 require_once '../includes/helpers.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

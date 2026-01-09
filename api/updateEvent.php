@@ -11,7 +11,7 @@ session_start();
 $bufferBeforeConnect = ob_get_contents();
 ob_clean();
 
-require_once '../connect.php';
+require_once '../core/connect.php';
 
 $bufferAfterConnect = ob_get_contents();
 if (!empty(trim($bufferAfterConnect))) {

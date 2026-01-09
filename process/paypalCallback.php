@@ -11,14 +11,14 @@
  */
 
 session_start();
-require_once 'connect.php';
-require_once 'config/paypal.php';
+require_once '../core/connect.php';
+require_once '../config/paypal.php';
 
 error_log('PayPal Callback reached - checking for pending payment');
 
 if (!isset($_SESSION['user_id'])) {
     error_log('User not logged in, redirecting to login');
-    header('Location: login.php');
+    header('Location: ../pages/login.php');
     exit;
 }
 
@@ -26,7 +26,7 @@ if (isset($_SESSION['payment_success_token']) && isset($_SESSION['payment_succes
     $successToken = $_SESSION['payment_success_token'];
     $transactionId = $_SESSION['payment_transaction_id'] ?? '';
     
-    header('Location: confirmation.php?success=' . urlencode($successToken) . '&tx=' . urlencode($transactionId));
+    header('Location: ../pages/confirmation.php?success=' . urlencode($successToken) . '&tx=' . urlencode($transactionId));
     exit;
 }
 
@@ -82,18 +82,18 @@ if (!empty($token) && !empty($payerId)) {
             unset($_SESSION['paypal_order_event_id']);
             unset($_SESSION['paypal_order_package_id']);
             
-            header('Location: confirmation.php?success=' . urlencode($successToken) . '&tx=' . urlencode($transactionId));
+            header('Location: ../pages/confirmation.php?success=' . urlencode($successToken) . '&tx=' . urlencode($transactionId));
             exit;
         } else {
             error_log('PayPal capture failed: ' . $response);
             $_SESSION['error_message'] = 'Failed to complete payment. Please try again or contact support.';
-            header('Location: payment.php?eventId=' . $eventId . '&error=capture_failed');
+            header('Location: ../pages/payment.php?eventId=' . $eventId . '&error=capture_failed');
             exit;
         }
     } else {
         error_log('Failed to get PayPal access token');
         $_SESSION['error_message'] = 'Payment service unavailable. Please try again later.';
-        header('Location: payment.php?error=auth_failed');
+        header('Location: ../pages/payment.php?error=auth_failed');
         exit;
     }
 }
@@ -103,12 +103,12 @@ if (isset($_GET['cancelled']) || isset($_GET['cancel'])) {
     $packageId = $_SESSION['pending_package_id'] ?? 0;
     
     $_SESSION['error_message'] = 'Payment was cancelled. You can try again when ready.';
-    header('Location: payment.php?eventId=' . $eventId . '&packageId=' . $packageId);
+    header('Location: ../pages/payment.php?eventId=' . $eventId . '&packageId=' . $packageId);
     exit;
 }
 
 $_SESSION['error_message'] = 'No payment in progress. Please start your reservation again.';
-header('Location: index.php');
+header('Location: ../pages/index.php');
 exit;
 
 function getPayPalAccessToken() {

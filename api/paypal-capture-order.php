@@ -28,7 +28,7 @@ header('Content-Type: application/json');
 
 try {
     require_once '../config/paypal.php';
-    require_once '../connect.php';
+    require_once '../core/connect.php';
     require_once '../includes/helpers.php';
     
     ob_clean();

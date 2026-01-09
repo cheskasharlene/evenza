@@ -6,8 +6,8 @@ ini_set('display_errors', 0);
 header('Content-Type: application/json');
 
 session_start();
-require_once '../adminAuth.php';
-require_once '../connect.php';
+require_once '../admin/adminAuth.php';
+require_once '../core/connect.php';
 require_once '../includes/helpers.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

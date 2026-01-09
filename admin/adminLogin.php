@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once 'connect.php';
-require_once 'includes/helpers.php';
+require_once '../core/connect.php';
+require_once '../includes/helpers.php';
 
 $error = '';
 
@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         .admin-login-wrapper {
             min-height: 100vh;
@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="admin-login-wrapper">
         <div class="admin-login-card">
             <div class="admin-login-logo">
-                <img src="assets/images/evenzaLogo.png" alt="EVENZA">
+                <img src="../assets/images/evenzaLogo.png" alt="EVENZA">
             </div>
             
             <div class="admin-login-header">
@@ -227,7 +227,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="text-center mt-4">
                 <a href="adminForgotPassword.php" class="text-muted small text-decoration-none d-block mb-2">Forgot Password?</a>
-                <a href="index.php" class="text-muted small text-decoration-none">← Back to EVENZA Home</a>
+                <a href="../pages/index.php" class="text-muted small text-decoration-none">← Back to EVENZA Home</a>
             </div>
         </div>
     </div>

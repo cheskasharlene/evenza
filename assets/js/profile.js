@@ -30,7 +30,7 @@
         formData.append('email', email);
         formData.append('mobile', mobile);
 
-        fetch('api/updateProfile.php', {
+        fetch('../api/updateProfile.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'

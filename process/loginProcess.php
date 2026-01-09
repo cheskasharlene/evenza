@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'connect.php';
+require_once '../core/connect.php';
 
 $error = '';
 
@@ -33,9 +33,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['user_role'] = $user['role'];
 
                 if ($user['role'] === 'admin' || $user['role'] === 'Admin') {
-                    header('Location: admin.php');
+                    header('Location: ../admin/admin.php');
                 } else {
-                    header('Location: index.php');
+                    header('Location: ../pages/index.php');
                 }
                 exit;
             } else {
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (!empty($error)) {
         $_SESSION['login_error'] = $error;
-        header('Location: login.php');
+        header('Location: ../pages/login.php');
         exit;
     }
 } else {

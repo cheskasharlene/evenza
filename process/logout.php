@@ -37,7 +37,7 @@ if ($logoutType === 'admin' && $isAdmin) {
     }
     
     // Redirect to admin login
-    header('Location: adminLogin.php');
+    header('Location: ../admin/adminLogin.php');
     exit;
 } elseif ($logoutType === 'user' && $isUser) {
     // Clear user session variables only
@@ -57,7 +57,7 @@ if ($logoutType === 'admin' && $isAdmin) {
     }
     
     // Redirect to user login page
-    header('Location: login.php');
+    header('Location: ../pages/login.php');
     exit;
 } else {
     // Fallback: if type doesn't match active session, log out both and redirect appropriately
@@ -84,9 +84,9 @@ if ($logoutType === 'admin' && $isAdmin) {
     
     // Redirect based on logout type requested, default to user login
     if ($logoutType === 'admin') {
-        header('Location: adminLogin.php');
+        header('Location: ../admin/adminLogin.php');
     } else {
-        header('Location: login.php');
+        header('Location: ../pages/login.php');
     }
     exit;
 }

@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
         reviewMessage.innerHTML = '';
 
         // Submit review
-        fetch('api/submitReview.php', {
+        fetch('../api/submitReview.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

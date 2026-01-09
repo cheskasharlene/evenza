@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 session_start();
-require_once '../connect.php';
+require_once '../core/connect.php';
 
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);

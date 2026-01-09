@@ -12,8 +12,8 @@ ini_set('log_errors', 1);
 
 ob_start();
 
-require_once '../adminAuth.php';
-require_once '../connect.php';
+require_once '../admin/adminAuth.php';
+require_once '../core/connect.php';
 
 try {
     if (!isset($_SESSION['admin_id'])) {

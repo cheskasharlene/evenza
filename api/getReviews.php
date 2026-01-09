@@ -11,7 +11,7 @@ ini_set('log_errors', 1);
 
 ob_start();
 
-require_once '../connect.php';
+require_once '../core/connect.php';
 
 try {
     $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 0;

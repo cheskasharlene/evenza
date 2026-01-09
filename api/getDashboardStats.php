@@ -1,8 +1,8 @@
 <?php
 header('Content-Type: application/json');
 session_start();
-require_once '../connect.php';
-require_once '../adminAuth.php';
+require_once '../core/connect.php';
+require_once '../admin/adminAuth.php';
 
 if (!isset($_SESSION['admin_id']) && !(isset($_SESSION['user_id']) && isset($_SESSION['role']) && (strtolower($_SESSION['role']) === 'admin'))) {
     http_response_code(401);

@@ -13,7 +13,7 @@ ini_set('log_errors', 1);
 
 ob_start();
 
-require_once '../connect.php';
+require_once '../core/connect.php';
 
 try {
     if (!isset($_SESSION['user_id'])) {

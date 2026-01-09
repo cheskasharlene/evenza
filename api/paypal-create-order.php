@@ -10,7 +10,7 @@ header('Content-Type: application/json');
 
 try {
     require_once '../config/paypal.php';
-    require_once '../connect.php';
+    require_once '../core/connect.php';
     
     ob_clean();
 } catch (Exception $e) {

@@ -4,8 +4,8 @@
  * Run this once to import existing messages that weren't stored
  */
 
-require_once 'connect.php';
-require_once 'adminAuth.php';
+require_once '../core/connect.php';
+require_once '../admin/adminAuth.php';
 
 $logFile = __DIR__ . "/sms_log.txt";
 

@@ -1,7 +1,7 @@
 <?php
 require_once 'adminAuth.php';
-require_once 'connect.php';
-require_once 'includes/helpers.php';
+require_once '../core/connect.php';
+require_once '../includes/helpers.php';
 
 // Filtering and pagination
 $ratingFilter = isset($_GET['rating']) ? intval($_GET['rating']) : 0;
@@ -148,7 +148,7 @@ mysqli_free_result($statsResult);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=Dancing+Script:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <title>Reviews & Feedback Management - EVENZA Admin</title>
     <style>
         .admin-wrapper { 
@@ -233,7 +233,7 @@ mysqli_free_result($statsResult);
         <div class="d-flex flex-column admin-sidebar p-4">
             <div class="d-flex align-items-center mb-5" style="padding: 1rem 0;">
                 <div class="luxury-logo">
-                    <img src="assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img" style="max-width: 180px;">
+                    <img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img" style="max-width: 180px;">
                 </div>
             </div>
             <div class="mb-4">
@@ -285,7 +285,7 @@ mysqli_free_result($statsResult);
                             <i class="fas fa-user text-muted"></i>
                         </div>
                     </div>
-                    <a href="logout.php?type=admin" class="btn btn-admin-primary btn-sm">Logout</a>
+                    <a href="../process/logout.php?type=admin" class="btn btn-admin-primary btn-sm">Logout</a>
                 </div>
             </div>
 
