@@ -75,17 +75,28 @@ if ($eventId > 0) {
     }
 }
 
-function getPackageFeatures($category, $tier) {
+function getPackageFeatures($category, $tier, $eventTitle = '') {
     $category = strtolower(trim($category ?? ''));
+    $eventTitle = strtolower(trim($eventTitle ?? ''));
     
-    if (stripos($category, 'business') !== false || stripos($category, 'conference') !== false) {
+    // Check for art exhibition, auction, or wine tasting events first
+    if (stripos($eventTitle, 'art') !== false || stripos($eventTitle, 'exhibition') !== false || 
+        stripos($eventTitle, 'auction') !== false || stripos($eventTitle, 'wine') !== false || 
+        stripos($eventTitle, 'tasting') !== false || stripos($category, 'art') !== false || 
+        stripos($category, 'exhibition') !== false || stripos($category, 'auction') !== false ||
+        stripos($category, 'wine') !== false || stripos($category, 'tasting') !== false ||
+        stripos($category, 'premium') !== false) {
+        $category = 'premium';
+    } elseif (stripos($category, 'business') !== false || stripos($category, 'conference') !== false) {
         $category = 'business';
-    } elseif (stripos($category, 'wedding') !== false) {
-        $category = 'wedding';
-    } elseif (stripos($category, 'art') !== false || stripos($category, 'exhibition') !== false) {
-        $category = 'art';
-    } elseif (stripos($category, 'social') !== false || stripos($category, 'gala') !== false) {
-        $category = 'social';
+    } elseif (stripos($category, 'wedding') !== false || stripos($category, 'weddings') !== false) {
+        $category = 'weddings';
+    } elseif (stripos($category, 'workshop') !== false || stripos($category, 'workshops') !== false || 
+              stripos($category, 'seminar') !== false || stripos($category, 'training') !== false) {
+        $category = 'workshops';
+    } elseif (stripos($category, 'social') !== false || stripos($category, 'socials') !== false || 
+              stripos($category, 'gala') !== false) {
+        $category = 'socials';
     } else {
         $category = 'business';
     }
@@ -95,98 +106,113 @@ function getPackageFeatures($category, $tier) {
     $features = [
         'business' => [
             'bronze' => [
-                'Basic seating',
-                'Digital handouts',
-                'Event access'
+                'Event access',
+                'High-speed Wi-Fi'
             ],
             'silver' => [
-                'Basic seating',
-                'Digital handouts',
                 'Event access',
-                'Networking lunch',
-                'Physical workbooks'
+                'High-speed Wi-Fi',
+                'Projector Access',
+                'Coffee/Tea Station'
             ],
             'gold' => [
-                'Basic seating',
-                'Digital handouts',
                 'Event access',
-                'Networking lunch',
-                'Physical workbooks',
+                'High-speed Wi-Fi',
+                'Projector Access',
+                'Coffee/Tea Station',
                 'VIP lounge access',
-                'Private speaker Q&A'
+                'Priority Seating',
+                'Premium Catering'
             ]
         ],
-        'wedding' => [
+        'weddings' => [
             'bronze' => [
                 'Venue rental',
-                'Basic seating',
-                'Standard decorations'
+                'Floral Arrangements'
             ],
             'silver' => [
                 'Venue rental',
-                'Basic seating',
-                'Standard decorations',
-                'Standard catering',
-                'Floral arrangements'
+                'Floral Arrangements',
+                'Champagne Toast',
+                'Standard catering'
             ],
             'gold' => [
                 'Venue rental',
-                'Basic seating',
-                'Standard decorations',
-                'Standard catering',
-                'Floral arrangements',
-                'Premium seating',
+                'Floral Arrangements',
+                'Champagne Toast',
+                'Bridal Suite Access',
                 'Premium open bar',
-                '5-course meal',
+                'Priority Seating',
+                'Premium Catering',
                 'Professional photography'
             ]
         ],
-        'art' => [
+        'workshops' => [
             'bronze' => [
-                'Gallery Entry',
-                'Digital Catalog'
+                'Event access',
+                'Materials & Kits',
+                'Certificate of Completion'
             ],
             'silver' => [
-                'Gallery Entry',
-                'Digital Catalog',
-                '1 Welcome Drink',
-                'Physical Brochure'
+                'Event access',
+                'Materials & Kits',
+                'Certificate of Completion',
+                'Lunch Buffet'
             ],
             'gold' => [
-                'Gallery Entry',
-                'Digital Catalog',
-                '1 Welcome Drink',
-                'Physical Brochure',
-                'Private Auction Preview',
-                'Open Bar'
+                'Event access',
+                'Materials & Kits',
+                'Certificate of Completion',
+                'Lunch Buffet',
+                'VIP lounge access',
+                'Priority Seating',
+                'Premium Catering',
+                'Private speaker Q&A'
             ]
         ],
-        'social' => [
+        'socials' => [
             'bronze' => [
                 'Event access',
-                'Basic seating',
-                'Standard refreshments'
+                'Party Decor'
             ],
             'silver' => [
                 'Event access',
-                'Basic seating',
-                'Standard refreshments',
-                'Premium seating',
-                'Networking opportunities',
-                'Event program'
+                'Party Decor',
+                'Music/DJ Setup',
+                'Finger Food Buffet'
             ],
             'gold' => [
                 'Event access',
-                'Basic seating',
-                'Standard refreshments',
-                'Premium seating',
-                'Networking opportunities',
-                'Event program',
+                'Party Decor',
+                'Music/DJ Setup',
+                'Finger Food Buffet',
                 'VIP event access',
                 'Premium open bar',
-                'Gourmet catering',
-                'Exclusive networking',
+                'Priority Seating',
+                'Premium Catering',
                 'VIP lounge access'
+            ]
+        ],
+        'premium' => [
+            'bronze' => [
+                'Event access',
+                'Finger Food Buffet'
+            ],
+            'silver' => [
+                'Event access',
+                'Finger Food Buffet',
+                'Premium open bar',
+                'VIP lounge access'
+            ],
+            'gold' => [
+                'Event access',
+                'Finger Food Buffet',
+                'Premium open bar',
+                'VIP lounge access',
+                'VIP event access',
+                'Priority Seating',
+                'Premium Catering',
+                'Private viewing access'
             ]
         ]
     ];
@@ -545,8 +571,9 @@ if (!$event) {
                             <div class="packages-container">
                                 <?php 
                                 $eventCategory = $event['category'] ?? 'Business';
+                                $eventTitle = $event['title'] ?? '';
                                 foreach ($packages as $package): 
-                                    $features = getPackageFeatures($eventCategory, $package['tier']);
+                                    $features = getPackageFeatures($eventCategory, $package['tier'], $eventTitle);
                                 ?>
                                     <div class="package-card" 
                                          data-package-id="<?php echo $package['id']; ?>"
@@ -777,6 +804,7 @@ if (!$event) {
         document.addEventListener('DOMContentLoaded', function() {
             const packageCards = document.querySelectorAll('.package-card');
             packageCards.forEach(card => {
+                // Handle card click to open modal
                 card.addEventListener('click', function() {
                     const packageId = this.getAttribute('data-package-id');
                     const packageName = this.getAttribute('data-package-name');
