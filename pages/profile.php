@@ -38,6 +38,8 @@ $query = "
            e.venue, 
            p.packageName,
            r.reservationDate as date,
+           r.paymentDeadline,
+           r.userCancelled,
            CONCAT(COALESCE(r.startTime, ''), ' - ', COALESCE(r.endTime, '')) as time
     FROM reservations r
     LEFT JOIN events e ON r.eventId = e.eventId
@@ -242,9 +244,11 @@ if ($stmt) {
                                                         'venue' => $reservation['venue'],
                                                         'date' => $reservation['date'],
                                                         'time' => $reservation['time'],
-                                                        'totalAmount' => $reservation['totalAmount'],
-                                                        'status' => $reservation['status']
-                                                    ]), ENT_QUOTES); ?>)">
+                                                    'totalAmount' => $reservation['totalAmount'],
+                                                    'status' => $reservation['status'],
+                                                    'paymentDeadline' => $reservation['paymentDeadline'] ?? null,
+                                                    'userCancelled' => $reservation['userCancelled'] ?? 0
+                                                ]), ENT_QUOTES); ?>)">
                                                     View Details
                                                 </button>
                                             </div>
@@ -398,10 +402,25 @@ if ($stmt) {
                                     <p class="small mb-0 mt-2">Your reservation is confirmed and paid.</p>
                                 </div>
                                 
+                                <!-- Payment Deadline Notice (for confirmed but unpaid reservations) -->
+                                <div id="paymentDeadlineNotice" class="alert alert-warning text-center" style="display: none;">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Payment Required</strong>
+                                    <p class="small mb-2 mt-2">Payment must be settled within <span id="deadlineDays"></span> days.</p>
+                                    <p class="small mb-0"><strong>Deadline:</strong> <span id="deadlineDate"></span></p>
+                                </div>
+                                
                                 <!-- PayPal Payment Section (only for confirmed reservations) -->
                                 <div id="paymentSection" style="display: none;">
                                     <p class="small text-muted text-center mb-3">Your reservation is confirmed. Complete payment below.</p>
                                     <div id="paypal-button-container-modal"></div>
+                                </div>
+                                
+                                <!-- Cancel Reservation Button (for non-cancelled reservations) -->
+                                <div id="cancelReservationSection" class="mt-3" style="display: none;">
+                                    <button type="button" class="btn btn-outline-danger w-100" onclick="showCancelConfirmation()">
+                                        <i class="fas fa-times-circle me-2"></i>Cancel Reservation
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -409,6 +428,27 @@ if ($stmt) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-luxury" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Reservation Confirmation Modal -->
+    <div class="modal fade" id="cancelReservationModal" tabindex="-1" aria-labelledby="cancelReservationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelReservationModalLabel">Cancel Reservation</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+                    <h5>Are you sure you want to continue?</h5>
+                    <p class="text-muted">Once cancelled, this reservation cannot be modified by the admin.</p>
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger" onclick="confirmCancelReservation()">Yes</button>
                 </div>
             </div>
         </div>
@@ -480,15 +520,49 @@ if ($stmt) {
             document.getElementById('cancelledMessage').style.display = 'none';
             document.getElementById('paidMessage').style.display = 'none';
             document.getElementById('paymentSection').style.display = 'none';
+            document.getElementById('paymentDeadlineNotice').style.display = 'none';
+            document.getElementById('cancelReservationSection').style.display = 'none';
+            
+            const userCancelled = reservation.userCancelled || 0;
             
             if (status === 'pending') {
                 document.getElementById('pendingMessage').style.display = 'block';
+                if (!userCancelled) {
+                    document.getElementById('cancelReservationSection').style.display = 'block';
+                }
             } else if (status === 'cancelled') {
                 document.getElementById('cancelledMessage').style.display = 'block';
             } else if (status === 'completed') {
                 document.getElementById('paidMessage').style.display = 'block';
+                // Allow cancellation of completed reservations
+                if (!userCancelled) {
+                    document.getElementById('cancelReservationSection').style.display = 'block';
+                }
             } else if (status === 'confirmed') {
                 document.getElementById('paymentSection').style.display = 'block';
+                
+                // Show payment deadline notice if deadline exists
+                if (reservation.paymentDeadline) {
+                    const deadline = new Date(reservation.paymentDeadline);
+                    const now = new Date();
+                    const daysRemaining = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysRemaining > 0) {
+                        document.getElementById('deadlineDays').textContent = daysRemaining;
+                        document.getElementById('deadlineDate').textContent = deadline.toLocaleDateString('en-US', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+                        document.getElementById('paymentDeadlineNotice').style.display = 'block';
+                    }
+                }
+                
+                if (!userCancelled) {
+                    document.getElementById('cancelReservationSection').style.display = 'block';
+                }
                 
                 if (!paypalButtonsRendered) {
                     renderPayPalButtons();
@@ -620,6 +694,64 @@ if ($stmt) {
             }).render('#paypal-button-container-modal')
             .then(function() {
                 paypalButtonsRendered = true;
+            });
+        }
+        
+        function showCancelConfirmation() {
+            if (!currentReservation) {
+                alert('No reservation selected');
+                return;
+            }
+            
+            const cancelModal = new bootstrap.Modal(document.getElementById('cancelReservationModal'));
+            cancelModal.show();
+        }
+        
+        function confirmCancelReservation() {
+            if (!currentReservation) {
+                alert('No reservation selected');
+                return;
+            }
+            
+            const reservationId = currentReservation.reservationId;
+            
+            // Disable button to prevent double submission
+            const confirmBtn = document.querySelector('#cancelReservationModal .btn-danger');
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Cancelling...';
+            
+            // Make API call to cancel reservation
+            fetch('/evenza/api/cancelReservation.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'reservationId=' + encodeURIComponent(reservationId)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close both modals
+                    const cancelModal = bootstrap.Modal.getInstance(document.getElementById('cancelReservationModal'));
+                    if (cancelModal) cancelModal.hide();
+                    
+                    const detailsModal = bootstrap.Modal.getInstance(document.getElementById('reservationDetailsModal'));
+                    if (detailsModal) detailsModal.hide();
+                    
+                    // Show success message and reload page
+                    alert('Reservation cancelled successfully');
+                    window.location.reload();
+                } else {
+                    alert('Error: ' + (data.message || 'Failed to cancel reservation'));
+                    confirmBtn.disabled = false;
+                    confirmBtn.textContent = 'Yes';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while cancelling the reservation. Please try again.');
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = 'Yes';
             });
         }
     </script>

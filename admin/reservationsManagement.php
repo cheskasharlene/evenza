@@ -23,6 +23,7 @@ $query = "SELECT
             r.totalAmount,
             r.status,
             r.createdAt,
+            r.userCancelled,
             u.fullName AS customerName,
             u.email AS customerEmail,
             e.title AS eventTitle,
@@ -878,24 +879,34 @@ uksort($groupedReservations, function($a, $b) {
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label class="form-label small fw-semibold">Reservation Status</label>
+                                        <?php if (isset($reservation['userCancelled']) && $reservation['userCancelled']): ?>
+                                            <div class="alert alert-warning small mb-2">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                <strong>User Cancelled:</strong> This reservation was cancelled by the user. Status cannot be modified.
+                                            </div>
+                                        <?php endif; ?>
                                         <div class="status-toggle-group">
                                             <button type="button" 
                                                     class="status-toggle-btn status-pending <?php echo (isset($reservation['status']) && strtolower($reservation['status']) === 'pending') ? 'active' : ''; ?>"
+                                                    <?php if (isset($reservation['userCancelled']) && $reservation['userCancelled']): ?>disabled title="Cannot modify: User cancelled this reservation"<?php endif; ?>
                                                     onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['reservationId'], ENT_QUOTES); ?>', 'pending')">
                                                 <i class="fas fa-clock me-1"></i> Pending
                                             </button>
                                             <button type="button" 
                                                     class="status-toggle-btn status-confirmed <?php echo (isset($reservation['status']) && strtolower($reservation['status']) === 'confirmed') ? 'active' : ''; ?>"
+                                                    <?php if (isset($reservation['userCancelled']) && $reservation['userCancelled']): ?>disabled title="Cannot modify: User cancelled this reservation"<?php endif; ?>
                                                     onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['reservationId'], ENT_QUOTES); ?>', 'confirmed')">
                                                 <i class="fas fa-check-circle me-1"></i> Confirmed
                                             </button>
                                             <button type="button" 
                                                     class="status-toggle-btn status-cancelled <?php echo (isset($reservation['status']) && strtolower($reservation['status']) === 'cancelled') ? 'active' : ''; ?>"
+                                                    <?php if (isset($reservation['userCancelled']) && $reservation['userCancelled']): ?>disabled title="Cannot modify: User cancelled this reservation"<?php endif; ?>
                                                     onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['reservationId'], ENT_QUOTES); ?>', 'cancelled')">
                                                 <i class="fas fa-times-circle me-1"></i> Cancelled
                                             </button>
                                             <button type="button" 
                                                     class="status-toggle-btn status-completed <?php echo (isset($reservation['status']) && strtolower($reservation['status']) === 'completed') ? 'active' : ''; ?>"
+                                                    <?php if (isset($reservation['userCancelled']) && $reservation['userCancelled']): ?>disabled title="Cannot modify: User cancelled this reservation"<?php endif; ?>
                                                     onclick="updateReservationStatus('<?php echo htmlspecialchars($reservation['reservationId'], ENT_QUOTES); ?>', 'completed')"
                                                     title="Mark as Completed (set automatically after PayPal payment)">
                                                 <i class="fas fa-credit-card me-1"></i> Completed

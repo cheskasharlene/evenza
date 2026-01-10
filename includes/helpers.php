@@ -414,9 +414,10 @@ function buildReservationEmailText($reservation, $reservationDate, $timeRange) {
  * @param mysqli $conn - Database connection
  * @param int $reservationId - Reservation ID
  * @param string $status - New status ('confirmed' or 'cancelled')
+ * @param string $cancellationType - Cancellation type: 'non_payment', 'date_occupied', 'other', or false for non-cancellation
  * @return bool - True if SMS sent successfully, false otherwise
  */
-function sendReservationStatusSMS($conn, $reservationId, $status) {
+function sendReservationStatusSMS($conn, $reservationId, $status, $cancellationType = false) {
     $query = "SELECT 
                 r.reservationId,
                 r.reservationDate,
@@ -476,12 +477,68 @@ function sendReservationStatusSMS($conn, $reservationId, $status) {
         $message .= " | Venue: " . $reservation['eventVenue'] . " | Package: " . $reservation['packageName'] . ". ";
         $message .= "We look forward to seeing you! - EVENZA";
     } elseif (strtolower($status) === 'cancelled') {
-        $message = "Hello " . $reservation['customerName'] . ", we regret to inform you that your reservation for " . $reservation['eventName'] . " on " . $reservationDate;
-        if (!empty($timeRange)) {
-            $message .= " (" . $timeRange . ")";
+        // Check if user cancelled the reservation and get paymentDeadline for fallback check
+        $checkQuery = "SELECT userCancelled, paymentDeadline FROM reservations WHERE reservationId = ?";
+        $checkStmt = mysqli_prepare($conn, $checkQuery);
+        $userCancelled = false;
+        $hasPaymentDeadline = false;
+        
+        if ($checkStmt) {
+            mysqli_stmt_bind_param($checkStmt, "i", $reservationId);
+            mysqli_stmt_execute($checkStmt);
+            $checkResult = mysqli_stmt_get_result($checkStmt);
+            $checkRow = mysqli_fetch_assoc($checkResult);
+            mysqli_stmt_close($checkStmt);
+            
+            if ($checkRow) {
+                $userCancelled = (bool)$checkRow['userCancelled'];
+                // Check if paymentDeadline exists (indicates it was a confirmed reservation)
+                if ($checkRow['paymentDeadline'] && !empty($checkRow['paymentDeadline']) && $checkRow['paymentDeadline'] !== '0000-00-00 00:00:00') {
+                    $hasPaymentDeadline = true;
+                }
+            }
         }
-        $message .= " has been CANCELLED. The selected date and time are already occupied. ";
-        $message .= "Please contact us for alternative dates. - EVENZA";
+        
+        // If cancellationType wasn't set correctly, use fallback logic
+        // If paymentDeadline exists and not user-cancelled, it's likely non-payment
+        if ($cancellationType === false && !$userCancelled && $hasPaymentDeadline) {
+            $cancellationType = 'non_payment';
+        }
+        
+        // Determine message based on cancellation type
+        if ($userCancelled) {
+            // User-initiated cancellation
+            $message = "Hello " . $reservation['customerName'] . ", we regret to inform you that your reservation for " . $reservation['eventName'] . " on " . $reservationDate;
+            if (!empty($timeRange)) {
+                $message .= " (" . $timeRange . ")";
+            }
+            $message .= " has been CANCELLED. You have cancelled this reservation. ";
+            $message .= "Please contact us for alternative dates. - EVENZA";
+        } elseif ($cancellationType === 'non_payment') {
+            // Confirmed → Cancelled: Non-payment (admin cancelled after payment deadline passed)
+            $message = "Hello " . $reservation['customerName'] . ", we regret to inform you that your reservation for " . $reservation['eventName'] . " on " . $reservationDate;
+            if (!empty($timeRange)) {
+                $message .= " (" . $timeRange . ")";
+            }
+            $message .= " has been CANCELLED due to failure to settle the payment within the required 2-day timeframe. ";
+            $message .= "Please contact us if you wish to make a new reservation. - EVENZA";
+        } elseif ($cancellationType === 'date_occupied') {
+            // Pending → Cancelled: Date/time occupied
+            $message = "Hello " . $reservation['customerName'] . ", we regret to inform you that your reservation for " . $reservation['eventName'] . " on " . $reservationDate;
+            if (!empty($timeRange)) {
+                $message .= " (" . $timeRange . ")";
+            }
+            $message .= " has been CANCELLED. The selected date and time are already occupied. ";
+            $message .= "Please contact us for alternative dates. - EVENZA";
+        } else {
+            // Other admin cancellation reasons (fallback)
+            $message = "Hello " . $reservation['customerName'] . ", we regret to inform you that your reservation for " . $reservation['eventName'] . " on " . $reservationDate;
+            if (!empty($timeRange)) {
+                $message .= " (" . $timeRange . ")";
+            }
+            $message .= " has been CANCELLED. The selected date and time are already occupied. ";
+            $message .= "Please contact us for alternative dates. - EVENZA";
+        }
     } else {
         return false;
     }
