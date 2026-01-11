@@ -816,11 +816,113 @@ html {
     box-shadow: 0 0 0 3px rgba(107, 127, 90, 0.15);
 }
 
+/* Form Validation Feedback - Dynamic validation (no static red) */
+.luxury-input:invalid:not(:placeholder-shown) {
+    border-color: #E8E4DC;
+    box-shadow: none;
+}
+
+.luxury-input:invalid:not(:placeholder-shown):focus {
+    border-color: var(--accent-olive);
+    box-shadow: 0 0 0 3px rgba(107, 127, 90, 0.15);
+}
+
+/* Validation feedback for required fields on form submit */
+.form-control.luxury-input.is-invalid,
+.form-select.luxury-input.is-invalid {
+    border-color: #D93025 !important;
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.1);
+}
+
+.form-control.luxury-input.is-invalid:focus,
+.form-select.luxury-input.is-invalid:focus {
+    border-color: #D93025 !important;
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.2);
+}
+
+/* Date input validation */
+input[type="date"].is-invalid,
+input[type="date"].luxury-input.is-invalid,
+input[type="date"].form-control.is-invalid {
+    border-color: #D93025 !important;
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.1);
+}
+
+input[type="date"].is-invalid:focus,
+input[type="date"].luxury-input.is-invalid:focus,
+input[type="date"].form-control.is-invalid:focus {
+    border-color: #D93025 !important;
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.2);
+}
+
 .luxury-input::placeholder {
     color: #9ca3af;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-weight: 400;
 }
+
+/* Date Input Styling - EVENZA Green */
+input[type="date"],
+input[type="date"].luxury-input,
+input[type="date"].form-control {
+    accent-color: #4A5D4E !important;
+    color-scheme: light;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    position: relative;
+}
+
+/* Force EVENZA Green accent color for all date inputs */
+input[type="date"] {
+    accent-color: #4A5D4E !important;
+    --accent-color: #4A5D4E !important;
+}
+
+/* Webkit browsers - ensure accent color is applied */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: none;
+}
+
+/* Note: The calendar popup's selected date color is controlled by the browser's accent-color property.
+   In Chrome/Edge/Safari, setting accent-color: #4A5D4E should change the selected date from blue to green.
+   However, the calendar popup itself is OS-controlled and cannot be fully styled with CSS. */
+
+/* Calendar Icon Styling - Keep native icon visible */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+    padding: 4px;
+    margin-left: 4px;
+    width: 20px;
+    height: 20px;
+}
+
+input[type="date"]:focus::-webkit-calendar-picker-indicator,
+input[type="date"]:hover::-webkit-calendar-picker-indicator {
+    opacity: 1;
+    cursor: pointer;
+}
+
+input[type="date"]:focus {
+    border-color: #6B7F5A;
+}
+
+/* Firefox date input calendar icon */
+input[type="date"]::-moz-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+input[type="date"]:focus::-moz-calendar-picker-indicator,
+input[type="date"]:hover::-moz-calendar-picker-indicator {
+    opacity: 1;
+}
+
 
 /* No Results Found Message */
 .no-results-container {
@@ -1058,7 +1160,7 @@ html {
 
 .breadcrumb {
     background-color: transparent;
-    padding: 0;
+    padding: 0.5rem 0 0 0;
     margin-bottom: 1rem;
 }
 
@@ -2474,6 +2576,10 @@ html {
     line-height: 1.6;
 }
 
+.modal-content {
+    border-radius: 20px;
+}
+
 .modal-content.luxury-card {
     border: none;
     border-radius: 20px;
@@ -2902,19 +3008,23 @@ html {
 
 .admin-card {
     background-color: #FFFFFF;
-    border-radius: 15px;
+    border-radius: 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
     border: none;
 }
 
 .stat-number { 
     color: var(--text-charcoal); 
-    font-family: 'Playfair Display', serif; 
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: 1.8rem;
 }
 
 .stat-label { 
     color: rgba(26, 26, 26, 0.7); 
     font-weight: 500;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
 }
 
 .table thead th { 
@@ -2973,11 +3083,10 @@ html {
 .package-tile {
     flex: 1;
     min-width: 140px;
-    padding: 1rem;
-    border: 2px solid rgba(107, 127, 90, 0.15);
-    border-radius: 15px;
+    padding: 1.25rem;
+    border-radius: 20px;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -2986,26 +3095,53 @@ html {
 
 .package-tile[data-tier="Bronze"],
 .package-tile[data-tier="bronze"] {
-    border-color: var(--tier-bronze);
     background: linear-gradient(135deg, #B8956A 0%, #9A7A52 100%);
+    border: 2px solid #8B6A42;
     color: white;
     box-shadow: 0 4px 12px rgba(184, 149, 106, 0.3);
 }
 
+.package-tile[data-tier="Bronze"].selected,
+.package-tile[data-tier="bronze"].selected {
+    background: linear-gradient(135deg, #B8956A 0%, #9A7A52 100%);
+    border: 3px solid #4A5D4E !important;
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.1);
+}
+
 .package-tile[data-tier="Silver"],
 .package-tile[data-tier="silver"] {
-    border-color: var(--tier-silver);
-    background: linear-gradient(135deg, #E8E8E8 0%, #C8C8C8 100%);
+    background: #E8E8E8;
+    border: none;
     color: #2C2C2C;
     box-shadow: 0 4px 12px rgba(212, 212, 212, 0.3);
 }
 
+.package-tile[data-tier="Silver"].selected,
+.package-tile[data-tier="silver"].selected {
+    background: #E8E8E8;
+    border: 3px solid #4A5D4E !important;
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.1);
+}
+
 .package-tile[data-tier="Gold"],
 .package-tile[data-tier="gold"] {
-    border-color: var(--tier-gold);
     background: linear-gradient(135deg, #F4D03F 0%, #D4AF37 100%);
+    border: 2px solid #C4A027;
     color: #2C2C2C;
     box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.package-tile[data-tier="Gold"].selected,
+.package-tile[data-tier="gold"].selected {
+    background: linear-gradient(135deg, #F4D03F 0%, #D4AF37 100%);
+    border: 3px solid #4A5D4E !important;
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.1);
 }
 
 .package-tile[data-tier="Bronze"]:hover,
@@ -3017,7 +3153,7 @@ html {
 
 .package-tile[data-tier="Silver"]:hover,
 .package-tile[data-tier="silver"]:hover {
-    background: linear-gradient(135deg, #F0F0F0 0%, #D8D8D8 100%);
+    background: #F0F0F0;
     box-shadow: 0 6px 20px rgba(212, 212, 212, 0.4);
     transform: translateY(-2px);
 }
@@ -3030,14 +3166,16 @@ html {
 }
 
 .package-tile.selected {
-    border-width: 3px;
-    box-shadow: 0 8px 24px rgba(107, 127, 90, 0.18);
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    filter: brightness(1.1);
 }
 
 .package-tile-name {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 0.75rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .package-tile[data-tier="Bronze"] .package-tile-name,
@@ -3060,9 +3198,10 @@ html {
 }
 
 .package-tile-price {
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 700;
     margin-top: auto;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .package-tile[data-tier="Bronze"] .package-tile-price,
@@ -3114,6 +3253,129 @@ html {
     cursor: pointer;
     height: 48px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    accent-color: #6B7F5A;
+}
+
+/* Style dropdown options with EVENZA Green - Remove blue highlight */
+.form-select.luxury-input option {
+    background-color: #FFFFFF !important;
+    color: #1A1A1A !important;
+    padding: 0.5rem;
+}
+
+.form-select.luxury-input option:checked {
+    background-color: #6B7F5A !important;
+    color: #FFFFFF !important;
+}
+
+/* Remove blue highlight and use EVENZA Green for selected/hovered options */
+.form-select.luxury-input option:hover,
+.form-select.luxury-input option:focus,
+.form-select.luxury-input option[selected] {
+    background-color: #6B7F5A !important;
+    color: #FFFFFF !important;
+}
+
+/* Custom Dropdown Styling - EVENZA Green (Reusable) */
+.custom-dropdown-wrapper {
+    position: relative;
+    z-index: 10;
+}
+
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.custom-dropdown-selected {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border: 2px solid rgba(107, 127, 90, 0.15);
+    border-radius: 10px;
+    background-color: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
+    color: #1A1A1A;
+    height: 48px;
+    box-sizing: border-box;
+}
+
+.custom-dropdown-selected:hover {
+    border-color: rgba(107, 127, 90, 0.3);
+}
+
+.custom-dropdown-selected i {
+    transition: transform 0.3s ease;
+    color: #6B7F5A;
+    font-size: 0.875rem;
+}
+
+.custom-dropdown.open .custom-dropdown-selected i {
+    transform: rotate(180deg);
+}
+
+.custom-dropdown.open .custom-dropdown-selected {
+    border-color: var(--accent-olive);
+    box-shadow: 0 0 0 3px rgba(107, 127, 90, 0.15);
+}
+
+.custom-dropdown-options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background-color: #FFFFFF;
+    border: 1px solid rgba(74, 93, 74, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 9999;
+    max-height: 250px;
+    overflow-y: auto;
+    display: none;
+}
+
+.custom-dropdown.open .custom-dropdown-options {
+    display: block;
+}
+
+.custom-dropdown-option {
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 0.95rem;
+    color: #1A1A1A;
+    background-color: #FFFFFF;
+}
+
+.custom-dropdown-option:first-child {
+    border-radius: 12px 12px 0 0;
+}
+
+.custom-dropdown-option:last-child {
+    border-radius: 0 0 12px 12px;
+}
+
+.custom-dropdown-option:hover {
+    background-color: #6B7F5A !important;
+    color: #FFFFFF !important;
+}
+
+.custom-dropdown-option.selected {
+    background-color: #6B7F5A !important;
+    color: #FFFFFF !important;
+    font-weight: 600;
+}
+
+/* Custom dropdown validation error state */
+.custom-dropdown-wrapper .custom-dropdown-selected.is-invalid {
+    border-color: #D93025 !important;
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.1);
 }
 
 .events-grid-section {
@@ -3375,7 +3637,6 @@ html {
     padding-bottom: 0;
 }
 
-/* Review Card Star Ratings - High Contrast Golden Yellow */
 .review-item .star-rating-display,
 .review-card .star-rating-display {
     margin-bottom: 0.75rem;

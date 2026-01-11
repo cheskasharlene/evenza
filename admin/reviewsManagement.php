@@ -211,20 +211,59 @@ mysqli_free_result($statsResult);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
         .star-rating-display {
-            color: #ffc107;
+            color: #FFD700;
         }
         .stat-label {
-            font-size: 0.875rem;
-            color: #6c757d;
+            font-size: 0.95rem;
+            color: rgba(26, 26, 26, 0.7);
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
         .stat-number {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #1A1A1A;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        /* Rating Filter Pill Styling */
+        .rating-filter-pill {
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            border: 2px solid #E8E4DC;
+            background-color: #FFFFFF;
+            color: #1A1A1A;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .rating-filter-pill:hover {
+            background-color: #F5F5F5;
+            border-color: #D4D4D4;
+        }
+        
+        .rating-filter-pill.active {
+            background-color: #4A5D4E;
+            border-color: #4A5D4E;
+            color: #FFFFFF;
+        }
+        
+        .rating-filter-pill.active:hover {
+            background-color: #5A6B5A;
+            border-color: #5A6B5A;
+        }
+        
+        .rating-filter-pill.active i.fa-star {
+            color: #FFFFFF !important;
         }
     </style>
 </head>
@@ -305,7 +344,12 @@ mysqli_free_result($statsResult);
                         <div class="admin-card p-4 h-100">
                             <div class="d-flex flex-column">
                                 <div class="stat-label mb-2">Average Rating</div>
-                                <div class="stat-number"><?php echo number_format($stats['averageRating'] ?? 0, 1); ?>/5</div>
+                                <div class="stat-number">
+                                    <?php echo number_format($stats['averageRating'] ?? 0, 1); ?>/5
+                                    <span style="font-size: 1.5rem; color: #FFD700; margin-left: 0.25rem; vertical-align: middle;">
+                                        <i class="fas fa-star"></i>
+                                    </span>
+                                </div>
                                 <div class="text-muted small mt-2">Overall rating</div>
                             </div>
                         </div>
@@ -315,29 +359,34 @@ mysqli_free_result($statsResult);
                 <!-- Filters -->
                 <div class="admin-card mb-4">
                     <div class="p-4">
-                        <form method="GET" action="" class="row g-3">
+                        <form method="GET" action="" id="reviewFilterForm" class="row g-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-semibold" style="color: #1A1A1A;">Search</label>
-                                <input type="text" class="form-control" name="search" placeholder="Name, email, or comment..." value="<?php echo htmlspecialchars($searchQuery); ?>" style="border-radius: 50px; padding: 0.6rem 1.25rem; border: 1px solid rgba(74, 93, 74, 0.2);">
+                                <input type="text" class="form-control" name="search" id="reviewSearchInput" placeholder="Name, email, or comment..." value="<?php echo htmlspecialchars($searchQuery); ?>" style="border-radius: 50px; padding: 0.6rem 1.25rem; border: 1px solid rgba(74, 93, 74, 0.2);">
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-semibold" style="color: #1A1A1A;">Rating</label>
-                                <select class="form-select" name="rating" style="border-radius: 50px; padding: 0.6rem 1.25rem; border: 1px solid rgba(74, 93, 74, 0.2);">
-                                    <option value="">All Ratings</option>
-                                    <option value="5" <?php echo $ratingFilter == 5 ? 'selected' : ''; ?>>5 Stars</option>
-                                    <option value="4" <?php echo $ratingFilter == 4 ? 'selected' : ''; ?>>4 Stars</option>
-                                    <option value="3" <?php echo $ratingFilter == 3 ? 'selected' : ''; ?>>3 Stars</option>
-                                    <option value="2" <?php echo $ratingFilter == 2 ? 'selected' : ''; ?>>2 Stars</option>
-                                    <option value="1" <?php echo $ratingFilter == 1 ? 'selected' : ''; ?>>1 Star</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="submit" class="btn btn-admin-primary w-100 me-2">
-                                    <i class="fas fa-filter me-2"></i>Filter
-                                </button>
-                                <a href="reviewsManagement.php" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 0.6rem 1.25rem;">
-                                    <i class="fas fa-times"></i>
-                                </a>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold mb-2" style="color: #1A1A1A;">Filter by Rating</label>
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <button type="button" class="rating-filter-pill <?php echo $ratingFilter == 0 ? 'active' : ''; ?>" data-rating="0">
+                                        All Ratings
+                                    </button>
+                                    <button type="button" class="rating-filter-pill <?php echo $ratingFilter == 5 ? 'active' : ''; ?>" data-rating="5">
+                                        5 <i class="fas fa-star" style="color: #FFD700; font-size: 0.85rem;"></i>
+                                    </button>
+                                    <button type="button" class="rating-filter-pill <?php echo $ratingFilter == 4 ? 'active' : ''; ?>" data-rating="4">
+                                        4 <i class="fas fa-star" style="color: #FFD700; font-size: 0.85rem;"></i>
+                                    </button>
+                                    <button type="button" class="rating-filter-pill <?php echo $ratingFilter == 3 ? 'active' : ''; ?>" data-rating="3">
+                                        3 <i class="fas fa-star" style="color: #FFD700; font-size: 0.85rem;"></i>
+                                    </button>
+                                    <button type="button" class="rating-filter-pill <?php echo $ratingFilter == 2 ? 'active' : ''; ?>" data-rating="2">
+                                        2 <i class="fas fa-star" style="color: #FFD700; font-size: 0.85rem;"></i>
+                                    </button>
+                                    <button type="button" class="rating-filter-pill <?php echo $ratingFilter == 1 ? 'active' : ''; ?>" data-rating="1">
+                                        1 <i class="fas fa-star" style="color: #FFD700; font-size: 0.85rem;"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="rating" id="ratingFilter" value="<?php echo $ratingFilter; ?>">
                             </div>
                         </form>
                     </div>
@@ -428,6 +477,34 @@ mysqli_free_result($statsResult);
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Handle rating filter pill clicks
+        document.querySelectorAll('.rating-filter-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                // Remove active class from all pills
+                document.querySelectorAll('.rating-filter-pill').forEach(p => p.classList.remove('active'));
+                // Add active class to clicked pill
+                this.classList.add('active');
+                // Update hidden input value
+                const ratingValue = this.getAttribute('data-rating');
+                document.getElementById('ratingFilter').value = ratingValue === '0' ? '' : ratingValue;
+                // Submit form immediately
+                document.getElementById('reviewFilterForm').submit();
+            });
+        });
+        
+        // Sidebar toggle for mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('adminSidebarToggle');
+            const sidebar = document.querySelector('.admin-sidebar');
+            
+            if (sidebarToggle && sidebar) {
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('show');
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 

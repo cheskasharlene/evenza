@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 star.classList.remove('fas');
                 star.classList.add('far', 'text-muted');
             }
+            star.style.color = '#ddd';
         });
     }
 
@@ -34,6 +35,13 @@ document.addEventListener('DOMContentLoaded', function() {
             star.addEventListener('mouseenter', function() {
                 const rating = parseInt(this.getAttribute('data-rating'));
                 highlightStars(rating);
+                // Ensure hover color is golden yellow
+                const allStars = starRating.querySelectorAll('.star-icon');
+                allStars.forEach((s, idx) => {
+                    if (idx < rating) {
+                        s.style.color = '#FFD700';
+                    }
+                });
             });
 
             star.addEventListener('click', function() {
@@ -58,9 +66,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (starRatingValue <= rating) {
                 star.classList.remove('far', 'text-muted');
                 star.classList.add('fas', 'text-warning');
+                star.style.color = '#FFD700';
             } else {
                 star.classList.remove('fas', 'text-warning');
                 star.classList.add('far', 'text-muted');
+                star.style.color = '#ddd';
             }
         });
     }

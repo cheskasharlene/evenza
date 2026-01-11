@@ -45,7 +45,7 @@ $query = "
     LEFT JOIN events e ON r.eventId = e.eventId
     LEFT JOIN packages p ON r.packageId = p.packageId
     WHERE r.userId = ?
-    ORDER BY r.reservationDate DESC, r.createdAt DESC
+    ORDER BY r.reservationId DESC
 ";
 $stmt = mysqli_prepare($conn, $query);
 
@@ -101,7 +101,7 @@ if ($stmt) {
                             <a class="nav-link active" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="logout.php?type=user">Logout</a>
+                            <a class="nav-link btn-register" href="../process/logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">

@@ -188,13 +188,28 @@ function getCategoryFilter($category) {
                                 </div>
                             </div>
                             <div class="col-md-4 category-select-col">
-                                <select class="form-select luxury-input" id="categoryFilter">
-                                    <option value="all">All Categories</option>
-                                    <option value="business">Business</option>
-                                    <option value="weddings">Weddings</option>
-                                    <option value="socials">Socials</option>
-                                    <option value="workshops">Workshops</option>
-                                </select>
+                                <div class="custom-dropdown-wrapper">
+                                    <select class="form-select luxury-input" id="categoryFilter" style="display: none;">
+                                        <option value="all">All Categories</option>
+                                        <option value="business">Business</option>
+                                        <option value="weddings">Weddings</option>
+                                        <option value="socials">Socials</option>
+                                        <option value="workshops">Workshops</option>
+                                    </select>
+                                    <div class="custom-dropdown" id="customCategoryFilter">
+                                        <div class="custom-dropdown-selected">
+                                            <span>All Categories</span>
+                                            <i class="fas fa-chevron-down"></i>
+                                        </div>
+                                        <div class="custom-dropdown-options">
+                                            <div class="custom-dropdown-option" data-value="all">All Categories</div>
+                                            <div class="custom-dropdown-option" data-value="business">Business</div>
+                                            <div class="custom-dropdown-option" data-value="weddings">Weddings</div>
+                                            <div class="custom-dropdown-option" data-value="socials">Socials</div>
+                                            <div class="custom-dropdown-option" data-value="workshops">Workshops</div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -294,10 +309,161 @@ function getCategoryFilter($category) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/main.js"></script>
     <script src="../assets/js/events.js"></script>
+    <style>
+        /* Custom Dropdown Styling - EVENZA Green */
+        .custom-dropdown-wrapper {
+            position: relative;
+        }
+        
+        .custom-dropdown {
+            position: relative;
+            width: 100%;
+        }
+        
+        .custom-dropdown-selected {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            border: 2px solid #E8E4DC;
+            border-radius: 8px;
+            background-color: #FDFCF9;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 48px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-dark-gray);
+        }
+        
+        .custom-dropdown-selected:hover {
+            border-color: var(--accent-olive);
+        }
+        
+        .custom-dropdown-selected i {
+            transition: transform 0.3s ease;
+            color: #6B7F5A;
+        }
+        
+        .custom-dropdown.open .custom-dropdown-selected i {
+            transform: rotate(180deg);
+        }
+        
+        .custom-dropdown.open .custom-dropdown-selected {
+            border-color: var(--accent-olive);
+            box-shadow: 0 0 0 3px rgba(107, 127, 90, 0.1);
+        }
+        
+        .custom-dropdown-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            right: 0;
+            background-color: #FFFFFF;
+            border: 2px solid #E8E4DC;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 250px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .custom-dropdown.open .custom-dropdown-options {
+            display: block;
+        }
+        
+        .custom-dropdown-option {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 0.95rem;
+            color: #1A1A1A;
+            background-color: #FFFFFF;
+        }
+        
+        .custom-dropdown-option:first-child {
+            border-radius: 6px 6px 0 0;
+        }
+        
+        .custom-dropdown-option:last-child {
+            border-radius: 0 0 6px 6px;
+        }
+        
+        .custom-dropdown-option:hover {
+            background-color: #6B7F5A !important;
+            color: #FFFFFF !important;
+        }
+        
+        .custom-dropdown-option.selected {
+            background-color: #6B7F5A !important;
+            color: #FFFFFF !important;
+            font-weight: 600;
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize custom dropdown
+            const customDropdown = document.getElementById('customCategoryFilter');
+            const nativeSelect = document.getElementById('categoryFilter');
+            const selectedText = customDropdown ? customDropdown.querySelector('.custom-dropdown-selected span') : null;
+            const options = customDropdown ? customDropdown.querySelectorAll('.custom-dropdown-option') : [];
+            
+            if (customDropdown && selectedText) {
+                // Set initial selected value
+                const initialValue = nativeSelect ? nativeSelect.value : 'all';
+                options.forEach(opt => {
+                    if (opt.getAttribute('data-value') === initialValue) {
+                        opt.classList.add('selected');
+                        selectedText.textContent = opt.textContent;
+                    }
+                });
+                
+                // Toggle dropdown
+                customDropdown.querySelector('.custom-dropdown-selected').addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    customDropdown.classList.toggle('open');
+                });
+                
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!customDropdown.contains(e.target)) {
+                        customDropdown.classList.remove('open');
+                    }
+                });
+                
+                // Handle option selection
+                options.forEach(option => {
+                    option.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const value = this.getAttribute('data-value');
+                        const text = this.textContent;
+                        
+                        // Update native select
+                        if (nativeSelect) {
+                            nativeSelect.value = value;
+                        }
+                        
+                        // Update custom dropdown
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        selectedText.textContent = text;
+                        
+                        // Close dropdown
+                        customDropdown.classList.remove('open');
+                        
+                        // Trigger change event
+                        if (nativeSelect) {
+                            const changeEvent = new Event('change', { bubbles: true });
+                            nativeSelect.dispatchEvent(changeEvent);
+                        }
+                    });
+                });
+            }
+            
             const searchInput = document.getElementById('searchInput');
-            const categoryFilter = document.getElementById('categoryFilter');
+            const categoryFilter = nativeSelect; // Use native select for filtering logic
             const eventCards = document.querySelectorAll('.event-card-wrapper');
 
             function filterEvents() {

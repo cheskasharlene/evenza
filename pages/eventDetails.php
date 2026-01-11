@@ -276,47 +276,52 @@ if (!$event) {
         }
         .package-card[data-package-tier="bronze"] {
             background: linear-gradient(135deg, #B8956A 0%, #9A7A52 100%);
-            border-color: #B8956A;
+            border: 2px solid #8B6A42;
             color: white;
             box-shadow: 0 4px 12px rgba(184, 149, 106, 0.3);
         }
         .package-card[data-package-tier="silver"] {
-            background: linear-gradient(135deg, #E8E8E8 0%, #C8C8C8 100%);
-            border-color: #D4D4D4;
+            background: #E8E8E8;
+            border: none;
             color: #2C2C2C;
             box-shadow: 0 4px 12px rgba(212, 212, 212, 0.3);
         }
         .package-card[data-package-tier="gold"] {
             background: linear-gradient(135deg, #F4D03F 0%, #D4AF37 100%);
-            border-color: #D4AF37;
+            border: 2px solid #C4A027;
             color: #2C2C2C;
             box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
         }
         .package-card[data-package-tier="bronze"]:hover {
             background: linear-gradient(135deg, #C4A575 0%, #A8855F 100%);
+            border: 2px solid #8B6A42;
             box-shadow: 0 6px 20px rgba(184, 149, 106, 0.4);
             transform: translateY(-2px);
         }
         .package-card[data-package-tier="silver"]:hover {
-            background: linear-gradient(135deg, #F0F0F0 0%, #D8D8D8 100%);
+            background: #F0F0F0;
+            border: none;
             box-shadow: 0 6px 20px rgba(212, 212, 212, 0.4);
             transform: translateY(-2px);
         }
         .package-card[data-package-tier="gold"]:hover {
             background: linear-gradient(135deg, #F8DC5F 0%, #E4C247 100%);
+            border: 2px solid #C4A027;
             box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
             transform: translateY(-2px);
         }
         .package-header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            justify-content: center;
         }
         .package-name {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             font-size: 1.1rem;
             font-weight: 600;
             margin: 0;
+            margin-bottom: 0.75rem;
         }
         .package-card[data-package-tier="bronze"] .package-name,
         .package-card[data-package-tier="bronze"] .package-price {
@@ -331,7 +336,8 @@ if (!$event) {
         .package-price {
             font-size: 1.3rem;
             font-weight: 700;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin-top: auto;
         }
         .package-modal-overlay {
             display: none;
@@ -493,7 +499,7 @@ if (!$event) {
                             <a class="nav-link" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="logout.php?type=user">Logout</a>
+                            <a class="nav-link btn-register" href="../process/logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">

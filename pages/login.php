@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <a class="nav-link" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="logout.php?type=user">Logout</a>
+                            <a class="nav-link btn-register" href="../process/logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
@@ -188,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <a href="forgot-password.php" class="text-muted small">Forgot Password?</a>
                             </div>
 
-                            <p class="text-center mb-0">Don't have an account? <a href="register.php" class="text-decoration-none">Register here</a></p>
+                            <p class="text-center mb-0">Don't have an account? <a href="register.php" class="register-link">Register here</a></p>
                         </form>
                     </div>
                 </div>
@@ -198,6 +198,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/login.js"></script>
+    <style>
+        .register-link {
+            color: #6B7F5A;
+            text-decoration: underline;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .register-link:hover {
+            color: #5A6B4F;
+            text-decoration: underline;
+        }
+        .login-page-section .luxury-card {
+            border-radius: 20px;
+        }
+    </style>
     <script>
         function togglePassword(inputId, toggleId) {
             const input = document.getElementById(inputId);

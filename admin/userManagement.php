@@ -187,18 +187,19 @@ if (!empty($params)) {
             color: #6b7280;
             border: 1px solid #6b7280;
         }
-        .search-input, .role-filter {
+        .search-input {
             border: 1px solid rgba(74, 93, 74, 0.2);
             border-radius: 50px;
             padding: 0.6rem 1.25rem;
             font-size: 0.9rem;
             transition: all 0.3s ease;
         }
-        .search-input:focus, .role-filter:focus {
+        .search-input:focus {
             border-color: #5A6B4F;
             box-shadow: 0 0 0 0.2rem rgba(90, 107, 79, 0.15);
             outline: none;
         }
+        
         .btn-add-user {
             background-color: #5A6B4F;
             border-color: #5A6B4F;
@@ -401,9 +402,10 @@ if (!empty($params)) {
                 <!-- Controls Section -->
                 <!-- Search & Filter Bar -->
                 <div class="admin-card p-4 mb-4">
-                    <div class="d-flex flex-wrap align-items-center gap-3">
+                    <div class="row g-3 align-items-end">
                         <!-- Search Input -->
-                        <div class="flex-grow-1" style="min-width: 250px;">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold" style="color: #1A1A1A;">Search</label>
                             <div class="position-relative">
                                 <i class="fas fa-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: #6c757d; z-index: 10;"></i>
                                 <input type="text" id="searchInput" class="form-control search-input" placeholder="Search by name or email..." value="<?php echo htmlspecialchars($searchQuery ?? ''); ?>" style="padding-left: 45px;">
@@ -411,18 +413,42 @@ if (!empty($params)) {
                         </div>
                         
                         <!-- Role Filter -->
-                        <div style="min-width: 180px;">
-                            <select id="roleFilter" class="form-select role-filter">
-                                <option value="all" <?php echo (empty($roleFilter) || $roleFilter === 'all') ? 'selected' : ''; ?>>All Roles</option>
-                                <option value="admin" <?php echo ($roleFilter === 'admin') ? 'selected' : ''; ?>>Admin</option>
-                                <option value="user" <?php echo ($roleFilter === 'user' || $roleFilter === 'client') ? 'selected' : ''; ?>>Client</option>
-                            </select>
+                        <div class="col-md-4">
+                            <label for="roleFilter" class="form-label fw-semibold" style="color: #1A1A1A;">Filter by Role</label>
+                            <div class="custom-dropdown-wrapper">
+                                <select id="roleFilter" class="form-select" style="display: none;">
+                                    <option value="all" <?php echo (empty($roleFilter) || $roleFilter === 'all') ? 'selected' : ''; ?>>All Roles</option>
+                                    <option value="admin" <?php echo ($roleFilter === 'admin') ? 'selected' : ''; ?>>Admin</option>
+                                    <option value="user" <?php echo ($roleFilter === 'user' || $roleFilter === 'client') ? 'selected' : ''; ?>>User</option>
+                                </select>
+                                <div class="custom-dropdown" id="customRoleFilter">
+                                    <div class="custom-dropdown-selected">
+                                        <span><?php 
+                                            if (empty($roleFilter) || $roleFilter === 'all') {
+                                                echo 'All Roles';
+                                            } elseif ($roleFilter === 'admin') {
+                                                echo 'Admin';
+                                            } else {
+                                                echo 'User';
+                                            }
+                                        ?></span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <div class="custom-dropdown-options">
+                                        <div class="custom-dropdown-option" data-value="all">All Roles</div>
+                                        <div class="custom-dropdown-option" data-value="admin">Admin</div>
+                                        <div class="custom-dropdown-option" data-value="user">User</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Add User Button -->
-                        <button type="button" class="btn btn-add-user" data-bs-toggle="modal" data-bs-target="#userModal" onclick="openAddUserModal()">
-                            <i class="fas fa-plus me-2"></i> Add New User
-                        </button>
+                        <div class="col-md-2">
+                            <button type="button" class="btn btn-add-user w-100" data-bs-toggle="modal" data-bs-target="#userModal" onclick="openAddUserModal()">
+                                <i class="fas fa-plus me-2"></i> Add New User
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -665,6 +691,55 @@ if (!empty($params)) {
         const searchInput = document.getElementById('searchInput');
         const roleFilter = document.getElementById('roleFilter');
         const usersTableBody = document.getElementById('usersTableBody');
+        
+        // Initialize custom dropdown for role filter
+        function initCustomDropdown(nativeSelect, customDropdown) {
+            const selectedText = customDropdown.querySelector('.custom-dropdown-selected span');
+            const options = customDropdown.querySelectorAll('.custom-dropdown-option');
+            
+            // Set initial selected value
+            const initialValue = nativeSelect.value;
+            const initialText = Array.from(nativeSelect.options).find(opt => opt.value === initialValue)?.textContent || 'All Roles';
+            selectedText.textContent = initialText;
+            
+            // Toggle dropdown on click
+            customDropdown.querySelector('.custom-dropdown-selected').addEventListener('click', function(e) {
+                e.stopPropagation();
+                customDropdown.classList.toggle('open');
+            });
+            
+            // Handle option selection
+            options.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+                    
+                    // Update native select
+                    nativeSelect.value = value;
+                    
+                    // Update custom dropdown display
+                    selectedText.textContent = text;
+                    customDropdown.classList.remove('open');
+                    
+                    // Trigger search
+                    performSearch();
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!customDropdown.contains(e.target)) {
+                    customDropdown.classList.remove('open');
+                }
+            });
+        }
+        
+        // Initialize role filter dropdown
+        const customRoleFilter = document.getElementById('customRoleFilter');
+        if (customRoleFilter && roleFilter) {
+            initCustomDropdown(roleFilter, customRoleFilter);
+        }
 
         function performSearch() {
             const searchQuery = searchInput.value.trim();
@@ -764,10 +839,6 @@ if (!empty($params)) {
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(performSearch, 300);
-        });
-
-        roleFilter.addEventListener('change', function() {
-            performSearch();
         });
 
         const urlParams = new URLSearchParams(window.location.search);

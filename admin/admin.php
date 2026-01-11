@@ -226,7 +226,19 @@ try {
             font-weight: 500;
         }
         .table-sm td, .table-sm th { 
-            padding: 0.75rem; 
+            padding: 20px 0.75rem; 
+            line-height: 1.4;
+            font-size: 1rem;
+        }
+        .card-content .table-responsive .table tbody tr td {
+            font-weight: 400;
+        }
+        .card-content .table-responsive .table tbody tr td .fw-semibold {
+            font-weight: 500;
+            line-height: 1.3;
+        }
+        .card-content .table-responsive .table tbody tr:last-child td {
+            padding-bottom: 0;
         }
         .activity-item { 
             border-left: 3px solid rgba(74, 93, 74, 0.2); 
@@ -235,6 +247,9 @@ try {
             border-radius: 8px;
             padding: 0.75rem;
             background-color: rgba(249, 247, 242, 0.5);
+        }
+        .activity-item:last-child {
+            margin-bottom: 0;
         }
         #recentActivity {
             overflow: visible;
@@ -260,6 +275,9 @@ try {
             display: flex;
             flex-direction: column;
         }
+        .dashboard-grid .admin-card {
+            padding-bottom: 24px;
+        }
         .dashboard-grid {
             display: flex;
             align-items: stretch;
@@ -283,9 +301,44 @@ try {
             margin-bottom: 24px;
         }
         .card-content {
+            flex: 0 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .card-content .table-responsive {
+            display: block;
+            flex-shrink: 0;
+        }
+        .card-content .table-responsive .table {
+            margin-bottom: 0 !important;
+            width: 100%;
+        }
+        .card-content .table-responsive .table tbody {
+            display: table-row-group;
+        }
+        .card-content .table-responsive .table tbody tr td:first-child {
+            font-family: 'Playfair Display', serif;
+        }
+        .card-content .table-responsive .table tbody tr td:nth-child(2) {
+            text-align: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .card-content .table-responsive .table tbody tr td:nth-child(3) {
+            text-align: right;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        .card-content #recentActivity {
             flex: 1;
             display: flex;
             flex-direction: column;
+            justify-content: flex-start;
+        }
+        .card-content #recentActivity > div:last-child {
+            margin-bottom: 0 !important;
+        }
+        .card-content #recentActivity .activity-item:last-child {
+            margin-bottom: 0 !important;
         }
         .btn-admin-primary {
             background-color: #5A6B4F;
@@ -542,7 +595,7 @@ try {
                                     $avgRating = isset($stats['averageRating']) ? floatval($stats['averageRating']) : 0;
                                     echo number_format($avgRating, 1);
                                     ?>
-                                    <span style="font-size: 1.5rem; color: #ffc107; margin-left: 0.25rem;">
+                                    <span style="font-size: 1.5rem; color: #FFD700; margin-left: 0.25rem; vertical-align: middle;">
                                         <i class="fas fa-star"></i>
                                     </span>
                                 </div>
@@ -568,8 +621,8 @@ try {
                                     <thead>
                                         <tr style="border-bottom: 2px solid rgba(74, 93, 74, 0.1);">
                                             <th style="font-weight: 600; color: #1A1A1A;">Event Name</th>
-                                            <th style="font-weight: 600; color: #1A1A1A;">Reservations</th>
-                                            <th style="font-weight: 600; color: #1A1A1A;">Revenue</th>
+                                            <th style="font-weight: 600; color: #1A1A1A; text-align: center;">Reservations</th>
+                                            <th style="font-weight: 600; color: #1A1A1A; text-align: right;">Revenue</th>
                                         </tr>
                                     </thead>
                                     <tbody id="topEventsBody">
@@ -585,8 +638,8 @@ try {
                                                             <div class="fw-semibold" style="font-family: 'Playfair Display', serif;"><?php echo htmlspecialchars($event['title']); ?></div>
                                                         </div>
                                                     </td>
-                                                    <td><?php echo number_format($event['packagesReserved']); ?></td>
-                                                    <td>₱ <?php echo number_format($event['revenue'], 2); ?></td>
+                                                    <td style="text-align: center;"><?php echo number_format($event['packagesReserved']); ?></td>
+                                                    <td style="text-align: right;">₱ <?php echo number_format($event['revenue'], 2); ?></td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         <?php endif; ?>

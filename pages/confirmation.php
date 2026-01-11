@@ -230,6 +230,21 @@ if ($reservationSaved && !$errorOccurred && $reservationId > 0) {
             }
             mysqli_stmt_close($statusCheckStmt);
         }
+        
+        // Fetch transaction ID from payments table
+        if (empty($transactionId)) {
+            $txQuery = "SELECT transactionId FROM payments WHERE reservationId = ? ORDER BY paymentId DESC LIMIT 1";
+            $txStmt = mysqli_prepare($conn, $txQuery);
+            if ($txStmt) {
+                mysqli_stmt_bind_param($txStmt, "i", $reservationId);
+                mysqli_stmt_execute($txStmt);
+                $txResult = mysqli_stmt_get_result($txStmt);
+                if ($txRow = mysqli_fetch_assoc($txResult)) {
+                    $transactionId = $txRow['transactionId'];
+                }
+                mysqli_stmt_close($txStmt);
+            }
+        }
     }
 }
 
@@ -433,6 +448,30 @@ if (!$package) {
             box-shadow: 0 6px 20px rgba(107, 93, 74, 0.3);
             color: #FFFFFF;
         }
+        .star-icon {
+            color: #ddd !important;
+            transition: color 0.2s ease;
+        }
+        .star-icon:hover,
+        .star-rating:hover .star-icon {
+            color: #FFD700 !important;
+        }
+        .star-icon.fas.text-warning {
+            color: #FFD700 !important;
+        }
+        .star-rating .star-icon.fas {
+            color: #FFD700 !important;
+        }
+        .contact-email-link {
+            color: #4A5D4A;
+            text-decoration: underline;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .contact-email-link:hover {
+            color: #6B8E6B;
+            text-decoration: underline;
+        }
         @media (max-width: 768px) {
             .thank-you-title {
                 font-size: 2rem;
@@ -477,7 +516,7 @@ if (!$package) {
                             <a class="nav-link" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="logout.php?type=user">Logout</a>
+                            <a class="nav-link btn-register" href="../process/logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
@@ -561,6 +600,15 @@ if (!$package) {
                                     <span class="detail-label">Reservation ID</span>
                                     <span class="detail-value">#<?php echo $reservationId; ?></span>
                                 </div>
+                                
+                                <?php if (!empty($transactionId)): ?>
+                                <div class="detail-row">
+                                    <span class="detail-label">Transaction ID</span>
+                                    <span class="detail-value">
+                                        <span class="transaction-id"><?php echo htmlspecialchars($transactionId); ?></span>
+                                    </span>
+                                </div>
+                                <?php endif; ?>
                             </div>
 
                             <div class="confirmation-actions text-center">
@@ -668,7 +716,7 @@ if (!$package) {
                             </li>
                             <li class="mb-0">
                                 <i class="fas fa-check-circle text-success me-2"></i>
-                                For any questions, contact us at <a href="mailto:info@evenza.com">info@evenza.com</a>
+                                For any questions, contact us at <a href="mailto:evenzacompany@gmail.com" class="contact-email-link">evenzacompany@gmail.com</a>
                             </li>
                         </ul>
                     </div>

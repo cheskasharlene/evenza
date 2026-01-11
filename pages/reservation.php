@@ -126,7 +126,7 @@ $totalAmount = $selectedPackage['price'];
                             <a class="nav-link" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="logout.php?type=user">Logout</a>
+                            <a class="nav-link btn-register" href="../process/logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
@@ -192,51 +192,100 @@ $totalAmount = $selectedPackage['price'];
                                 <input type="tel" class="form-control luxury-input" id="mobile" name="mobile" required placeholder="0921 123 4567">
                             </div>
 
-                            <div class="mb-4">
-                                <label for="reservationDate" class="form-label">Preferred Date <span class="text-danger">*</span></label>
-                                <input type="date" class="form-control luxury-input" id="reservationDate" name="reservationDate" required>
-                            </div>
-
                             <div class="row g-3 mb-4">
-                                <div class="col-md-6">
-                                    <label for="eventStartTime" class="form-label">Event Start Time <span class="text-danger">*</span></label>
-                                    <select class="form-select luxury-input" id="eventStartTime" name="eventStartTime" required>
-                                        <option value="">Select start time</option>
-                                        <option value="08:00 AM">8:00 AM</option>
-                                        <option value="09:00 AM">9:00 AM</option>
-                                        <option value="10:00 AM">10:00 AM</option>
-                                        <option value="11:00 AM">11:00 AM</option>
-                                        <option value="12:00 PM">12:00 PM</option>
-                                        <option value="01:00 PM">1:00 PM</option>
-                                        <option value="02:00 PM">2:00 PM</option>
-                                        <option value="03:00 PM">3:00 PM</option>
-                                        <option value="04:00 PM">4:00 PM</option>
-                                        <option value="05:00 PM">5:00 PM</option>
-                                        <option value="06:00 PM">6:00 PM</option>
-                                        <option value="07:00 PM">7:00 PM</option>
-                                        <option value="08:00 PM">8:00 PM</option>
-                                    </select>
+                                <div class="col-md-4">
+                                    <label for="reservationDate" class="form-label">Preferred Date <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control luxury-input" id="reservationDate" name="reservationDate" required style="accent-color: #4A5D4E;">
                                 </div>
-                                <div class="col-md-6">
+                                <div class="col-md-4">
+                                    <label for="eventStartTime" class="form-label">Event Start Time <span class="text-danger">*</span></label>
+                                    <div class="custom-dropdown-wrapper">
+                                        <select class="form-select luxury-input" id="eventStartTime" name="eventStartTime" required style="display: none;">
+                                            <option value="">Select start time</option>
+                                            <option value="08:00 AM">8:00 AM</option>
+                                            <option value="09:00 AM">9:00 AM</option>
+                                            <option value="10:00 AM">10:00 AM</option>
+                                            <option value="11:00 AM">11:00 AM</option>
+                                            <option value="12:00 PM">12:00 PM</option>
+                                            <option value="01:00 PM">1:00 PM</option>
+                                            <option value="02:00 PM">2:00 PM</option>
+                                            <option value="03:00 PM">3:00 PM</option>
+                                            <option value="04:00 PM">4:00 PM</option>
+                                            <option value="05:00 PM">5:00 PM</option>
+                                            <option value="06:00 PM">6:00 PM</option>
+                                            <option value="07:00 PM">7:00 PM</option>
+                                            <option value="08:00 PM">8:00 PM</option>
+                                        </select>
+                                        <div class="custom-dropdown" id="customEventStartTime">
+                                            <div class="custom-dropdown-selected">
+                                                <span>Select start time</span>
+                                                <i class="fas fa-chevron-down"></i>
+                                            </div>
+                                            <div class="custom-dropdown-options">
+                                                <div class="custom-dropdown-option" data-value="">Select start time</div>
+                                                <div class="custom-dropdown-option" data-value="08:00 AM">8:00 AM</div>
+                                                <div class="custom-dropdown-option" data-value="09:00 AM">9:00 AM</div>
+                                                <div class="custom-dropdown-option" data-value="10:00 AM">10:00 AM</div>
+                                                <div class="custom-dropdown-option" data-value="11:00 AM">11:00 AM</div>
+                                                <div class="custom-dropdown-option" data-value="12:00 PM">12:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="01:00 PM">1:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="02:00 PM">2:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="03:00 PM">3:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="04:00 PM">4:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="05:00 PM">5:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="06:00 PM">6:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="07:00 PM">7:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="08:00 PM">8:00 PM</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
                                     <label for="eventEndTime" class="form-label">Event End Time <span class="text-danger">*</span></label>
-                                    <select class="form-select luxury-input" id="eventEndTime" name="eventEndTime" required>
-                                        <option value="">Select end time</option>
-                                        <option value="09:00 AM">9:00 AM</option>
-                                        <option value="10:00 AM">10:00 AM</option>
-                                        <option value="11:00 AM">11:00 AM</option>
-                                        <option value="12:00 PM">12:00 PM</option>
-                                        <option value="01:00 PM">1:00 PM</option>
-                                        <option value="02:00 PM">2:00 PM</option>
-                                        <option value="03:00 PM">3:00 PM</option>
-                                        <option value="04:00 PM">4:00 PM</option>
-                                        <option value="05:00 PM">5:00 PM</option>
-                                        <option value="06:00 PM">6:00 PM</option>
-                                        <option value="07:00 PM">7:00 PM</option>
-                                        <option value="08:00 PM">8:00 PM</option>
-                                        <option value="09:00 PM">9:00 PM</option>
-                                        <option value="10:00 PM">10:00 PM</option>
-                                        <option value="11:00 PM">11:00 PM</option>
-                                    </select>
+                                    <div class="custom-dropdown-wrapper">
+                                        <select class="form-select luxury-input" id="eventEndTime" name="eventEndTime" required style="display: none;">
+                                            <option value="">Select end time</option>
+                                            <option value="09:00 AM">9:00 AM</option>
+                                            <option value="10:00 AM">10:00 AM</option>
+                                            <option value="11:00 AM">11:00 AM</option>
+                                            <option value="12:00 PM">12:00 PM</option>
+                                            <option value="01:00 PM">1:00 PM</option>
+                                            <option value="02:00 PM">2:00 PM</option>
+                                            <option value="03:00 PM">3:00 PM</option>
+                                            <option value="04:00 PM">4:00 PM</option>
+                                            <option value="05:00 PM">5:00 PM</option>
+                                            <option value="06:00 PM">6:00 PM</option>
+                                            <option value="07:00 PM">7:00 PM</option>
+                                            <option value="08:00 PM">8:00 PM</option>
+                                            <option value="09:00 PM">9:00 PM</option>
+                                            <option value="10:00 PM">10:00 PM</option>
+                                            <option value="11:00 PM">11:00 PM</option>
+                                        </select>
+                                        <div class="custom-dropdown" id="customEventEndTime">
+                                            <div class="custom-dropdown-selected">
+                                                <span>Select end time</span>
+                                                <i class="fas fa-chevron-down"></i>
+                                            </div>
+                                            <div class="custom-dropdown-options">
+                                                <div class="custom-dropdown-option" data-value="">Select end time</div>
+                                                <div class="custom-dropdown-option" data-value="09:00 AM">9:00 AM</div>
+                                                <div class="custom-dropdown-option" data-value="10:00 AM">10:00 AM</div>
+                                                <div class="custom-dropdown-option" data-value="11:00 AM">11:00 AM</div>
+                                                <div class="custom-dropdown-option" data-value="12:00 PM">12:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="01:00 PM">1:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="02:00 PM">2:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="03:00 PM">3:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="04:00 PM">4:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="05:00 PM">5:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="06:00 PM">6:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="07:00 PM">7:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="08:00 PM">8:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="09:00 PM">9:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="10:00 PM">10:00 PM</div>
+                                                <div class="custom-dropdown-option" data-value="11:00 PM">11:00 PM</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -244,7 +293,7 @@ $totalAmount = $selectedPackage['price'];
                                 <label class="form-label">Select Package <span class="text-danger">*</span></label>
                                 <div class="package-options d-flex gap-2 mt-2 flex-wrap" id="packageOptions">
                                     <?php foreach ($packages as $p): ?>
-                                        <div class="package-tile <?php echo ($p['id'] == $selectedPackageId) ? 'selected' : ''; ?>" role="button" tabindex="0" data-id="<?php echo $p['id']; ?>" data-tier="<?php echo htmlspecialchars($p['tier']); ?>" data-name="<?php echo htmlspecialchars($p['name']); ?>" data-price="<?php echo $p['price']; ?>">
+                                        <div class="package-tile" role="button" tabindex="0" data-id="<?php echo $p['id']; ?>" data-tier="<?php echo htmlspecialchars($p['tier']); ?>" data-name="<?php echo htmlspecialchars($p['name']); ?>" data-price="<?php echo $p['price']; ?>">
                                             <div class="package-tile-name"><?php echo htmlspecialchars($p['name']); ?></div>
                                             <div class="package-tile-price">₱ <?php echo number_format($p['price'], 2); ?></div>
                                         </div>
@@ -372,10 +421,65 @@ $totalAmount = $selectedPackage['price'];
             }
         };
 
-        // Set minimum date to today
-        const dateInput = document.getElementById('reservationDate');
-        const today = new Date().toISOString().split('T')[0];
-        dateInput.setAttribute('min', today);
+        // Set minimum date to today - moved to DOMContentLoaded
+
+        // Initialize custom dropdowns for time selection
+        function initCustomTimeDropdown(selectId, customDropdownId) {
+            const nativeSelect = document.getElementById(selectId);
+            const customDropdown = document.getElementById(customDropdownId);
+            if (!nativeSelect || !customDropdown) return;
+            
+            const selectedText = customDropdown.querySelector('.custom-dropdown-selected span');
+            const options = customDropdown.querySelectorAll('.custom-dropdown-option');
+            
+            // Set initial selected value
+            const initialValue = nativeSelect.value;
+            options.forEach(opt => {
+                if (opt.getAttribute('data-value') === initialValue) {
+                    opt.classList.add('selected');
+                    if (initialValue) {
+                        selectedText.textContent = opt.textContent;
+                    }
+                }
+            });
+            
+            // Toggle dropdown
+            customDropdown.querySelector('.custom-dropdown-selected').addEventListener('click', function(e) {
+                e.stopPropagation();
+                customDropdown.classList.toggle('open');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!customDropdown.contains(e.target)) {
+                    customDropdown.classList.remove('open');
+                }
+            });
+            
+            // Handle option selection
+            options.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const value = this.getAttribute('data-value');
+                    const text = this.textContent;
+                    
+                    // Update native select
+                    nativeSelect.value = value;
+                    
+                    // Update custom dropdown
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    selectedText.textContent = text;
+                    
+                    // Close dropdown
+                    customDropdown.classList.remove('open');
+                    
+                    // Trigger change event for form updates
+                    const changeEvent = new Event('change', { bubbles: true });
+                    nativeSelect.dispatchEvent(changeEvent);
+                });
+            });
+        }
 
         // Format date for display
         function formatDate(dateString) {
@@ -387,7 +491,8 @@ $totalAmount = $selectedPackage['price'];
 
         // Update reservation summary in real-time
         function updateReservationSummary() {
-            const dateValue = dateInput.value;
+            const dateInput = document.getElementById('reservationDate');
+            const dateValue = dateInput ? dateInput.value : '';
             const startTimeValue = document.getElementById('eventStartTime').value;
             const endTimeValue = document.getElementById('eventEndTime').value;
 
@@ -414,6 +519,9 @@ $totalAmount = $selectedPackage['price'];
         // Handle package selection and update summary
         function setupPackageSelectionListeners() {
             const packageTiles = document.querySelectorAll('.package-tile');
+            
+            // Ensure no package is selected by default
+            packageTiles.forEach(t => t.classList.remove('selected'));
             
             packageTiles.forEach(tile => {
                 tile.addEventListener('click', function() {
@@ -449,32 +557,92 @@ $totalAmount = $selectedPackage['price'];
             });
         }
 
-        // Add event listeners for real-time updates
-        dateInput.addEventListener('change', updateReservationSummary);
-        document.getElementById('eventStartTime').addEventListener('change', updateReservationSummary);
-        document.getElementById('eventEndTime').addEventListener('change', updateReservationSummary);
+        // Wait for DOM to be ready before initializing
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set minimum date to today
+            const dateInput = document.getElementById('reservationDate');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.setAttribute('min', today);
+            }
+            
+            // Get time select elements and custom dropdowns
+            const startTimeSelect = document.getElementById('eventStartTime');
+            const endTimeSelect = document.getElementById('eventEndTime');
+            const customStartTime = document.getElementById('customEventStartTime');
+            const customEndTime = document.getElementById('customEventEndTime');
+            
+            // Initialize time dropdowns
+            initCustomTimeDropdown('eventStartTime', 'customEventStartTime');
+            initCustomTimeDropdown('eventEndTime', 'customEventEndTime');
+            
+            // Initialize package selection
+            setupPackageSelectionListeners();
 
-        // Validate form on submission
-        document.getElementById('reservationForm').addEventListener('submit', function(e) {
+            // Add event listeners for real-time updates
+            if (dateInput) {
+                dateInput.addEventListener('change', updateReservationSummary);
+            }
+            if (startTimeSelect) {
+                startTimeSelect.addEventListener('change', updateReservationSummary);
+            }
+            if (endTimeSelect) {
+                endTimeSelect.addEventListener('change', updateReservationSummary);
+            }
+
+            // Validate form on submission with dynamic validation
+            const reservationForm = document.getElementById('reservationForm');
+            if (reservationForm) {
+                reservationForm.addEventListener('submit', function(e) {
             const dateValue = dateInput.value;
-            const startTimeValue = document.getElementById('eventStartTime').value;
-            const endTimeValue = document.getElementById('eventEndTime').value;
+            const startTimeValue = startTimeSelect ? startTimeSelect.value : '';
+            const endTimeValue = endTimeSelect ? endTimeSelect.value : '';
+            let hasErrors = false;
 
+            // Remove previous error states
+            dateInput.classList.remove('is-invalid');
+            
+            startTimeSelect.classList.remove('is-invalid');
+            endTimeSelect.classList.remove('is-invalid');
+            if (customStartTime) {
+                customStartTime.querySelector('.custom-dropdown-selected').classList.remove('is-invalid');
+            }
+            if (customEndTime) {
+                customEndTime.querySelector('.custom-dropdown-selected').classList.remove('is-invalid');
+            }
+
+            // Validate date
             if (!dateValue) {
                 e.preventDefault();
-                alert('Please select a preferred date.');
-                return false;
+                dateInput.classList.add('is-invalid');
+                hasErrors = true;
             }
 
+            // Validate start time
             if (!startTimeValue) {
                 e.preventDefault();
-                alert('Please select an event start time.');
-                return false;
+                if (startTimeSelect) {
+                    startTimeSelect.classList.add('is-invalid');
+                }
+                if (customStartTime) {
+                    customStartTime.querySelector('.custom-dropdown-selected').classList.add('is-invalid');
+                }
+                hasErrors = true;
             }
 
+            // Validate end time
             if (!endTimeValue) {
                 e.preventDefault();
-                alert('Please select an event end time.');
+                if (endTimeSelect) {
+                    endTimeSelect.classList.add('is-invalid');
+                }
+                if (customEndTime) {
+                    customEndTime.querySelector('.custom-dropdown-selected').classList.add('is-invalid');
+                }
+                hasErrors = true;
+            }
+
+            if (hasErrors) {
                 return false;
             }
 
@@ -497,13 +665,50 @@ $totalAmount = $selectedPackage['price'];
             if (selectedDate < today) {
                 e.preventDefault();
                 alert('Please select a future date.');
+                dateInput.classList.add('is-invalid');
                 dateInput.focus();
                 return false;
             }
-        });
 
-        // Initialize package selection on page load
-        setupPackageSelectionListeners();
+            // Clear error states if validation passes
+            dateInput.classList.remove('is-invalid');
+            startTimeSelect.classList.remove('is-invalid');
+            endTimeSelect.classList.remove('is-invalid');
+            if (customStartTime) {
+                customStartTime.querySelector('.custom-dropdown-selected').classList.remove('is-invalid');
+            }
+            if (customEndTime) {
+                customEndTime.querySelector('.custom-dropdown-selected').classList.remove('is-invalid');
+            }
+                });
+            }
+
+            // Clear error states when user interacts with fields
+            if (dateInput) {
+                dateInput.addEventListener('input', function() {
+                    this.classList.remove('is-invalid');
+                });
+            }
+            
+            // Clear error states when time dropdowns are changed
+            if (startTimeSelect) {
+                startTimeSelect.addEventListener('change', function() {
+                    this.classList.remove('is-invalid');
+                    if (customStartTime) {
+                        customStartTime.querySelector('.custom-dropdown-selected').classList.remove('is-invalid');
+                    }
+                });
+            }
+            
+            if (endTimeSelect) {
+                endTimeSelect.addEventListener('change', function() {
+                    this.classList.remove('is-invalid');
+                    if (customEndTime) {
+                        customEndTime.querySelector('.custom-dropdown-selected').classList.remove('is-invalid');
+                    }
+                });
+            }
+        });
     </script>
     <script src="../assets/js/reservation.js"></script>
 </body>

@@ -98,7 +98,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                             <a class="nav-link" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="logout.php?type=user">Logout</a>
+                            <a class="nav-link btn-register" href="../process/logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
