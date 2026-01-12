@@ -74,14 +74,14 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php"><img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <a class="navbar-brand luxury-logo" href="../index.php"><img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
+                        <a class="nav-link" href="../index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="events.php">Events</a>
@@ -119,7 +119,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                 <div class="col-lg-8">
                     <div aria-label="breadcrumb" class="mb-4">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="index.php">Home</a></li>
+                            <li class="breadcrumb-item"><a href="../index.php">Home</a></li>
                             <li class="breadcrumb-item"><a href="events.php">Events</a></li>
                             <li class="breadcrumb-item"><a href="eventDetails.php?id=<?php echo $eventId; ?>">Event Details</a></li>
                             <li class="breadcrumb-item"><a href="reservation.php?eventId=<?php echo $eventId; ?>&package=<?php echo urlencode($packageName); ?>">Reservation</a></li>
@@ -216,7 +216,7 @@ $paymentStatus = isset($_GET['status']) ? $_GET['status'] : 'pending';
                                 </div>
                                 <script>
                                     setTimeout(function() {
-                                        window.location.href = 'index.php';
+                                        window.location.href = '../index.php';
                                     }, 2000);
                                 </script>
                             <?php endif; ?>

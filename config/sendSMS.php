@@ -182,4 +182,3 @@ if ($success) {
     echo json_encode(['success' => false, 'message' => $errorMessage . ' (HTTP Code: ' . $httpCode . '). Please check your SMS Gateway configuration and ensure the app is running on your Android device.']);
 }
 ?>
-

@@ -45,7 +45,7 @@ $query = "
     LEFT JOIN events e ON r.eventId = e.eventId
     LEFT JOIN packages p ON r.packageId = p.packageId
     WHERE r.userId = ?
-    ORDER BY r.reservationId DESC
+    ORDER BY r.reservationDate DESC, r.createdAt DESC
 ";
 $stmt = mysqli_prepare($conn, $query);
 
@@ -77,14 +77,14 @@ if ($stmt) {
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php"><img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <a class="navbar-brand luxury-logo" href="../index.php"><img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
+                        <a class="nav-link" href="../index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="events.php">Events</a>
@@ -101,7 +101,7 @@ if ($stmt) {
                             <a class="nav-link active" href="profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="../process/logout.php?type=user">Logout</a>
+                            <a class="nav-link btn-register" href="logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">

@@ -17,7 +17,7 @@ if (!empty($successToken) && isset($_SESSION['payment_success_token'])) {
 
 if (!$isAuthorized) {
     $_SESSION['error_message'] = 'Invalid or expired payment confirmation link. Please complete your payment to view confirmation.';
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -493,14 +493,14 @@ if (!$package) {
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="index.php"><img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <a class="navbar-brand luxury-logo" href="../index.php"><img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="index.php">Home</a>
+                        <a class="nav-link" href="../index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="events.php">Events</a>
@@ -553,7 +553,7 @@ if (!$package) {
                                 
                                 <div class="mt-4">
                                     <a href="profile.php" class="btn btn-primary-luxury">View My Profile</a>
-                                    <a href="index.php" class="btn btn-outline-luxury ms-2">Return Home</a>
+                                    <a href="../index.php" class="btn btn-outline-luxury ms-2">Return Home</a>
                                 </div>
                             </div>
                         </div>

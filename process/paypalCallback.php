@@ -108,7 +108,7 @@ if (isset($_GET['cancelled']) || isset($_GET['cancel'])) {
 }
 
 $_SESSION['error_message'] = 'No payment in progress. Please start your reservation again.';
-header('Location: ../pages/index.php');
+header('Location: ../index.php');
 exit;
 
 function getPayPalAccessToken() {

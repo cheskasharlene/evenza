@@ -112,6 +112,7 @@ if ($countStmt) {
 
 $totalPages = ceil($totalCount / $perPage);
 
+// Calculate Total Revenue from all reservations (respecting filters, ignoring pagination)
 $revenueQuery = "SELECT 
             COALESCE(SUM(r.totalAmount), 0) as totalRevenue
           FROM reservations r
@@ -144,7 +145,9 @@ if (!empty($dateFilter)) {
     $revenueParams[] = $filterDate;
     $revenueTypes .= 's';
 }
+// Note: No default date filter for revenue - show all revenue to match Admin Overview
 
+// Only include completed reservations for revenue calculation (exclude pending and confirmed - only count fully completed)
 $revenueQuery .= " AND LOWER(r.status) = 'completed'";
 
 $totalRevenue = 0;
@@ -171,6 +174,7 @@ if (!empty($revenueParams)) {
     }
 }
 
+// Calculate Revenue by Package Tier from all reservations (respecting filters, ignoring pagination)
 $packageRevenueQuery = "SELECT 
             CASE 
                 WHEN p.packageName LIKE 'Bronze%' THEN 'Bronze'
@@ -209,7 +213,9 @@ if (!empty($dateFilter)) {
     $packageRevenueParams[] = $filterDate;
     $packageRevenueTypes .= 's';
 }
+// Note: No default date filter for revenue - show all revenue to match Admin Overview
 
+// Only include completed reservations for revenue calculation (exclude pending and confirmed - only count fully completed)
 $packageRevenueQuery .= " AND LOWER(r.status) = 'completed'";
 $packageRevenueQuery .= " GROUP BY packageTier";
 
@@ -252,6 +258,7 @@ $query .= " ORDER BY r.reservationDate ASC, r.createdAt ASC LIMIT " . intval($pe
 
 $reservations = [];
 
+// Execute query with pagination
 if (!empty($params)) {
     $stmt = mysqli_prepare($conn, $query);
     if ($stmt) {
@@ -428,6 +435,7 @@ uksort($groupedReservations, function($a, $b) {
         .status-toggle-btn.active i {
             color: #FFFFFF !important;
         }
+        /* Pending - Amber/Orange */
         .status-pending {
             color: rgba(217, 119, 6, 0.6);
             border-color: rgba(217, 119, 6, 0.4);
@@ -436,6 +444,7 @@ uksort($groupedReservations, function($a, $b) {
             background-color: #f59e0b;
             border-color: #f59e0b;
         }
+        /* Confirmed - EVENZA Green */
         .status-confirmed {
             color: rgba(74, 93, 78, 0.6);
             border-color: rgba(74, 93, 78, 0.4);
@@ -444,6 +453,7 @@ uksort($groupedReservations, function($a, $b) {
             background-color: #4A5D4E;
             border-color: #4A5D4E;
         }
+        /* Cancelled - Soft Red */
         .status-cancelled {
             color: rgba(220, 38, 38, 0.6);
             border-color: rgba(220, 38, 38, 0.4);
@@ -452,6 +462,7 @@ uksort($groupedReservations, function($a, $b) {
             background-color: #ef4444;
             border-color: #ef4444;
         }
+        /* Completed - Light Blue */
         .status-completed {
             color: rgba(59, 130, 246, 0.6);
             border-color: rgba(59, 130, 246, 0.4);
@@ -705,64 +716,26 @@ uksort($groupedReservations, function($a, $b) {
                     <form method="GET" action="reservationsManagement.php" class="row g-3">
                         <div class="col-md-3">
                             <label for="packageFilter" class="form-label fw-semibold">Package Tier</label>
-                            <div class="custom-dropdown-wrapper">
-                                <select class="form-select" id="packageFilter" name="package" style="display: none;">
-                                    <option value="">All Packages</option>
-                                    <option value="Bronze" <?php echo $packageFilter === 'Bronze' ? 'selected' : ''; ?>>Bronze</option>
-                                    <option value="Silver" <?php echo $packageFilter === 'Silver' ? 'selected' : ''; ?>>Silver</option>
-                                    <option value="Gold" <?php echo $packageFilter === 'Gold' ? 'selected' : ''; ?>>Gold</option>
-                                </select>
-                                <div class="custom-dropdown" id="customPackageFilter">
-                                    <div class="custom-dropdown-selected">
-                                        <span><?php echo !empty($packageFilter) ? $packageFilter : 'All Packages'; ?></span>
-                                        <i class="fas fa-chevron-down"></i>
-                                    </div>
-                                    <div class="custom-dropdown-options">
-                                        <div class="custom-dropdown-option" data-value="">All Packages</div>
-                                        <div class="custom-dropdown-option" data-value="Bronze">Bronze</div>
-                                        <div class="custom-dropdown-option" data-value="Silver">Silver</div>
-                                        <div class="custom-dropdown-option" data-value="Gold">Gold</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <select class="form-select" id="packageFilter" name="package" style="border-radius: 50px; padding: 0.6rem 1.25rem;">
+                                <option value="">All Packages</option>
+                                <option value="Bronze" <?php echo $packageFilter === 'Bronze' ? 'selected' : ''; ?>>Bronze</option>
+                                <option value="Silver" <?php echo $packageFilter === 'Silver' ? 'selected' : ''; ?>>Silver</option>
+                                <option value="Gold" <?php echo $packageFilter === 'Gold' ? 'selected' : ''; ?>>Gold</option>
+                            </select>
                         </div>
                         <div class="col-md-3">
                             <label for="statusFilter" class="form-label fw-semibold">Filter by Status</label>
-                            <div class="custom-dropdown-wrapper">
-                                <select class="form-select" id="statusFilter" name="status" style="display: none;">
-                                    <option value="all" <?php echo empty($statusFilter) || $statusFilter === 'all' ? 'selected' : ''; ?>>All Statuses</option>
-                                    <option value="pending" <?php echo $statusFilter === 'pending' ? 'selected' : ''; ?>>Pending</option>
-                                    <option value="confirmed" <?php echo $statusFilter === 'confirmed' ? 'selected' : ''; ?>>Confirmed</option>
-                                    <option value="cancelled" <?php echo $statusFilter === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
-                                    <option value="completed" <?php echo $statusFilter === 'completed' ? 'selected' : ''; ?>>Completed</option>
-                                </select>
-                                <div class="custom-dropdown" id="customStatusFilter">
-                                    <div class="custom-dropdown-selected">
-                                        <span><?php 
-                                            $statusLabels = [
-                                                'all' => 'All Statuses',
-                                                'pending' => 'Pending',
-                                                'confirmed' => 'Confirmed',
-                                                'cancelled' => 'Cancelled',
-                                                'completed' => 'Completed'
-                                            ];
-                                            echo $statusLabels[$statusFilter] ?? 'All Statuses';
-                                        ?></span>
-                                        <i class="fas fa-chevron-down"></i>
-                                    </div>
-                                    <div class="custom-dropdown-options">
-                                        <div class="custom-dropdown-option" data-value="all">All Statuses</div>
-                                        <div class="custom-dropdown-option" data-value="pending">Pending</div>
-                                        <div class="custom-dropdown-option" data-value="confirmed">Confirmed</div>
-                                        <div class="custom-dropdown-option" data-value="cancelled">Cancelled</div>
-                                        <div class="custom-dropdown-option" data-value="completed">Completed</div>
-                                    </div>
-                                </div>
-                            </div>
+                            <select class="form-select" id="statusFilter" name="status" style="border-radius: 50px; padding: 0.6rem 1.25rem;">
+                                <option value="all" <?php echo empty($statusFilter) || $statusFilter === 'all' ? 'selected' : ''; ?>>All Statuses</option>
+                                <option value="pending" <?php echo $statusFilter === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                                <option value="confirmed" <?php echo $statusFilter === 'confirmed' ? 'selected' : ''; ?>>Confirmed</option>
+                                <option value="cancelled" <?php echo $statusFilter === 'cancelled' ? 'selected' : ''; ?>>Cancelled</option>
+                                <option value="completed" <?php echo $statusFilter === 'completed' ? 'selected' : ''; ?>>Completed</option>
+                            </select>
                         </div>
                         <div class="col-md-3">
                             <label for="dateFilter" class="form-label fw-semibold">Filter by Date</label>
-                            <input type="date" class="form-control" id="dateFilter" name="date" value="<?php echo htmlspecialchars($dateFilter); ?>" style="border-radius: 50px; padding: 0.6rem 1.25rem; accent-color: #4A5D4E;">
+                            <input type="date" class="form-control" id="dateFilter" name="date" value="<?php echo htmlspecialchars($dateFilter); ?>" style="border-radius: 50px; padding: 0.6rem 1.25rem;">
                         </div>
                         <div class="col-md-3 d-flex align-items-end">
                             <button type="submit" class="btn btn-admin-primary me-2">
@@ -1006,12 +979,14 @@ uksort($groupedReservations, function($a, $b) {
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body" id="toastMessage">
+                <!-- Message will be inserted here -->
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Sidebar toggle for mobile
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('adminSidebarToggle');
             const sidebar = document.querySelector('.admin-sidebar');
@@ -1023,6 +998,7 @@ uksort($groupedReservations, function($a, $b) {
             }
         });
 
+        // Show feedback toast
         function showFeedback(message, type = 'info') {
             const toast = document.getElementById('feedbackToast');
             const toastMessage = document.getElementById('toastMessage');
@@ -1030,6 +1006,7 @@ uksort($groupedReservations, function($a, $b) {
             
             toastMessage.textContent = message;
             
+            // Update icon based on type
             const icon = toastHeader.querySelector('i');
             if (type === 'success') {
                 icon.className = 'fas fa-check-circle me-2 text-success';
@@ -1046,22 +1023,27 @@ uksort($groupedReservations, function($a, $b) {
             bsToast.show();
         }
 
+        // Update reservation status
         function filterByDate(dateKey) {
+            // Build URL with filter_date parameter and preserve other filters
             const urlParams = new URLSearchParams(window.location.search);
             urlParams.set('filter_date', dateKey);
-            urlParams.set('page', '1');
+            urlParams.set('page', '1'); // Reset to first page when filtering
             window.location.href = '?' + urlParams.toString();
         }
 
         function updateReservationStatus(reservationId, newStatus) {
+            // Disable all status buttons for this reservation while updating
             const allButtons = document.querySelectorAll(`[onclick*="'${reservationId}'"]`);
             allButtons.forEach(btn => {
                 btn.disabled = true;
                 btn.style.opacity = '0.6';
             });
             
+            // Show processing feedback
             showFeedback('Updating reservation status...', 'info');
             
+            // Make AJAX call to update status in database
             fetch('/evenza/api/updateReservationStatus.php', {
                 method: 'POST',
                 headers: {
@@ -1070,9 +1052,11 @@ uksort($groupedReservations, function($a, $b) {
                 body: 'reservationId=' + encodeURIComponent(reservationId) + '&status=' + encodeURIComponent(newStatus)
             })
             .then(response => {
+                // Check if response is OK
                 if (!response.ok) {
                     throw new Error('Network response was not ok: ' + response.status);
                 }
+                // Check if response is JSON
                 const contentType = response.headers.get('content-type');
                 if (!contentType || !contentType.includes('application/json')) {
                     return response.text().then(text => {
@@ -1083,24 +1067,29 @@ uksort($groupedReservations, function($a, $b) {
             })
             .then(data => {
                 if (data.success) {
+                    // Capitalize first letter for display
                     const displayStatus = newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
                     showFeedback('Reservation status updated to ' + displayStatus + ' successfully!', 'success');
                     
+                    // Update button states immediately (case-insensitive comparison)
                     allButtons.forEach(btn => {
                         btn.classList.remove('active');
                         btn.disabled = false;
                         btn.style.opacity = '1';
                         
+                        // Check if button text contains the status (case-insensitive)
                         const btnText = btn.textContent.toLowerCase().trim();
                         if (btnText.includes(newStatus.toLowerCase())) {
                             btn.classList.add('active');
                         }
                     });
                     
+                    // Reload after a short delay to reflect server-side changes
                     setTimeout(function() {
                         location.reload();
                     }, 1000);
                 } else {
+                    // Re-enable buttons on error
                     allButtons.forEach(btn => {
                         btn.disabled = false;
                         btn.style.opacity = '1';
@@ -1109,6 +1098,7 @@ uksort($groupedReservations, function($a, $b) {
                 }
             })
             .catch(error => {
+                // Re-enable buttons on error
                 allButtons.forEach(btn => {
                     btn.disabled = false;
                     btn.style.opacity = '1';
@@ -1117,61 +1107,13 @@ uksort($groupedReservations, function($a, $b) {
             });
         }
 
+        // Show feedback on page load if there's a message in URL
         const urlParams = new URLSearchParams(window.location.search);
         const message = urlParams.get('message');
         const messageType = urlParams.get('type') || 'success';
         if (message) {
             showFeedback(decodeURIComponent(message), messageType);
         }
-        
-        function initCustomDropdown(selectId, customDropdownId) {
-            const nativeSelect = document.getElementById(selectId);
-            const customDropdown = document.getElementById(customDropdownId);
-            if (!nativeSelect || !customDropdown) return;
-            
-            const selectedText = customDropdown.querySelector('.custom-dropdown-selected span');
-            const options = customDropdown.querySelectorAll('.custom-dropdown-option');
-            
-            const initialValue = nativeSelect.value;
-            options.forEach(opt => {
-                if (opt.getAttribute('data-value') === initialValue) {
-                    opt.classList.add('selected');
-                }
-            });
-            
-            customDropdown.querySelector('.custom-dropdown-selected').addEventListener('click', function(e) {
-                e.stopPropagation();
-                customDropdown.classList.toggle('open');
-            });
-            
-            document.addEventListener('click', function(e) {
-                if (!customDropdown.contains(e.target)) {
-                    customDropdown.classList.remove('open');
-                }
-            });
-            
-            options.forEach(option => {
-                option.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const value = this.getAttribute('data-value');
-                    const text = this.textContent;
-                    
-                    nativeSelect.value = value;
-                    
-                    options.forEach(opt => opt.classList.remove('selected'));
-                    this.classList.add('selected');
-                    selectedText.textContent = text;
-                    
-                    customDropdown.classList.remove('open');
-                    
-                    const changeEvent = new Event('change', { bubbles: true });
-                    nativeSelect.dispatchEvent(changeEvent);
-                });
-            });
-        }
-        
-        initCustomDropdown('packageFilter', 'customPackageFilter');
-        initCustomDropdown('statusFilter', 'customStatusFilter');
     </script>
 </body>
 

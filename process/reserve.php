@@ -4,7 +4,7 @@ require_once '../core/connect.php';
 
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['error_message'] = 'Please login to make a reservation.';
-    header('Location: login.php');
+    header('Location: ../pages/login.php');
     exit;
 }
 
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         mysqli_stmt_close($insertStmt);
                         
-                        header('Location: reservation.php?eventId=' . $eventId . '&success=1');
+                        header('Location: ../pages/reservation.php?eventId=' . $eventId . '&success=1');
                         exit;
                     } else {
                         $error_message = 'Failed to save reservation: ' . mysqli_error($conn);
@@ -84,12 +84,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if (!empty($error_message)) {
         $_SESSION['error_message'] = $error_message;
-        header('Location: reservation.php?eventId=' . $eventId);
+        header('Location: ../pages/reservation.php?eventId=' . $eventId);
         exit;
     }
 } else {
     $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 0;
-    header('Location: reservation.php?eventId=' . $eventId);
+    header('Location: ../pages/reservation.php?eventId=' . $eventId);
     exit;
 }
 ?>
