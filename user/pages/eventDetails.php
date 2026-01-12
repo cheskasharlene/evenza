@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../core/connect.php';
+require_once '../../core/connect.php';
 require_once '../includes/helpers.php';
 $eventId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 

@@ -1,9 +1,9 @@
 <?php 
 session_start();
-require_once '../core/connect.php';
+require_once '../../core/connect.php';
 
 function getEventImagePath($imagePath) {
-    $imageDir = '../assets/images/event_images/';
+    $imageDir = '../../assets/images/event_images/';
     $placeholder = $imageDir . 'placeholder.jpg';
     
     if (empty($imagePath)) {
@@ -12,6 +12,10 @@ function getEventImagePath($imagePath) {
     
     $imagePath = ltrim($imagePath, '/\\');
     
+    // Remove '../../assets/' if already present
+    if (strpos($imagePath, '../../assets/images/event_images/') === 0) {
+        $imagePath = substr($imagePath, strlen('../../assets/images/event_images/'));
+    }
     // Remove '../assets/' if already present
     if (strpos($imagePath, '../assets/images/event_images/') === 0) {
         $imagePath = substr($imagePath, strlen('../assets/images/event_images/'));
@@ -58,9 +62,9 @@ if ($result) {
         $originalImagePath = $event['imagePath'];
         $event['imagePath'] = getEventImagePath($event['imagePath']);
         
-        if (stripos($event['title'], 'wine') !== false && !file_exists($event['imagePath']) && $event['imagePath'] === '../assets/images/event_images/placeholder.jpg') {
-            if (file_exists('../assets/images/event_images/wineTasting.jpg')) {
-                $event['imagePath'] = '../assets/images/event_images/wineTasting.jpg';
+        if (stripos($event['title'], 'wine') !== false && !file_exists($event['imagePath']) && $event['imagePath'] === '../../assets/images/event_images/placeholder.jpg') {
+            if (file_exists(__DIR__ . '/../../assets/images/event_images/wineTasting.jpg')) {
+                $event['imagePath'] = '../../assets/images/event_images/wineTasting.jpg';
             }
         }
         
@@ -126,12 +130,12 @@ function getCategoryFilter($category) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="../index.php"><img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <a class="navbar-brand luxury-logo" href="../../index.php"><img src="../../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -268,7 +272,7 @@ function getCategoryFilter($category) {
                                     <img src="<?php echo htmlspecialchars($event['imagePath']); ?>" 
                                          class="card-img-top" 
                                          alt="<?php echo htmlspecialchars($event['title']); ?>"
-                                         onerror="this.src='../assets/images/event_images/placeholder.jpg'">
+                                         onerror="this.src='../../assets/images/event_images/placeholder.jpg'">
                                 </div>
                                 <div class="card-body">
                                     <h3 class="card-title event-title"><?php echo htmlspecialchars($event['title']); ?></h3>

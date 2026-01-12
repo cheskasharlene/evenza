@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../core/connect.php';
+require_once '../../core/connect.php';
 require_once '../includes/helpers.php';
 
 $successToken = isset($_GET['success']) ? trim($_GET['success']) : '';
