@@ -46,7 +46,7 @@ if ($from && $body) {
     $phoneNumberForDB = preg_replace('/[^0-9]/', '', $from);
     
     try {
-        require_once '../core/connect.php';
+        require_once '../../core/connect.php';
         
         if ($conn) {
             $query = "INSERT INTO sms_messages (phone_number, message_body, received_at, raw_data) 

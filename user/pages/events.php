@@ -142,7 +142,7 @@ function getCategoryFilter($category) {
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.php">Home</a>
+                        <a class="nav-link" href="../../index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" href="events.php">Events</a>
@@ -311,8 +311,8 @@ function getCategoryFilter($category) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/events.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/events.js"></script>
     <style>
         /* Custom Dropdown Styling - EVENZA Green */
         .custom-dropdown-wrapper {

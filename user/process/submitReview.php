@@ -124,7 +124,7 @@ try {
             echo json_encode(['error' => 'Failed to save review']);
             exit;
         }
-        mysqli_stmt_bind_param($insertStmt, "iis", $reservationId, $userId, $rating, $comment);
+        mysqli_stmt_bind_param($insertStmt, "iiis", $reservationId, $userId, $rating, $comment);
     }
     
     if (mysqli_stmt_execute($insertStmt)) {
@@ -138,10 +138,13 @@ try {
             'reviewId' => $reviewId
         ]);
     } else {
+        $error = mysqli_stmt_error($insertStmt);
+        error_log("Review Insert Error: " . $error);
+        error_log("Review Data - ReservationId: $reservationId, UserId: $userId, EventId: " . ($eventId ?? 'NULL') . ", Rating: $rating, Comment: " . substr($comment, 0, 50));
         mysqli_stmt_close($insertStmt);
         ob_end_clean();
         http_response_code(500);
-        echo json_encode(['error' => 'Failed to save review']);
+        echo json_encode(['error' => 'Failed to save review. Please try again.']);
     }
 
 } catch (Exception $e) {

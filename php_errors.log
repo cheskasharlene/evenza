@@ -1,0 +1,5 @@
+[12-Jan-2026 15:59:52 Europe/Berlin] PHP Warning:  require_once(C:\xampp\htdocs\evenza\includes/../vendor/autoload.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\evenza\includes\helpers.php on line 190
+[12-Jan-2026 15:59:52 Europe/Berlin] PayPal Capture Fatal Error: Failed opening required 'C:\xampp\htdocs\evenza\includes/../vendor/autoload.php' (include_path='C:\xampp\php\PEAR')
+[12-Jan-2026 15:59:52 Europe/Berlin] File: C:\xampp\htdocs\evenza\includes\helpers.php Line: 190
+[12-Jan-2026 15:59:52 Europe/Berlin] Stack trace: #0 C:\xampp\htdocs\evenza\user\process\paypal\paypal-capture-order.php(258): sendReservationConfirmationEmail(Object(mysqli), 63)
+#1 {main}

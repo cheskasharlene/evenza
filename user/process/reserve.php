@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../core/connect.php';
+require_once '../../core/connect.php';
 
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['error_message'] = 'Please login to make a reservation.';

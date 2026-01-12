@@ -31,6 +31,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (starRating) {
         const stars = starRating.querySelectorAll('.star-icon');
         
+        if (stars.length === 0) {
+            console.error('No star icons found in starRating element');
+        }
+        
         stars.forEach(star => {
             star.addEventListener('mouseenter', function() {
                 const rating = parseInt(this.getAttribute('data-rating'));
@@ -44,12 +48,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             });
 
-            star.addEventListener('click', function() {
+            star.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
                 selectedRating = parseInt(this.getAttribute('data-rating'));
-                reviewRatingInput.value = selectedRating;
+                console.log('Star clicked, rating:', selectedRating);
+                if (reviewRatingInput) {
+                    reviewRatingInput.value = selectedRating;
+                    console.log('Rating input value set to:', reviewRatingInput.value);
+                } else {
+                    console.error('reviewRatingInput element not found');
+                }
                 highlightStars(selectedRating);
-                ratingError.textContent = '';
-                ratingError.classList.remove('d-block');
+                if (ratingError) {
+                    ratingError.textContent = '';
+                    ratingError.style.display = 'none';
+                    ratingError.classList.remove('d-block');
+                }
             });
         });
 
@@ -61,8 +76,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function highlightStars(rating) {
         if (!starRating) return;
         const stars = starRating.querySelectorAll('.star-icon');
-        stars.forEach((star, index) => {
-            const starRatingValue = index + 1;
+        stars.forEach((star) => {
+            const starRatingValue = parseInt(star.getAttribute('data-rating'));
             if (starRatingValue <= rating) {
                 star.classList.remove('far', 'text-muted');
                 star.classList.add('fas', 'text-warning');
@@ -85,9 +100,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Validation - Rating is required
         if (!rating || rating < 1 || rating > 5) {
-            ratingError.textContent = 'Please select a rating by clicking on the stars';
-            ratingError.style.display = 'block';
-            ratingError.style.color = '#dc3545';
+            if (ratingError) {
+                ratingError.textContent = 'Please select a rating by clicking on the stars';
+                ratingError.style.display = 'block';
+                ratingError.style.color = '#dc3545';
+                ratingError.classList.add('d-block');
+            }
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Review';
             return;
@@ -99,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
         reviewMessage.innerHTML = '';
 
         // Submit review
-        fetch('../../user/process/submitReview.php', {
+        fetch('../process/submitReview.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -110,7 +128,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 comment: comment
             })
         })
-        .then(response => response.json())
+        .then(response => {
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                return response.text().then(text => {
+                    console.error('Non-JSON response:', text);
+                    throw new Error('Server returned an invalid response');
+                });
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 reviewMessage.innerHTML = `
@@ -143,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
             reviewMessage.innerHTML = `
                 <div class="alert alert-danger">
                     <i class="fas fa-exclamation-circle me-2"></i>
-                    An error occurred. Please try again later.
+                    ${error.message || 'An error occurred. Please try again later.'}
                 </div>
             `;
             submitBtn.disabled = false;

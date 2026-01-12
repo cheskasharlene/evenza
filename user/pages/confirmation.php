@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once '../../core/connect.php';
-require_once '../includes/helpers.php';
+require_once '../../includes/helpers.php';
 
 $successToken = isset($_GET['success']) ? trim($_GET['success']) : '';
 $transactionId = isset($_GET['tx']) ? trim($_GET['tx']) : '';
@@ -17,7 +17,7 @@ if (!empty($successToken) && isset($_SESSION['payment_success_token'])) {
 
 if (!$isAuthorized) {
     $_SESSION['error_message'] = 'Invalid or expired payment confirmation link. Please complete your payment to view confirmation.';
-    header('Location: ../index.php');
+    header('Location: ../../index.php');
     exit;
 }
 
@@ -286,7 +286,7 @@ if (!$package) {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/style.css">
     <style>
         .confirmation-page-section {
             background: linear-gradient(135deg, #F9F7F2 0%, #FFFFFF 100%);
@@ -493,14 +493,14 @@ if (!$package) {
 <body>
     <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
         <div class="container">
-            <a class="navbar-brand luxury-logo" href="../index.php"><img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
+            <a class="navbar-brand luxury-logo" href="../../index.php"><img src="../../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link" href="../index.php">Home</a>
+                        <a class="nav-link" href="../../index.php">Home</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="events.php">Events</a>
@@ -553,7 +553,7 @@ if (!$package) {
                                 
                                 <div class="mt-4">
                                     <a href="profile.php" class="btn btn-primary-luxury">View My Profile</a>
-                                    <a href="../index.php" class="btn btn-outline-luxury ms-2">Return Home</a>
+                                    <a href="../../index.php" class="btn btn-outline-luxury ms-2">Return Home</a>
                                 </div>
                             </div>
                         </div>
@@ -648,15 +648,15 @@ if (!$package) {
                                             <label class="form-label text-center d-block mb-3">
                                                 <strong>Rate your experience <span class="text-danger">*</span></strong>
                                             </label>
-                                            <div class="star-rating d-flex justify-content-center" id="starRating" style="display: flex !important; gap: 0.5rem; margin: 1rem 0;">
-                                                <i class="far fa-star star-icon" data-rating="1" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
-                                                <i class="far fa-star star-icon" data-rating="2" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
-                                                <i class="far fa-star star-icon" data-rating="3" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
-                                                <i class="far fa-star star-icon" data-rating="4" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
-                                                <i class="far fa-star star-icon" data-rating="5" style="font-size: 2rem !important; color: #ddd !important; cursor: pointer !important; display: inline-block !important;"></i>
+                                            <div class="star-rating d-flex justify-content-center" id="starRating" style="gap: 0.5rem; margin: 1rem 0;">
+                                                <i class="far fa-star star-icon" data-rating="1" style="font-size: 2rem; color: #ddd; cursor: pointer; transition: color 0.2s;"></i>
+                                                <i class="far fa-star star-icon" data-rating="2" style="font-size: 2rem; color: #ddd; cursor: pointer; transition: color 0.2s;"></i>
+                                                <i class="far fa-star star-icon" data-rating="3" style="font-size: 2rem; color: #ddd; cursor: pointer; transition: color 0.2s;"></i>
+                                                <i class="far fa-star star-icon" data-rating="4" style="font-size: 2rem; color: #ddd; cursor: pointer; transition: color 0.2s;"></i>
+                                                <i class="far fa-star star-icon" data-rating="5" style="font-size: 2rem; color: #ddd; cursor: pointer; transition: color 0.2s;"></i>
                                             </div>
                                             <input type="hidden" id="reviewRating" name="rating" required>
-                                            <div class="invalid-feedback text-center d-block" id="ratingError" style="display: none !important;"></div>
+                                            <div class="invalid-feedback text-center d-block" id="ratingError" style="display: none;"></div>
                                         </div>
 
                                         <div class="mb-4">
@@ -749,7 +749,7 @@ if (!$package) {
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/main.js"></script>
-    <script src="../assets/js/review.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script src="../../assets/js/review.js"></script>
 </body>
 </html>
