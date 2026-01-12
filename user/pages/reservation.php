@@ -100,46 +100,7 @@ $totalAmount = $selectedPackage['price'];
     <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 <body>
-    <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
-        <div class="container">
-            <a class="navbar-brand luxury-logo" href="../../index.php"><img src="../../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../../index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="events.php">Events</a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="about.php">About</a>
-                    </li>
-                    <li class="nav-item nav-divider">
-                        <span class="nav-separator"></span>
-                    </li>
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="profile.php">My Profile</a>
-                        </li>
-                        <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="../process/logout.php?type=user">Logout</a>
-                        </li>
-                    <?php else: ?>
-                        <li class="nav-item">
-                            <a class="nav-link btn-login" href="login.php">Login</a>
-                        </li>
-                        <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="register.php">Register</a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </div>
-    </div>
+    <?php $activePage = 'events'; include __DIR__ . '/includes/nav.php'; ?>
 
     <div class="reservation-page-section py-5 mt-5">
         <div class="container">
@@ -305,28 +266,7 @@ $totalAmount = $selectedPackage['price'];
         </div>
     </div>
 
-    <div class="luxury-footer py-5">
-        <div class="container">
-            <div>
-                <div>
-                    <h5 class="footer-logo">EVENZA</h5>
-                    <p class="footer-text">EVENZA is a premier event reservation platform dedicated to seamless experiences. Elevate your occasions with our curated venues and sophisticated planning tools.</p>
-                </div>
-                <div>
-                    <h6 class="footer-heading">Contact Info</h6>
-                    <p class="footer-text">
-                        Email: <a href="mailto:evenzacompany@gmail.com">evenzacompany@gmail.com</a><br>
-                        Phone: 09916752007<br>
-                        Address: Ambulong, Tanauan City, Batangas.
-                    </p>
-                </div>
-            </div>
-            <hr class="footer-divider">
-            <div class="text-center">
-                <p class="footer-copyright">&copy; 2026 EVENZA</p>
-            </div>
-        </div>
-    </div>
+    <?php include __DIR__ . '/includes/footer.php'; ?>
 
     <div class="modal fade" id="reservationSuccessModal" tabindex="-1" aria-labelledby="reservationSuccessModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">

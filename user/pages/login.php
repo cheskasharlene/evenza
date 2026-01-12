@@ -108,46 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../../assets/css/style.css">
 </head>
 <body>
-    <div class="navbar navbar-expand-lg navbar-light fixed-top luxury-nav">
-        <div class="container">
-            <a class="navbar-brand luxury-logo" href="../../index.php"><img src="../../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img"></a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../../index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="events.php">Events</a>
-                    </li>
-                    
-                    <li class="nav-item">
-                        <a class="nav-link" href="about.php">About</a>
-                    </li>
-                    <li class="nav-item nav-divider">
-                        <span class="nav-separator"></span>
-                    </li>
-                    <?php if (isset($_SESSION['user_id'])): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="profile.php">My Profile</a>
-                        </li>
-                        <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="../process/logout.php?type=user">Logout</a>
-                        </li>
-                    <?php else: ?>
-                        <li class="nav-item">
-                            <a class="nav-link btn-login active" href="login.php">Login</a>
-                        </li>
-                        <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="register.php">Register</a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </div>
-    </div>
+    <?php $activePage = 'login'; include __DIR__ . '/includes/nav.php'; ?>
 
     <div class="login-page-section py-5 mt-5">
         <div class="container">
@@ -196,6 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <?php include __DIR__ . '/includes/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../assets/js/login.js"></script>
     <style>
