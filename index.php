@@ -101,27 +101,27 @@ require_once 'core/connect.php';
                         <a class="nav-link active" href="index.php">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="pages/events.php">Events</a>
+                        <a class="nav-link" href="user/pages/events.php">Events</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="pages/about.php">About</a>
+                        <a class="nav-link" href="user/pages/about.php">About</a>
                     </li>
                     <li class="nav-item nav-divider">
                         <span class="nav-separator"></span>
                     </li>
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="pages/profile.php">My Profile</a>
+                            <a class="nav-link" href="user/pages/profile.php">My Profile</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="process/logout.php?type=user">Logout</a>
+                            <a class="nav-link btn-register" href="user/process/logout.php?type=user">Logout</a>
                         </li>
                     <?php else: ?>
                         <li class="nav-item">
-                            <a class="nav-link btn-login" href="pages/login.php">Login</a>
+                            <a class="nav-link btn-login" href="user/pages/login.php">Login</a>
                         </li>
                         <li class="nav-item ms-2">
-                            <a class="nav-link btn-register" href="pages/register.php">Register</a>
+                            <a class="nav-link btn-register" href="user/pages/register.php">Register</a>
                         </li>
                     <?php endif; ?>
                 </ul>
@@ -141,7 +141,7 @@ require_once 'core/connect.php';
                         <h1 class="visually-hidden">EVENZA</h1>
                         <p class="hero-subtitle">Reserve Hotel-Hosted Events with Ease</p>
                         <div class="hero-buttons mt-4">
-                            <a href="pages/events.php" class="btn btn-primary-luxury btn-lg">Explore Events</a>
+                            <a href="user/pages/events.php" class="btn btn-primary-luxury btn-lg">Explore Events</a>
                         </div>
                     </div>
                 </div>
@@ -165,7 +165,7 @@ require_once 'core/connect.php';
                             <h3 class="event-title">Gala Evening</h3>
 
                             <p class="event-description">An elegant evening of fine dining and entertainment in an exclusive setting.</p>
-                            <?php $link = isset($_SESSION['user_id']) ? 'pages/reservation.php?eventId=1' : 'pages/login.php?redirect=' . urlencode('pages/reservation.php?eventId=1'); ?>
+                            <?php $link = isset($_SESSION['user_id']) ? 'user/pages/reservation.php?eventId=1' : 'user/pages/login.php?redirect=' . urlencode('user/pages/reservation.php?eventId=1'); ?>
                             <a href="<?php echo $link; ?>" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
                         </div>
                     </div>
@@ -179,7 +179,7 @@ require_once 'core/connect.php';
                             <h3 class="event-title">Wine Tasting</h3>
 
                             <p class="event-description">Discover rare vintages in an intimate tasting experience.</p>
-                            <?php $link = isset($_SESSION['user_id']) ? 'pages/reservation.php?eventId=2' : 'pages/login.php?redirect=' . urlencode('pages/reservation.php?eventId=2'); ?>
+                            <?php $link = isset($_SESSION['user_id']) ? 'user/pages/reservation.php?eventId=2' : 'user/pages/login.php?redirect=' . urlencode('user/pages/reservation.php?eventId=2'); ?>
                             <a href="<?php echo $link; ?>" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
                         </div>
                     </div>
@@ -193,7 +193,7 @@ require_once 'core/connect.php';
                             <h3 class="event-title">Art Exhibition</h3>
 
                             <p class="event-description">Private viewing of contemporary masterpieces.</p>
-                            <?php $link = isset($_SESSION['user_id']) ? 'pages/reservation.php?eventId=3' : 'pages/login.php?redirect=' . urlencode('pages/reservation.php?eventId=3'); ?>
+                            <?php $link = isset($_SESSION['user_id']) ? 'user/pages/reservation.php?eventId=3' : 'user/pages/login.php?redirect=' . urlencode('user/pages/reservation.php?eventId=3'); ?>
                             <a href="<?php echo $link; ?>" class="btn btn-sm btn-primary-luxury mt-3">Reserve Now</a>
                         </div>
                     </div>
@@ -283,7 +283,7 @@ require_once 'core/connect.php';
             <div class="luxury-card cta-card text-center p-5">
                 <h2 class="cta-title mb-3">Ready to Reserve Your Experience?</h2>
                 <p class="cta-subtitle mb-4">Join our exclusive community and gain access to premium events worldwide.</p>
-                <a href="pages/register.php" class="btn btn-primary-luxury btn-lg">Create Account</a>
+                <a href="user/pages/register.php" class="btn btn-primary-luxury btn-lg">Create Account</a>
             </div>
         </div>
     </div>

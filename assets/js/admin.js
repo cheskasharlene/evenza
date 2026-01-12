@@ -5,7 +5,7 @@ function formatCurrency(n) {
 
 
 function refreshDashboardData() {
-    fetch('../api/getDashboardStats.php')
+    fetch('../../admin/process/fetch/getDashboardStats.php')
         .then(response => response.json())
         .then(data => {
             if (data.success && data.data) {
