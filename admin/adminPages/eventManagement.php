@@ -7,7 +7,7 @@ require_once '../process/auth/adminAuth.php';
 require_once '../../core/connect.php';
 
 function getEventImagePath($imagePath) {
-    $imageDir = '../assets/images/event_images/';
+    $imageDir = '../../assets/images/event_images/';
     $placeholder = $imageDir . 'placeholder.jpg';
 
     if (empty($imagePath)) {
@@ -16,6 +16,9 @@ function getEventImagePath($imagePath) {
 
     $imagePath = ltrim($imagePath, '/\\');
 
+    if (strpos($imagePath, '../../assets/images/event_images/') === 0) {
+        $imagePath = substr($imagePath, strlen('../../assets/images/event_images/'));
+    }
     if (strpos($imagePath, '../assets/images/event_images/') === 0) {
         $imagePath = substr($imagePath, strlen('../assets/images/event_images/'));
     }
@@ -313,7 +316,7 @@ if (!empty($searchQuery)) {
         <div class="d-flex flex-column admin-sidebar p-4" style="background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%);">
             <div class="d-flex align-items-center mb-5" style="padding: 1rem 0;">
                 <div class="luxury-logo">
-                    <img src="../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img" style="max-width: 180px;">
+                    <img src="../../assets/images/evenzaLogo.png" alt="EVENZA" class="evenza-logo-img" style="max-width: 180px;">
                 </div>
             </div>
             <div class="mb-4">
@@ -459,8 +462,8 @@ if (!empty($searchQuery)) {
                                     $imageSrc = getEventImagePath($event['imagePath']);
                                     
                                     if (stripos($event['title'], 'wine') !== false || stripos($event['name'], 'wine') !== false) {
-                                        if (file_exists('assets/images/event_images/wineCellar.jpg')) {
-                                            $imageSrc = 'assets/images/event_images/wineCellar.jpg';
+                                        if (file_exists(__DIR__ . '/../../assets/images/event_images/wineCellar.jpg')) {
+                                            $imageSrc = '../../assets/images/event_images/wineCellar.jpg';
                                         }
                                     }
                                 ?>
@@ -472,7 +475,7 @@ if (!empty($searchQuery)) {
                                         <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
                                              alt="<?php echo htmlspecialchars($event['name'] ?? $event['title']); ?>" 
                                              class="event-thumbnail"
-                                             onerror="this.src='../assets/images/event_images/businessInnovation.jpg'">
+                                             onerror="this.src='../../assets/images/event_images/businessInnovation.jpg'">
                                     </td>
                                     <td>
                                         <div class="fw-semibold"><?php echo htmlspecialchars($event['name'] ?? $event['title']); ?></div>

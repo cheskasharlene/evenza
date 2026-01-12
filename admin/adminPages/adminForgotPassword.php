@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="admin-login-wrapper">
         <div class="admin-login-card">
             <div class="admin-login-logo">
-                <img src="../assets/images/evenzaLogo.png" alt="EVENZA">
+                <img src="../../assets/images/evenzaLogo.png" alt="EVENZA">
             </div>
             
             <div class="admin-login-header">
