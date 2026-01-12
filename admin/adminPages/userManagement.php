@@ -385,7 +385,7 @@ if (!empty($params)) {
                     </div>
                     <div>
                         <h4 class="mb-0" style="font-family: 'Playfair Display', serif;">User Management</h4>
-                        <div class="text-muted small">Manage user accounts and permissions</div>
+                        <div class="text-muted small">View user accounts and information</div>
                     </div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
@@ -413,7 +413,7 @@ if (!empty($params)) {
                         </div>
                         
                         <!-- Role Filter -->
-                        <div class="col-md-4">
+                        <div class="col-md-6">
                             <label for="roleFilter" class="form-label fw-semibold" style="color: #1A1A1A;">Filter by Role</label>
                             <div class="custom-dropdown-wrapper">
                                 <select id="roleFilter" class="form-select" style="display: none;">
@@ -442,13 +442,6 @@ if (!empty($params)) {
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Add User Button -->
-                        <div class="col-md-2">
-                            <button type="button" class="btn btn-add-user w-100" data-bs-toggle="modal" data-bs-target="#userModal" onclick="openAddUserModal()">
-                                <i class="fas fa-plus me-2"></i> Add New User
-                            </button>
-                        </div>
                     </div>
                 </div>
 
@@ -462,13 +455,12 @@ if (!empty($params)) {
                                     <th>Email</th>
                                     <th>Mobile</th>
                                     <th>Role</th>
-                                    <th class="text-end">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="usersTableBody">
                                 <?php if (empty($users)): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted py-5">
+                                    <td colspan="4" class="text-center text-muted py-5">
                                         <i class="fas fa-users fa-2x mb-3 d-block"></i>
                                         No users found.
                                     </td>
@@ -499,14 +491,6 @@ if (!empty($params)) {
                                             <?php echo htmlspecialchars($user['role']); ?>
                                         </span>
                                     </td>
-                                    <td class="text-end">
-                                        <button class="action-btn" onclick="editUser('<?php echo htmlspecialchars($user['id'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['fullName'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['email'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['mobile'] ?? '', ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['role'], ENT_QUOTES); ?>')" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn text-danger" onclick="deleteUser('<?php echo htmlspecialchars($user['id'], ENT_QUOTES); ?>', '<?php echo htmlspecialchars($user['fullName'], ENT_QUOTES); ?>')" title="Delete">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </td>
                                 </tr>
                                 <?php endforeach; ?>
                                 <?php endif; ?>
@@ -532,58 +516,8 @@ if (!empty($params)) {
         </div>
     </div>
 
-    <!-- User Modal (Add/Edit) -->
-    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" style="font-family: 'Playfair Display', serif;" id="userModalLabel">Add New User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="userForm">
-                        <input type="hidden" id="userId" name="userId">
-                        <div class="mb-3">
-                            <label for="userFullName" class="form-label">Full Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="userFullName" name="fullName" required placeholder="Enter full name">
-                        </div>
-                        <div class="mb-3">
-                            <label for="userEmail" class="form-label">Email Address <span class="text-danger">*</span></label>
-                            <input type="email" class="form-control" id="userEmail" name="email" required placeholder="Enter email address">
-                        </div>
-                        <div class="mb-3">
-                            <label for="userMobile" class="form-label">Mobile Number</label>
-                            <input type="tel" class="form-control" id="userMobile" name="mobile" placeholder="Enter mobile number">
-                        </div>
-                        <div class="mb-3" id="passwordField">
-                            <label for="userPassword" class="form-label">Password <span class="text-danger">*</span></label>
-                            <input type="password" class="form-control" id="userPassword" name="password" placeholder="Enter password">
-                            <div class="form-text">Leave blank when editing to keep current password.</div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="isAdmin" name="isAdmin">
-                                <label class="form-check-label" for="isAdmin">
-                                    <strong>Grant Administrative Permissions</strong>
-                                </label>
-                                <div class="form-text">Check this box to assign administrative access to this user.</div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-admin-primary" onclick="saveUser()">Save User</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let isEditMode = false;
-        let currentUserId = null;
-
         // Sidebar toggle for mobile
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('adminSidebarToggle');
@@ -619,72 +553,6 @@ if (!empty($params)) {
                 delay: 4000
             });
             bsToast.show();
-        }
-
-        // Open add user modal
-        function openAddUserModal() {
-            isEditMode = false;
-            currentUserId = null;
-            document.getElementById('userModalLabel').textContent = 'Add New User';
-            document.getElementById('userForm').reset();
-            document.getElementById('userId').value = '';
-            document.getElementById('passwordField').style.display = 'block';
-            document.getElementById('userPassword').required = true;
-        }
-
-        // Edit user function
-        function editUser(userId, fullName, email, mobile, role) {
-            isEditMode = true;
-            currentUserId = userId;
-            document.getElementById('userModalLabel').textContent = 'Edit User';
-            document.getElementById('userId').value = userId;
-            document.getElementById('userFullName').value = fullName;
-            document.getElementById('userEmail').value = email;
-            document.getElementById('userMobile').value = mobile;
-            document.getElementById('isAdmin').checked = (role === 'Admin');
-            document.getElementById('passwordField').style.display = 'block';
-            document.getElementById('userPassword').required = false;
-            document.getElementById('userPassword').placeholder = 'Leave blank to keep current password';
-            
-            const modal = new bootstrap.Modal(document.getElementById('userModal'));
-            modal.show();
-        }
-
-        function saveUser() {
-            const fullName = document.getElementById('userFullName').value.trim();
-            const email = document.getElementById('userEmail').value.trim();
-            const mobile = document.getElementById('userMobile').value.trim();
-            const password = document.getElementById('userPassword').value;
-            const isAdmin = document.getElementById('isAdmin').checked;
-            
-            if (!fullName || !email) {
-                showFeedback('Please fill in all required fields.', 'error');
-                return;
-            }
-            
-            if (!isEditMode && !password) {
-                showFeedback('Password is required for new users.', 'error');
-                return;
-            }
-            
-            const action = isEditMode ? 'updated' : 'added';
-            showFeedback('User "' + fullName + '" has been ' + action + ' successfully.', 'success');
-            
-            const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
-            modal.hide();
-            
-            setTimeout(function() {
-                location.reload();
-            }, 1500);
-        }
-
-        function deleteUser(userId, userName) {
-            if (confirm('Are you sure you want to delete user "' + userName + '"? This action cannot be undone.')) {
-                showFeedback('User "' + userName + '" has been deleted successfully.', 'success');
-                setTimeout(function() {
-                    location.reload();
-                }, 1500);
-            }
         }
 
         let searchTimeout;
@@ -777,7 +645,7 @@ if (!empty($params)) {
             if (users.length === 0) {
                 usersTableBody.innerHTML = `
                     <tr>
-                        <td colspan="5" class="text-center text-muted py-5">
+                        <td colspan="4" class="text-center text-muted py-5">
                             <i class="fas fa-users fa-2x mb-3 d-block"></i>
                             No users found.
                         </td>
@@ -815,14 +683,6 @@ if (!empty($params)) {
                                 <i class="fas ${roleIcon} me-1"></i>
                                 ${escapeHtml(user.role)}
                             </span>
-                        </td>
-                        <td class="text-end">
-                            <button class="action-btn" onclick="editUser('${escapeHtml(user.id)}', '${escapeHtml(fullName)}', '${escapeHtml(user.email)}', '${escapeHtml(user.mobile || '')}', '${escapeHtml(user.role)}')" title="Edit">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-btn text-danger" onclick="deleteUser('${escapeHtml(user.id)}', '${escapeHtml(fullName)}')" title="Delete">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
                         </td>
                     </tr>
                 `;
