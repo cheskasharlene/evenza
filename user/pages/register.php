@@ -175,21 +175,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="form-group mb-4">
                                 <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
                                 <div class="password-input-wrapper position-relative">
-                                    <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password" minlength="6" style="padding-right: 60px;">
-                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password')" aria-label="Toggle password visibility" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4A5D4E; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500;">
+                                    <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password" minlength="6" style="padding-right: 70px;">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password')" aria-label="Toggle password visibility" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4A5D4E; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500; z-index: 5;">
                                         <span id="passwordToggleText">Show</span>
                                     </button>
                                 </div>
+                                <div class="error-message" id="passwordError"></div>
+                                <small class="password-requirement-text">Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number.</small>
                             </div>
 
                             <div class="form-group mb-4">
                                 <label for="confirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                 <div class="password-input-wrapper position-relative">
-                                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control luxury-input" required placeholder="Confirm your password" minlength="6" style="padding-right: 60px;">
-                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmPassword')" aria-label="Toggle password visibility" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4A5D4E; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500;">
+                                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control luxury-input" required placeholder="Confirm your password" minlength="6" style="padding-right: 70px;">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmPassword')" aria-label="Toggle password visibility" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4A5D4E; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500; z-index: 5;">
                                         <span id="confirmPasswordToggleText">Show</span>
                                     </button>
                                 </div>
+                                <div class="error-message" id="confirmPasswordError"></div>
                             </div>
 
                             <button type="submit" class="btn btn-primary-luxury w-100 mb-4">Register</button>

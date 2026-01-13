@@ -102,37 +102,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         <?php else: ?>
                             <!-- Reset Password Form -->
-                            <form method="post" action="" novalidate>
+                            <form id="forgotPasswordForm" method="post" action="" novalidate>
                                 <div class="form-group mb-4">
-                                    <label for="email" class="form-label">Email Address</label>
+                                    <label for="email" class="form-label">Email Address <span class="required-asterisk">*</span></label>
                                     <input id="email" name="email" type="email" class="form-control luxury-input" required placeholder="Enter your registered email" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                                    <div class="error-message" id="emailError"></div>
                                 </div>
 
                                 <div class="form-group mb-4">
-                                    <label for="new_password" class="form-label">New Password</label>
+                                    <label for="new_password" class="form-label">New Password <span class="required-asterisk">*</span></label>
                                     <div class="password-input-wrapper" style="position: relative;">
                                         <input id="new_password" name="new_password" type="password" class="form-control luxury-input" required placeholder="Enter new password">
                                         <button type="button" class="password-toggle-btn" onclick="togglePassword('new_password', 'toggle_new_password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6c757d; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
                                             <span id="toggle_new_password">Show</span>
                                         </button>
                                     </div>
+                                    <div class="error-message" id="newPasswordError"></div>
                                     <small class="text-muted">Must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number.</small>
                                 </div>
 
                                 <div class="form-group mb-4">
-                                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                    <label for="confirm_password" class="form-label">Confirm New Password <span class="required-asterisk">*</span></label>
                                     <div class="password-input-wrapper" style="position: relative;">
                                         <input id="confirm_password" name="confirm_password" type="password" class="form-control luxury-input" required placeholder="Confirm new password">
                                         <button type="button" class="password-toggle-btn" onclick="togglePassword('confirm_password', 'toggle_confirm_password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6c757d; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
                                             <span id="toggle_confirm_password">Show</span>
                                         </button>
                                     </div>
+                                    <div class="error-message" id="confirmPasswordError"></div>
                                 </div>
 
                                 <button type="submit" class="btn btn-primary-luxury w-100 mb-4">Reset Password</button>
 
                                 <p class="text-center mb-0">
-                                    Remember your password? <a href="login.php" class="text-decoration-none">Login here</a>
+                                    Remember your password? <a href="login.php" class="login-link">Login here</a>
                                 </p>
                             </form>
                         <?php endif; ?>
@@ -142,8 +145,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
+    <!-- Error Modal for Form Validation -->
+    <div class="modal fade" id="forgotPasswordErrorModal" tabindex="-1" aria-labelledby="forgotPasswordErrorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-alert-modal">
+                <div class="modal-body custom-alert-body text-center">
+                    <div class="custom-alert-icon-wrapper mb-4">
+                        <i class="fas fa-exclamation-circle custom-alert-icon error-icon"></i>
+                    </div>
+                    <h5 class="custom-alert-title">Form Incomplete</h5>
+                    <p class="custom-alert-message" id="forgotPasswordErrorModalMessage">Please fill in all required fields before submitting.</p>
+                </div>
+                <div class="modal-footer custom-alert-footer justify-content-center">
+                    <button type="button" class="btn custom-alert-btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <?php include __DIR__ . '/includes/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../../assets/js/forgot-password.js"></script>
     <script>
         function togglePassword(inputId, toggleId) {
             const input = document.getElementById(inputId);

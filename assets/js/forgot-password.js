@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
-  const form = document.getElementById('loginForm');
+  const form = document.getElementById('forgotPasswordForm');
   if (!form) return;
 
   const emailEl = document.getElementById('email');
-  const passwordEl = document.getElementById('password');
+  const newPasswordEl = document.getElementById('new_password');
+  const confirmPasswordEl = document.getElementById('confirm_password');
 
   // Helper function to show error
   function showError(field, errorMessageEl, message) {
@@ -29,9 +30,14 @@ document.addEventListener('DOMContentLoaded', function () {
       clearError(this, document.getElementById('emailError'));
     });
   }
-  if (passwordEl) {
-    passwordEl.addEventListener('input', function() {
-      clearError(this, document.getElementById('passwordError'));
+  if (newPasswordEl) {
+    newPasswordEl.addEventListener('input', function() {
+      clearError(this, document.getElementById('newPasswordError'));
+    });
+  }
+  if (confirmPasswordEl) {
+    confirmPasswordEl.addEventListener('input', function() {
+      clearError(this, document.getElementById('confirmPasswordError'));
     });
   }
 
@@ -55,10 +61,12 @@ document.addEventListener('DOMContentLoaded', function () {
   form.addEventListener('submit', function (e) {
     // Clear all previous errors
     if (emailEl) clearError(emailEl, document.getElementById('emailError'));
-    if (passwordEl) clearError(passwordEl, document.getElementById('passwordError'));
+    if (newPasswordEl) clearError(newPasswordEl, document.getElementById('newPasswordError'));
+    if (confirmPasswordEl) clearError(confirmPasswordEl, document.getElementById('confirmPasswordError'));
 
     const email = emailEl ? emailEl.value.trim() : '';
-    const password = passwordEl ? passwordEl.value : '';
+    const newPassword = newPasswordEl ? newPasswordEl.value : '';
+    const confirmPassword = confirmPasswordEl ? confirmPasswordEl.value : '';
     let hasErrors = false;
     let errorMessages = [];
 
@@ -76,26 +84,37 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
 
-    // Validate password
-    if (!password) {
-      showError(passwordEl, document.getElementById('passwordError'), 'Please enter your password');
+    // Validate new password
+    if (!newPassword) {
+      showError(newPasswordEl, document.getElementById('newPasswordError'), 'Please enter a new password');
       hasErrors = true;
-      errorMessages.push('Password');
+      errorMessages.push('New Password');
     } else {
-      const passwordValidation = validatePassword(password);
+      const passwordValidation = validatePassword(newPassword);
       if (passwordValidation !== true) {
-        showError(passwordEl, document.getElementById('passwordError'), passwordValidation);
+        showError(newPasswordEl, document.getElementById('newPasswordError'), passwordValidation);
         hasErrors = true;
-        errorMessages.push('Password');
+        errorMessages.push('New Password');
       }
+    }
+
+    // Validate confirm password
+    if (!confirmPassword) {
+      showError(confirmPasswordEl, document.getElementById('confirmPasswordError'), 'Please confirm your new password');
+      hasErrors = true;
+      errorMessages.push('Confirm Password');
+    } else if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+      showError(confirmPasswordEl, document.getElementById('confirmPasswordError'), 'Passwords do not match');
+      hasErrors = true;
+      errorMessages.push('Confirm Password');
     }
 
     if (hasErrors) {
       e.preventDefault();
       
       // Show error modal
-      const errorModal = document.getElementById('loginErrorModal');
-      const errorMessageEl = document.getElementById('loginErrorModalMessage');
+      const errorModal = document.getElementById('forgotPasswordErrorModal');
+      const errorMessageEl = document.getElementById('forgotPasswordErrorModalMessage');
       if (errorModal && errorMessageEl) {
         const message = errorMessages.length > 0 
           ? `Please complete the following required fields: ${errorMessages.join(', ')}.`
@@ -109,12 +128,16 @@ document.addEventListener('DOMContentLoaded', function () {
       if (emailEl && emailEl.classList.contains('is-invalid')) {
         emailEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
         emailEl.focus();
-      } else if (passwordEl && passwordEl.classList.contains('is-invalid')) {
-        passwordEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        passwordEl.focus();
+      } else if (newPasswordEl && newPasswordEl.classList.contains('is-invalid')) {
+        newPasswordEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        newPasswordEl.focus();
+      } else if (confirmPasswordEl && confirmPasswordEl.classList.contains('is-invalid')) {
+        confirmPasswordEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        confirmPasswordEl.focus();
       }
       
       return false;
     }
   });
 });
+

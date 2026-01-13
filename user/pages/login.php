@@ -128,19 +128,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php endif; ?>
                         <form id="loginForm" method="post" action="" novalidate>
                             <div class="form-group mb-4">
-                                <label for="email" class="form-label">Email Address</label>
+                                <label for="email" class="form-label">Email Address <span class="required-asterisk">*</span></label>
                                 <input id="email" name="email" type="email" class="form-control luxury-input" required placeholder="you@example.com">
+                                <div class="error-message" id="emailError"></div>
                             </div>
 
                             <div class="form-group mb-4">
-                                <label for="password" class="form-label">Password</label>
+                                <label for="password" class="form-label">Password <span class="required-asterisk">*</span></label>
                                 <div class="password-input-wrapper" style="position: relative;">
-                                    <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password" style="padding-right: 60px;">
-                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('password', 'toggle_password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4A5D4E; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500;">
+                                    <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password" style="padding-right: 70px;">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('password', 'toggle_password')" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4A5D4E; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500; z-index: 5;">
                                         <span id="toggle_password">Show</span>
                                     </button>
                                 </div>
-                                <small class="text-muted">Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number.</small>
+                                <div class="error-message" id="passwordError"></div>
+                                <small class="password-requirement-text">Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number.</small>
                             </div>
 
                             <input type="hidden" name="redirect" value="<?php echo htmlspecialchars($redirect); ?>">
@@ -152,6 +154,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <p class="text-center mb-0">Don't have an account? <a href="register.php" class="register-link">Register here</a></p>
                         </form>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal for Form Validation -->
+    <div class="modal fade" id="loginErrorModal" tabindex="-1" aria-labelledby="loginErrorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-alert-modal">
+                <div class="modal-body custom-alert-body text-center">
+                    <div class="custom-alert-icon-wrapper mb-4">
+                        <i class="fas fa-exclamation-circle custom-alert-icon error-icon"></i>
+                    </div>
+                    <h5 class="custom-alert-title">Form Incomplete</h5>
+                    <p class="custom-alert-message" id="loginErrorModalMessage">Please fill in all required fields before submitting.</p>
+                </div>
+                <div class="modal-footer custom-alert-footer justify-content-center">
+                    <button type="button" class="btn custom-alert-btn-primary" data-bs-dismiss="modal">OK</button>
                 </div>
             </div>
         </div>

@@ -142,6 +142,25 @@
             }
 
             // Clear errors when user starts typing/selecting
+            const fullNameEl = document.getElementById('fullName');
+            const emailEl = document.getElementById('email');
+            const mobileEl = document.getElementById('mobile');
+            
+            if (fullNameEl) {
+                fullNameEl.addEventListener('input', function() {
+                    clearError(this, document.getElementById('fullNameError'));
+                });
+            }
+            if (emailEl) {
+                emailEl.addEventListener('input', function() {
+                    clearError(this, document.getElementById('emailError'));
+                });
+            }
+            if (mobileEl) {
+                mobileEl.addEventListener('input', function() {
+                    clearError(this, document.getElementById('mobileError'));
+                });
+            }
             if (dateInput) {
                 dateInput.addEventListener('input', function() {
                     clearError(this, document.getElementById('reservationDateError'));
@@ -157,75 +176,120 @@
                     clearError(this, document.getElementById('eventEndTimeError'));
                 });
             }
+            
+            // Clear package error when package is selected
+            const packageTiles = document.querySelectorAll('.package-tile');
+            packageTiles.forEach(tile => {
+                tile.addEventListener('click', function() {
+                    const packageErrorEl = document.getElementById('packageError');
+                    if (packageErrorEl) {
+                        packageErrorEl.textContent = '';
+                        packageErrorEl.classList.remove('show');
+                    }
+                });
+            });
 
             reservationForm.addEventListener('submit', function(e) {
-                const fullName = (document.getElementById('fullName') || {}).value?.trim() || '';
-                const email = (document.getElementById('email') || {}).value?.trim() || '';
-                const mobile = (document.getElementById('mobile') || {}).value?.trim() || '';
+                const fullNameEl = document.getElementById('fullName');
+                const emailEl = document.getElementById('email');
+                const mobileEl = document.getElementById('mobile');
                 const packageId = (document.getElementById('packageId') || {}).value || '';
+                
+                const fullName = fullNameEl ? fullNameEl.value.trim() : '';
+                const email = emailEl ? emailEl.value.trim() : '';
+                const mobile = mobileEl ? mobileEl.value.trim() : '';
                 const dateValue = dateInput ? dateInput.value : '';
                 const startTimeValue = startTimeSelect ? startTimeSelect.value : '';
                 const endTimeValue = endTimeSelect ? endTimeSelect.value : '';
 
                 // Clear all previous errors
-                const allFields = [dateInput, startTimeSelect, endTimeSelect].filter(f => f);
-                allFields.forEach(field => {
-                    const errorId = field.id + 'Error';
-                    clearError(field, document.getElementById(errorId));
+                const allFields = [
+                    { field: fullNameEl, errorId: 'fullNameError' },
+                    { field: emailEl, errorId: 'emailError' },
+                    { field: mobileEl, errorId: 'mobileError' },
+                    { field: dateInput, errorId: 'reservationDateError' },
+                    { field: startTimeSelect, errorId: 'eventStartTimeError' },
+                    { field: endTimeSelect, errorId: 'eventEndTimeError' }
+                ].filter(item => item.field);
+                
+                allFields.forEach(item => {
+                    clearError(item.field, document.getElementById(item.errorId));
                 });
 
                 let hasErrors = false;
+                let errorMessages = [];
 
-                // Validate required fields
-                if (!fullName || !email || !mobile) {
-                    e.preventDefault();
+                // Validate full name
+                if (!fullName) {
+                    showError(fullNameEl, document.getElementById('fullNameError'), 'Please enter your full name');
                     hasErrors = true;
+                    errorMessages.push('Full Name');
                 }
 
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (email && !emailRegex.test(email)) {
-                    e.preventDefault();
+                // Validate email
+                if (!email) {
+                    showError(emailEl, document.getElementById('emailError'), 'Please enter your email address');
                     hasErrors = true;
+                    errorMessages.push('Email Address');
+                } else {
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email)) {
+                        showError(emailEl, document.getElementById('emailError'), 'Please enter a valid email address');
+                        hasErrors = true;
+                        errorMessages.push('Email Address');
+                    }
                 }
 
-                if (mobile && mobile.length < 10) {
-                    e.preventDefault();
+                // Validate mobile
+                if (!mobile) {
+                    showError(mobileEl, document.getElementById('mobileError'), 'Please enter your mobile number');
                     hasErrors = true;
+                    errorMessages.push('Mobile Number');
+                } else if (mobile.length < 10) {
+                    showError(mobileEl, document.getElementById('mobileError'), 'Please enter a valid mobile number');
+                    hasErrors = true;
+                    errorMessages.push('Mobile Number');
                 }
 
+                // Validate package selection
                 if (!packageId) {
-                    e.preventDefault();
+                    const packageErrorEl = document.getElementById('packageError');
+                    if (packageErrorEl) {
+                        packageErrorEl.textContent = 'Please select a package';
+                        packageErrorEl.classList.add('show');
+                    }
                     hasErrors = true;
+                    errorMessages.push('Package');
                 }
 
                 // Validate date
                 if (!dateValue) {
-                    e.preventDefault();
                     showError(dateInput, document.getElementById('reservationDateError'), 'Please select a preferred date');
                     hasErrors = true;
+                    errorMessages.push('Preferred Date');
                 } else {
                     const selectedDate = new Date(dateValue + 'T00:00:00');
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     if (selectedDate < today) {
-                        e.preventDefault();
                         showError(dateInput, document.getElementById('reservationDateError'), 'Please select a future date');
                         hasErrors = true;
+                        errorMessages.push('Preferred Date');
                     }
                 }
 
                 // Validate start time
                 if (!startTimeValue) {
-                    e.preventDefault();
                     showError(startTimeSelect, document.getElementById('eventStartTimeError'), 'Please select a start time');
                     hasErrors = true;
+                    errorMessages.push('Start Time');
                 }
 
                 // Validate end time
                 if (!endTimeValue) {
-                    e.preventDefault();
                     showError(endTimeSelect, document.getElementById('eventEndTimeError'), 'Please select an end time');
                     hasErrors = true;
+                    errorMessages.push('End Time');
                 }
 
                 // Validate time order
@@ -234,13 +298,34 @@
                     const startIndex = timeOrder.indexOf(startTimeValue);
                     const endIndex = timeOrder.indexOf(endTimeValue);
                     if (startIndex >= endIndex) {
-                        e.preventDefault();
                         showError(endTimeSelect, document.getElementById('eventEndTimeError'), 'Event end time must be after start time');
                         hasErrors = true;
+                        errorMessages.push('End Time');
                     }
                 }
 
                 if (hasErrors) {
+                    e.preventDefault();
+                    
+                    // Show error modal
+                    const errorModal = document.getElementById('reservationErrorModal');
+                    const errorMessageEl = document.getElementById('reservationErrorModalMessage');
+                    if (errorModal && errorMessageEl) {
+                        const message = errorMessages.length > 0 
+                            ? `Please complete the following required fields: ${errorMessages.join(', ')}.`
+                            : 'Please fill in all required fields before submitting.';
+                        errorMessageEl.textContent = message;
+                        const bsModal = new bootstrap.Modal(errorModal);
+                        bsModal.show();
+                    }
+                    
+                    // Scroll to first error
+                    const firstErrorField = allFields.find(item => item.field && item.field.classList.contains('is-invalid'));
+                    if (firstErrorField && firstErrorField.field) {
+                        firstErrorField.field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstErrorField.field.focus();
+                    }
+                    
                     return false;
                 }
             });

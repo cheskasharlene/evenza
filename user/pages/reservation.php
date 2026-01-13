@@ -139,28 +139,31 @@ $totalAmount = $selectedPackage['price'];
                             <input type="hidden" name="packageName" id="packageName" value="<?php echo htmlspecialchars($selectedPackage['name']); ?>">
                             <input type="hidden" name="packagePrice" id="packagePrice" value="<?php echo $selectedPackage['price']; ?>">
                             <div class="mb-4">
-                                <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                <label for="fullName" class="form-label">Full Name <span class="required-asterisk">*</span></label>
                                 <input type="text" class="form-control luxury-input" id="fullName" name="fullName" required placeholder="Enter your full name">
+                                <div class="error-message" id="fullNameError"></div>
                             </div>
 
                             <div class="mb-4">
-                                <label for="email" class="form-label">Email Address <span class="text-danger">*</span></label>
+                                <label for="email" class="form-label">Email Address <span class="required-asterisk">*</span></label>
                                 <input type="email" class="form-control luxury-input" id="email" name="email" required placeholder="your.email@example.com">
+                                <div class="error-message" id="emailError"></div>
                             </div>
 
                             <div class="mb-4">
-                                <label for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+                                <label for="mobile" class="form-label">Mobile Number <span class="required-asterisk">*</span></label>
                                 <input type="tel" class="form-control luxury-input" id="mobile" name="mobile" required placeholder="0921 123 4567">
+                                <div class="error-message" id="mobileError"></div>
                             </div>
 
                             <div class="row g-3 mb-4">
                                 <div class="col-md-4">
-                                    <label for="reservationDate" class="form-label">Preferred Date <span class="text-danger">*</span></label>
+                                    <label for="reservationDate" class="form-label">Preferred Date <span class="required-asterisk">*</span></label>
                                     <input type="date" class="form-control luxury-input" id="reservationDate" name="reservationDate" required style="accent-color: #4A5D4E;">
                                     <div class="error-message" id="reservationDateError"></div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label for="eventStartTime" class="form-label">Event Start Time <span class="text-danger">*</span></label>
+                                    <label for="eventStartTime" class="form-label">Event Start Time <span class="required-asterisk">*</span></label>
                                     <select class="form-select luxury-input" id="eventStartTime" name="eventStartTime" required style="position: relative; z-index: 10;">
                                         <option value="">Select start time</option>
                                         <option value="08:00 AM">8:00 AM</option>
@@ -180,7 +183,7 @@ $totalAmount = $selectedPackage['price'];
                                     <div class="error-message" id="eventStartTimeError"></div>
                                 </div>
                                 <div class="col-md-4">
-                                    <label for="eventEndTime" class="form-label">Event End Time <span class="text-danger">*</span></label>
+                                    <label for="eventEndTime" class="form-label">Event End Time <span class="required-asterisk">*</span></label>
                                     <select class="form-select luxury-input" id="eventEndTime" name="eventEndTime" required style="position: relative; z-index: 10;">
                                         <option value="">Select end time</option>
                                         <option value="09:00 AM">9:00 AM</option>
@@ -204,7 +207,7 @@ $totalAmount = $selectedPackage['price'];
                             </div>
 
                             <div class="mb-4">
-                                <label class="form-label">Select Package <span class="text-danger">*</span></label>
+                                <label class="form-label">Select Package <span class="required-asterisk">*</span></label>
                                 <div class="package-options d-flex gap-2 mt-2 flex-wrap" id="packageOptions">
                                     <?php foreach ($packages as $p): ?>
                                         <div class="package-tile" role="button" tabindex="0" data-id="<?php echo $p['id']; ?>" data-tier="<?php echo htmlspecialchars($p['tier']); ?>" data-name="<?php echo htmlspecialchars($p['name']); ?>" data-price="<?php echo $p['price']; ?>">
@@ -213,6 +216,7 @@ $totalAmount = $selectedPackage['price'];
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
+                                <div class="error-message" id="packageError"></div>
                                 <small class="text-muted d-block mt-2">Choose a package to reserve the event as a single purchase.</small>
                             </div>
 
@@ -260,7 +264,7 @@ $totalAmount = $selectedPackage['price'];
 
                             <div class="d-flex gap-3 mt-4">
                                 <a href="eventDetails.php?id=<?php echo $eventId; ?>" class="btn btn-outline-luxury flex-fill">Back to Event</a>
-                                <button type="submit" class="btn btn-primary-luxury flex-fill">Submit Reservation</button>
+                                <button type="submit" class="btn btn-primary-luxury flex-fill" id="submitReservationBtn">Submit Reservation</button>
                             </div>
                         </form>
                     </div>
@@ -312,6 +316,24 @@ $totalAmount = $selectedPackage['price'];
     </div>
 
     <?php include __DIR__ . '/includes/footer.php'; ?>
+
+    <!-- Error Modal for Form Validation -->
+    <div class="modal fade" id="reservationErrorModal" tabindex="-1" aria-labelledby="reservationErrorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-alert-modal">
+                <div class="modal-body custom-alert-body text-center">
+                    <div class="custom-alert-icon-wrapper mb-4">
+                        <i class="fas fa-exclamation-circle custom-alert-icon error-icon"></i>
+                    </div>
+                    <h5 class="custom-alert-title">Form Incomplete</h5>
+                    <p class="custom-alert-message" id="reservationErrorModalMessage">Please fill in all required fields before submitting.</p>
+                </div>
+                <div class="modal-footer custom-alert-footer justify-content-center">
+                    <button type="button" class="btn custom-alert-btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="modal fade" id="reservationSuccessModal" tabindex="-1" aria-labelledby="reservationSuccessModalLabel" aria-hidden="true" data-bs-backdrop="static">
         <div class="modal-dialog modal-dialog-centered">
