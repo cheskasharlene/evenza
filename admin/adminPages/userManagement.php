@@ -567,7 +567,7 @@ if (!empty($params)) {
                             <i class="fas fa-user text-muted"></i>
                         </div>
                     </div>
-                    <a href="../user/process/logout.php?type=admin" class="btn btn-admin-primary btn-sm">Logout</a>
+                    <a href="../../user/process/logout.php?type=admin" class="btn btn-admin-primary btn-sm">Logout</a>
                 </div>
             </div>
 

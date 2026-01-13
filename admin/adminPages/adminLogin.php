@@ -227,7 +227,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="text-center mt-4">
                 <a href="adminForgotPassword.php" class="text-muted small text-decoration-none d-block mb-2">Forgot Password?</a>
-                <a href="../index.php" class="text-muted small text-decoration-none">← Back to EVENZA Home</a>
             </div>
         </div>
     </div>
