@@ -323,9 +323,24 @@ try {
         .trend-indicator {
             font-size: 0.85rem;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         .trend-up {
-            color: #4A5D4A;
+            color: rgba(26, 26, 26, 0.7);
+        }
+        .trend-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            background-color: #d1e7dd;
+            color: #0f5132;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
         @media (max-width: 1024px) {
             .dashboard-grid {
@@ -519,7 +534,7 @@ try {
                         </a>
                         <a href="userManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
-                            <span style="font-weight: 500;">User Management</span>
+                            <span style="font-weight: 500;">Users</span>
                         </a>
                         <a href="reviewsManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-star"></i></span>
@@ -577,7 +592,7 @@ try {
                                 <div class="stat-label mb-2">Total Revenue</div>
                                 <div class="stat-number">₱ <span id="totalRevenue"><?php echo isset($stats['totalRevenue']) ? number_format($stats['totalRevenue'], 2) : '0.00'; ?></span></div>
                                 <div class="trend-indicator trend-up mt-2">
-                                    <span>↗</span> <span id="revenueTrend"><?php echo isset($stats['revenueTrend']) ? number_format($stats['revenueTrend'], 1) : '0.0'; ?>%</span> since last month
+                                    <span class="trend-icon"><i class="fas fa-arrow-up"></i></span> <span id="revenueTrend"><?php echo isset($stats['revenueTrend']) ? number_format($stats['revenueTrend'], 1) : '0.0'; ?>%</span> since last month
                                 </div>
                             </div>
                         </div>

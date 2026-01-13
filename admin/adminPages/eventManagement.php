@@ -226,6 +226,31 @@ if (!empty($searchQuery)) {
             color: #721c24;
             box-shadow: 0 2px 4px rgba(114, 28, 36, 0.2);
         }
+        
+        /* Package Inclusions Button */
+        .btn-package-inclusions {
+            border: 1px solid #4A5D4E;
+            color: #4A5D4E;
+            background-color: #FFFFFF;
+            border-radius: 20px;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .btn-package-inclusions:hover {
+            background-color: #4A5D4E;
+            color: #FFFFFF;
+            border-color: #4A5D4E;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(74, 93, 78, 0.2);
+        }
+        
+        .btn-package-inclusions:active {
+            transform: translateY(0);
+        }
         /* Actions column container */
         .actions-cell {
             width: 120px;
@@ -444,7 +469,7 @@ if (!empty($searchQuery)) {
                         </a>
                         <a href="userManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
-                            <span style="font-weight: 500;">User Management</span>
+                            <span style="font-weight: 500;">Users</span>
                         </a>
                         <a href="reviewsManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-star"></i></span>
@@ -540,7 +565,7 @@ if (!empty($searchQuery)) {
                                     <th>Title</th>
                                     <th>Category</th>
                                     <th>Venue</th>
-                                    <th>Status</th>
+                                    <th>PACKAGES</th>
                                     <th class="text-center" style="width: 120px;">Actions</th>
                                 </tr>
                             </thead>
@@ -595,9 +620,13 @@ if (!empty($searchQuery)) {
                                         <div class="text-muted small"><?php echo htmlspecialchars($event['venue']); ?></div>
                                     </td>
                                     <td>
-                                        <span class="status-badge <?php echo strtolower($event['status']) === 'active' ? 'status-active' : 'status-inactive'; ?>">
-                                            <?php echo htmlspecialchars($event['status']); ?>
-                                        </span>
+                                        <button type="button" 
+                                                class="btn btn-package-inclusions" 
+                                                data-event-id="<?php echo $event['eventId'] ?? $event['id']; ?>"
+                                                data-event-title="<?php echo htmlspecialchars($event['name'] ?? $event['title'], ENT_QUOTES); ?>"
+                                                onclick="viewPackageInclusions(<?php echo $event['eventId'] ?? $event['id']; ?>, '<?php echo htmlspecialchars($event['name'] ?? $event['title'], ENT_QUOTES); ?>')">
+                                            <i class="fas fa-box me-1"></i> Package Inclusions
+                                        </button>
                                     </td>
                                     <td class="actions-cell">
                                         <div class="actions-group">
@@ -852,6 +881,31 @@ if (!empty($searchQuery)) {
                 <div class="modal-footer">
                     <button type="button" class="btn btn-cancel-event" data-bs-dismiss="modal">Cancel</button>
                     <button type="button" class="btn btn-save-event" onclick="saveEditedEvent()">Update Event</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Package Inclusions Modal -->
+    <div class="modal fade" id="packageInclusionsModal" tabindex="-1" aria-labelledby="packageInclusionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" style="border-radius: 20px;">
+                <div class="modal-header" style="border-bottom: 1px solid rgba(74, 93, 74, 0.1);">
+                    <h5 class="modal-title" style="font-family: 'Playfair Display', serif; font-weight: 600; color: #1A1A1A;" id="packageInclusionsModalLabel">Packages for <span id="packageModalEventTitle"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" style="padding: 2rem;">
+                    <div id="packageInclusionsContent">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Loading package details...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: 1px solid rgba(74, 93, 74, 0.1);">
+                    <button type="button" class="btn btn-cancel-event" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>
         </div>
@@ -1244,6 +1298,148 @@ if (!empty($searchQuery)) {
         const messageType = urlParams.get('type') || 'success';
         if (message) {
             showFeedback(decodeURIComponent(message), messageType);
+        }
+
+        // View Package Inclusions
+        function viewPackageInclusions(eventId, eventTitle) {
+            // Set the modal title
+            document.getElementById('packageModalEventTitle').textContent = eventTitle;
+            
+            // Show loading state
+            document.getElementById('packageInclusionsContent').innerHTML = `
+                <div class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-3 text-muted">Loading package details...</p>
+                </div>
+            `;
+            
+            // Open the modal
+            const modal = new bootstrap.Modal(document.getElementById('packageInclusionsModal'));
+            modal.show();
+            
+            // Fetch package data
+            fetch('/evenza/admin/process/fetch/getEvent.php?eventId=' + eventId)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success && data.packages) {
+                        displayPackageInclusions(data.packages);
+                    } else {
+                        document.getElementById('packageInclusionsContent').innerHTML = `
+                            <div class="alert alert-warning" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                No package information available for this event.
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching packages:', error);
+                    document.getElementById('packageInclusionsContent').innerHTML = `
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-times-circle me-2"></i>
+                            Error loading package details. Please try again later.
+                        </div>
+                    `;
+                });
+        }
+
+        // Display Package Inclusions
+        function displayPackageInclusions(packages) {
+            const content = document.getElementById('packageInclusionsContent');
+            
+            let html = '<div class="row g-4">';
+            
+            // Bronze Package
+            if (packages.bronze) {
+                html += `
+                    <div class="col-12">
+                        <div class="card" style="border: 1px solid rgba(184, 149, 106, 0.3); border-radius: 15px; overflow: hidden;">
+                            <div class="card-header" style="background: linear-gradient(135deg, rgba(184, 149, 106, 0.1) 0%, rgba(184, 149, 106, 0.05) 100%); border-bottom: 1px solid rgba(184, 149, 106, 0.2);">
+                                <h6 class="mb-0 fw-bold" style="color: #B8956A; font-family: 'Playfair Display', serif;">
+                                    <i class="fas fa-box me-2"></i>Bronze Package
+                                    ${packages.bronze.price !== null ? `<span class="badge bg-light text-dark ms-2" style="font-size: 0.85rem; padding: 0.3rem 0.7rem; border-radius: 50px;">₱${parseFloat(packages.bronze.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>` : ''}
+                                </h6>
+                            </div>
+                            <div class="card-body" style="padding: 1.5rem;">
+                                ${packages.bronze.inclusions ? `
+                                    <ul class="list-unstyled mb-0" style="line-height: 1.8;">
+                                        ${packages.bronze.inclusions.split('\n').filter(item => item.trim()).map(item => `
+                                            <li style="color: #1A1A1A; margin-bottom: 0.5rem;">
+                                                <i class="fas fa-check-circle me-2" style="color: #B8956A;"></i>${item.trim()}
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                ` : '<p class="text-muted mb-0">No inclusions specified.</p>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Silver Package
+            if (packages.silver) {
+                html += `
+                    <div class="col-12">
+                        <div class="card" style="border: 1px solid rgba(212, 212, 212, 0.5); border-radius: 15px; overflow: hidden;">
+                            <div class="card-header" style="background: linear-gradient(135deg, rgba(212, 212, 212, 0.1) 0%, rgba(212, 212, 212, 0.05) 100%); border-bottom: 1px solid rgba(212, 212, 212, 0.2);">
+                                <h6 class="mb-0 fw-bold" style="color: #8B8B8B; font-family: 'Playfair Display', serif;">
+                                    <i class="fas fa-box me-2"></i>Silver Package
+                                    ${packages.silver.price !== null ? `<span class="badge bg-light text-dark ms-2" style="font-size: 0.85rem; padding: 0.3rem 0.7rem; border-radius: 50px;">₱${parseFloat(packages.silver.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>` : ''}
+                                </h6>
+                            </div>
+                            <div class="card-body" style="padding: 1.5rem;">
+                                ${packages.silver.inclusions ? `
+                                    <ul class="list-unstyled mb-0" style="line-height: 1.8;">
+                                        ${packages.silver.inclusions.split('\n').filter(item => item.trim()).map(item => `
+                                            <li style="color: #1A1A1A; margin-bottom: 0.5rem;">
+                                                <i class="fas fa-check-circle me-2" style="color: #8B8B8B;"></i>${item.trim()}
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                ` : '<p class="text-muted mb-0">No inclusions specified.</p>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Gold Package
+            if (packages.gold) {
+                html += `
+                    <div class="col-12">
+                        <div class="card" style="border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 15px; overflow: hidden;">
+                            <div class="card-header" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border-bottom: 1px solid rgba(212, 175, 55, 0.2);">
+                                <h6 class="mb-0 fw-bold" style="color: #D4AF37; font-family: 'Playfair Display', serif;">
+                                    <i class="fas fa-box me-2"></i>Gold Package
+                                    ${packages.gold.price !== null ? `<span class="badge bg-light text-dark ms-2" style="font-size: 0.85rem; padding: 0.3rem 0.7rem; border-radius: 50px;">₱${parseFloat(packages.gold.price).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>` : ''}
+                                </h6>
+                            </div>
+                            <div class="card-body" style="padding: 1.5rem;">
+                                ${packages.gold.inclusions ? `
+                                    <ul class="list-unstyled mb-0" style="line-height: 1.8;">
+                                        ${packages.gold.inclusions.split('\n').filter(item => item.trim()).map(item => `
+                                            <li style="color: #1A1A1A; margin-bottom: 0.5rem;">
+                                                <i class="fas fa-check-circle me-2" style="color: #D4AF37;"></i>${item.trim()}
+                                            </li>
+                                        `).join('')}
+                                    </ul>
+                                ` : '<p class="text-muted mb-0">No inclusions specified.</p>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            
+            content.innerHTML = html;
         }
     </script>
 </body>
