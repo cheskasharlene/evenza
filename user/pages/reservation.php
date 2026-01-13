@@ -19,19 +19,30 @@ if (isset($_SESSION['error_message'])) {
 $eventId = isset($_GET['eventId']) ? intval($_GET['eventId']) : 0;
 
 $packages = [];
-$packagesQuery = "SELECT packageId, packageName, price FROM packages ORDER BY packageId ASC";
+$packageMap = []; // dedupe by tier, prefer latest (highest id)
+$packagesQuery = "SELECT packageId, packageName, price FROM packages ORDER BY packageId DESC";
 $packagesResult = mysqli_query($conn, $packagesQuery);
 if ($packagesResult) {
     while ($row = mysqli_fetch_assoc($packagesResult)) {
-        $tier = str_replace(' Package', '', $row['packageName']);
-        $packages[] = [
-            'id' => $row['packageId'],
-            'name' => $row['packageName'],
-            'tier' => $tier,
-            'price' => floatval($row['price'])
-        ];
+        $tier = strtolower(str_replace(' Package', '', $row['packageName']));
+        if (!isset($packageMap[$tier])) {
+            $packageMap[$tier] = [
+                'id' => $row['packageId'],
+                'name' => $row['packageName'],
+                'tier' => ucfirst($tier),
+                'price' => floatval($row['price'])
+            ];
+        }
     }
     mysqli_free_result($packagesResult);
+}
+
+// normalize order Bronze, Silver, Gold
+$orderedTiers = ['bronze', 'silver', 'gold'];
+foreach ($orderedTiers as $t) {
+    if (isset($packageMap[$t])) {
+        $packages[] = $packageMap[$t];
+    }
 }
 
 $event = null;

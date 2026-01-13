@@ -797,11 +797,61 @@ if (!empty($searchQuery)) {
                             <input type="text" class="form-control" id="editEventImagePath" placeholder="assets/images/event_images/filename.jpg" required>
                             <div class="form-text">Enter the path to the event image (e.g., assets/images/event_images/myevent.jpg)</div>
                         </div>
+
+                        <!-- Package Tiers & Inclusions Section (Edit) -->
+                        <div class="mt-4 pt-3" style="border-top: 1px solid rgba(74, 93, 74, 0.1);">
+                            <h6 class="mb-4" style="font-family: 'Playfair Display', serif; font-weight: 600; color: #1A1A1A;">Package Tiers & Inclusions</h6>
+                            
+                            <!-- Bronze Package -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold" style="color: #B8956A;">Bronze Package</label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="editBronzePrice" class="form-label small">Price (₱) <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="editBronzePrice" placeholder="0.00" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label for="editBronzeInclusions" class="form-label small">Inclusions/Offers <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="editBronzeInclusions" rows="2" placeholder="e.g., 4-hour venue use, basic sound system" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Silver Package -->
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold" style="color: #D4D4D4;">Silver Package</label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="editSilverPrice" class="form-label small">Price (₱) <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="editSilverPrice" placeholder="0.00" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label for="editSilverInclusions" class="form-label small">Inclusions/Offers <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="editSilverInclusions" rows="2" placeholder="e.g., 6-hour venue use, premium sound system, catering" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Gold Package -->
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold" style="color: #D4AF37;">Gold Package</label>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="editGoldPrice" class="form-label small">Price (₱) <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="editGoldPrice" placeholder="0.00" step="0.01" min="0" required>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label for="editGoldInclusions" class="form-label small">Inclusions/Offers <span class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="editGoldInclusions" rows="2" placeholder="e.g., Full-day venue use, premium sound system, catering, decorations" required></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-admin-primary" onclick="saveEditedEvent()">Update Event</button>
+                    <button type="button" class="btn btn-cancel-event" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-save-event" onclick="saveEditedEvent()">Update Event</button>
                 </div>
             </div>
         </div>
@@ -923,6 +973,15 @@ if (!empty($searchQuery)) {
                         document.getElementById('editEventVenue').value = event.venue || '';
                         document.getElementById('editEventDescription').value = event.description || '';
                         document.getElementById('editEventImagePath').value = event.imagePath || '';
+
+                        // Populate package pricing and inclusions
+                        const packages = data.packages || {};
+                        document.getElementById('editBronzePrice').value = packages.bronze && packages.bronze.price !== null ? packages.bronze.price : '';
+                        document.getElementById('editSilverPrice').value = packages.silver && packages.silver.price !== null ? packages.silver.price : '';
+                        document.getElementById('editGoldPrice').value = packages.gold && packages.gold.price !== null ? packages.gold.price : '';
+                        document.getElementById('editBronzeInclusions').value = packages.bronze && packages.bronze.inclusions ? packages.bronze.inclusions : '';
+                        document.getElementById('editSilverInclusions').value = packages.silver && packages.silver.inclusions ? packages.silver.inclusions : '';
+                        document.getElementById('editGoldInclusions').value = packages.gold && packages.gold.inclusions ? packages.gold.inclusions : '';
                         
                         const modal = new bootstrap.Modal(document.getElementById('editEventModal'));
                         modal.show();
@@ -1075,9 +1134,20 @@ if (!empty($searchQuery)) {
             const venue = document.getElementById('editEventVenue').value.trim();
             const description = document.getElementById('editEventDescription').value.trim();
             const imagePath = document.getElementById('editEventImagePath').value.trim();
+            const bronzePrice = document.getElementById('editBronzePrice').value.trim();
+            const silverPrice = document.getElementById('editSilverPrice').value.trim();
+            const goldPrice = document.getElementById('editGoldPrice').value.trim();
+            const bronzeInclusions = document.getElementById('editBronzeInclusions').value.trim();
+            const silverInclusions = document.getElementById('editSilverInclusions').value.trim();
+            const goldInclusions = document.getElementById('editGoldInclusions').value.trim();
             
             if (!title || !category || !description || !venue || !imagePath) {
                 showFeedback('Please fill in all required fields including Description, Venue, and Image Path.', 'error');
+                return;
+            }
+
+            if (!bronzePrice || !silverPrice || !goldPrice || !bronzeInclusions || !silverInclusions || !goldInclusions) {
+                showFeedback('Please fill in all package details (Price and Inclusions for Bronze, Silver, and Gold).', 'error');
                 return;
             }
             
@@ -1086,7 +1156,10 @@ if (!empty($searchQuery)) {
                 eventId: eventId,
                 title: title,
                 category: category,
-                venue: venue
+                venue: venue,
+                bronzePrice,
+                silverPrice,
+                goldPrice
             });
             
             const formData = new FormData();
@@ -1096,6 +1169,12 @@ if (!empty($searchQuery)) {
             formData.append('venue', venue);
             formData.append('description', description);
             formData.append('imagePath', imagePath);
+            formData.append('bronzePrice', bronzePrice);
+            formData.append('silverPrice', silverPrice);
+            formData.append('goldPrice', goldPrice);
+            formData.append('bronzeInclusions', bronzeInclusions);
+            formData.append('silverInclusions', silverInclusions);
+            formData.append('goldInclusions', goldInclusions);
             
             fetch('/evenza/admin/process/update/updateEvent.php', {
                 method: 'POST',

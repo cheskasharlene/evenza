@@ -220,19 +220,51 @@ function getPackageFeatures($category, $tier, $eventTitle = '') {
 }
 
 $packages = [];
-$packagesQuery = "SELECT packageId, packageName, price FROM packages ORDER BY packageId ASC";
+$packageMap = []; // ensure only one entry per tier
+$packagesQuery = "SELECT packageId, packageName, price FROM packages ORDER BY packageId DESC";
 $packagesResult = mysqli_query($conn, $packagesQuery);
 if ($packagesResult) {
     while ($row = mysqli_fetch_assoc($packagesResult)) {
         $tier = strtolower(str_replace(' Package', '', $row['packageName']));
-        $packages[] = [
-            'id' => $row['packageId'],
-            'name' => $row['packageName'],
-            'tier' => $tier,
-            'price' => floatval($row['price'])
-        ];
+        if (!isset($packageMap[$tier])) {
+            $packageMap[$tier] = [
+                'id' => $row['packageId'],
+                'name' => $row['packageName'],
+                'tier' => $tier,
+                'price' => floatval($row['price'])
+            ];
+        }
     }
     mysqli_free_result($packagesResult);
+}
+
+// Normalize order Bronze, Silver, Gold
+$orderedTiers = ['bronze', 'silver', 'gold'];
+foreach ($orderedTiers as $t) {
+    if (isset($packageMap[$t])) {
+        $packages[] = $packageMap[$t];
+    }
+}
+
+// Fetch per-event package inclusions
+$packageInclusions = [
+    'bronze' => [],
+    'silver' => [],
+    'gold'   => []
+];
+$incQuery = "SELECT packageTier, inclusionText FROM package_inclusions WHERE eventId = ? ORDER BY displayOrder ASC, inclusionId ASC";
+$incStmt = mysqli_prepare($conn, $incQuery);
+if ($incStmt) {
+    mysqli_stmt_bind_param($incStmt, "i", $eventId);
+    mysqli_stmt_execute($incStmt);
+    $incResult = mysqli_stmt_get_result($incStmt);
+    while ($incRow = mysqli_fetch_assoc($incResult)) {
+        $tierKey = strtolower($incRow['packageTier']);
+        if (isset($packageInclusions[$tierKey])) {
+            $packageInclusions[$tierKey][] = $incRow['inclusionText'];
+        }
+    }
+    mysqli_stmt_close($incStmt);
 }
 
 if (!$event) {
@@ -539,7 +571,10 @@ if (!$event) {
                                 $eventCategory = $event['category'] ?? 'Business';
                                 $eventTitle = $event['title'] ?? '';
                                 foreach ($packages as $package): 
-                                    $features = getPackageFeatures($eventCategory, $package['tier'], $eventTitle);
+                                    $tierKey = strtolower($package['tier']);
+                                    $features = !empty($packageInclusions[$tierKey])
+                                        ? $packageInclusions[$tierKey]
+                                        : getPackageFeatures($eventCategory, $tierKey, $eventTitle);
                                 ?>
                                     <div class="package-card" 
                                          data-package-id="<?php echo $package['id']; ?>"
@@ -670,11 +705,24 @@ if (!$event) {
         "venueAddress": <?php echo json_encode($event['venueAddress'] ?? ''); ?>,
         "formattedDate": <?php echo json_encode($event['formattedDate'] ?? ''); ?>,
         "eventTime": <?php echo json_encode($event['eventTime'] ?? ''); ?>,
-        "packages": [
-            {"name": "Bronze Package", "price": 7000},
-            {"name": "Silver Package", "price": 10000},
-            {"name": "Gold Package", "price": 15000}
-        ],
+        "packages": <?php 
+            $eventCategory = $event['category'] ?? 'Business';
+            $eventTitle = $event['title'] ?? '';
+            $packagesForJson = [];
+            foreach ($packages as $package) {
+                $tierKey = strtolower($package['tier']);
+                $features = !empty($packageInclusions[$tierKey])
+                    ? $packageInclusions[$tierKey]
+                    : getPackageFeatures($eventCategory, $tierKey, $eventTitle);
+                $packagesForJson[] = [
+                    'name' => $package['name'],
+                    'price' => $package['price'],
+                    'tier' => $package['tier'],
+                    'inclusions' => array_values($features)
+                ];
+            }
+            echo json_encode($packagesForJson, JSON_UNESCAPED_UNICODE);
+        ?>,
         "faqs": [
             {
                 "question": "Can I request additional customizations for my chosen package?",
