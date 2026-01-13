@@ -499,22 +499,17 @@ function sendReservationStatusSMS($conn, $reservationId, $status, $cancellationT
             }
         }
         
-        // If cancellationType wasn't set correctly, use fallback logic
-        // If paymentDeadline exists and not user-cancelled, it's likely non-payment
-        if ($cancellationType === false && !$userCancelled && $hasPaymentDeadline) {
+        // Skip SMS entirely for user-initiated cancellations
+        if ($userCancelled || strtolower((string)$cancellationType) === 'user') {
+            return true;
+        }
+        
+        if ($cancellationType === false && $hasPaymentDeadline) {
             $cancellationType = 'non_payment';
         }
         
         // Determine message based on cancellation type
-        if ($userCancelled) {
-            // User-initiated cancellation
-            $message = "Hello " . $reservation['customerName'] . ", we regret to inform you that your reservation for " . $reservation['eventName'] . " on " . $reservationDate;
-            if (!empty($timeRange)) {
-                $message .= " (" . $timeRange . ")";
-            }
-            $message .= " has been CANCELLED. You have cancelled this reservation. ";
-            $message .= "Please contact us for alternative dates. - EVENZA";
-        } elseif ($cancellationType === 'non_payment') {
+        if ($cancellationType === 'non_payment') {
             // Confirmed → Cancelled: Non-payment (admin cancelled after payment deadline passed)
             $message = "Hello " . $reservation['customerName'] . ", we regret to inform you that your reservation for " . $reservation['eventName'] . " on " . $reservationDate;
             if (!empty($timeRange)) {
