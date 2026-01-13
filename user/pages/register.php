@@ -92,6 +92,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <style>
+        .password-input-wrapper {
+            position: relative;
+        }
+        .password-toggle-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6B7F5A;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease;
+        }
+        .password-toggle-btn:hover {
+            color: #4A5D4A;
+        }
+        .password-toggle-btn:focus {
+            outline: none;
+        }
+        .password-toggle-btn i {
+            font-size: 1rem;
+        }
+        .luxury-input {
+            padding-right: 45px;
+        }
+        .login-link {
+            color: #6B7F5A;
+            text-decoration: underline;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .login-link:hover {
+            color: #5A6B4F;
+            text-decoration: underline;
+        }
+        .register-page-section .luxury-card {
+            border-radius: 20px;
+        }
+    </style>
 </head>
 <body>
     <?php $activePage = 'register'; include __DIR__ . '/includes/nav.php'; ?>
@@ -167,53 +214,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php include __DIR__ . '/includes/footer.php'; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../assets/js/login.js"></script>
-    <style>
-        .password-input-wrapper {
-            position: relative;
-        }
-        .password-toggle-btn {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #6B7F5A;
-            cursor: pointer;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.3s ease;
-        }
-        .password-toggle-btn:hover {
-            color: #4A5D4A;
-        }
-        .password-toggle-btn:focus {
-            outline: none;
-        }
-        .password-toggle-btn i {
-            font-size: 1rem;
-        }
-        .luxury-input {
-            padding-right: 45px;
-        }
-        .login-link {
-            color: #6B7F5A;
-            text-decoration: underline;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        .login-link:hover {
-            color: #5A6B4F;
-            text-decoration: underline;
-        }
-        .register-page-section .luxury-card {
-            border-radius: 20px;
-        }
-    </style>
     <script>
         // Password visibility toggle
         function togglePasswordVisibility(fieldId) {
