@@ -113,7 +113,7 @@ if (!empty($params)) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <title>User Management - EVENZA Admin</title>
+    <title>Users - EVENZA Admin</title>
     <style>
         .admin-wrapper { 
             min-height: 100vh; 
@@ -531,7 +531,7 @@ if (!empty($params)) {
                         </a>
                         <a href="userManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3 active" style="background: linear-gradient(135deg, rgba(90, 107, 79, 0.15) 0%, rgba(90, 107, 79, 0.08) 100%); color: #5A6B4F; font-weight: 600; text-decoration: none; border-left: 3px solid #5A6B4F;">
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-users"></i></span> 
-                            <span>User Management</span>
+                            <span>Users</span>
                         </a>
                         <a href="reviewsManagement.php" class="d-flex align-items-center py-3 px-3 rounded-3" style="transition: all 0.3s ease; color: rgba(26, 26, 26, 0.7); text-decoration: none; border-left: 3px solid transparent;">
                             <span class="me-3" style="width: 24px; text-align: center;"><i class="fas fa-star"></i></span>
@@ -557,7 +557,7 @@ if (!empty($params)) {
                         </button>
                     </div>
                     <div>
-                        <h4 class="mb-0" style="font-family: 'Playfair Display', serif;">User Management</h4>
+                        <h4 class="mb-0" style="font-family: 'Playfair Display', serif;">Users</h4>
                         <div class="text-muted small">View user accounts and information</div>
                     </div>
                 </div>
