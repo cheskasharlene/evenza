@@ -800,7 +800,7 @@ html {
 
 .luxury-input {
     border: 2px solid rgba(107, 127, 90, 0.15);
-    border-radius: 12px;
+    border-radius: 10px;
     padding: 0.75rem 1rem;
     font-size: 0.95rem;
     color: var(--text-dark-gray);
@@ -816,9 +816,8 @@ html {
     box-shadow: 0 0 0 3px rgba(107, 127, 90, 0.15);
 }
 
-/* Form Validation Feedback - Dynamic validation (no static red) */
 .luxury-input:invalid:not(:placeholder-shown) {
-    border-color: #E8E4DC;
+    border-color: rgba(107, 127, 90, 0.15);
     box-shadow: none;
 }
 
@@ -827,36 +826,74 @@ html {
     box-shadow: 0 0 0 3px rgba(107, 127, 90, 0.15);
 }
 
-/* Validation feedback for required fields on form submit */
 .form-control.luxury-input.is-invalid,
 .form-select.luxury-input.is-invalid {
-    border-color: #D93025 !important;
+    border-color: #EF4444 !important;
     border-width: 2px;
-    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.1);
+    background-color: #FEE2E2 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    padding-right: 2.5rem;
 }
 
 .form-control.luxury-input.is-invalid:focus,
 .form-select.luxury-input.is-invalid:focus {
-    border-color: #D93025 !important;
+    border-color: #EF4444 !important;
     border-width: 2px;
-    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.2);
+    background-color: #FEE2E2 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
 }
 
-/* Date input validation */
 input[type="date"].is-invalid,
 input[type="date"].luxury-input.is-invalid,
 input[type="date"].form-control.is-invalid {
-    border-color: #D93025 !important;
+    border-color: #EF4444 !important;
     border-width: 2px;
-    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.1);
+    background-color: #FEE2E2 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
 input[type="date"].is-invalid:focus,
 input[type="date"].luxury-input.is-invalid:focus,
 input[type="date"].form-control.is-invalid:focus {
-    border-color: #D93025 !important;
+    border-color: #EF4444 !important;
     border-width: 2px;
-    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.2);
+    background-color: #FEE2E2 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+/* Error icon for invalid fields */
+.form-control.luxury-input.is-invalid,
+input[type="date"].luxury-input.is-invalid {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23EF4444' viewBox='0 0 16 16'%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3E%3Cpath d='M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 16px 16px;
+}
+
+/* Error icon for select fields - positioned before dropdown arrow */
+.form-select.luxury-input.is-invalid {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23EF4444' viewBox='0 0 16 16'%3E%3Cpath d='M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z'/%3E%3Cpath d='M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z'/%3E%3C/svg%3E"), url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23EF4444' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat, no-repeat;
+    background-position: right 2.5rem center, right 0.75rem center;
+    background-size: 16px 16px, 16px 12px;
+}
+
+/* Error message styling */
+.error-message {
+    display: none;
+    color: #EF4444;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+}
+
+.error-message.show {
+    display: block;
+}
+
+.error-message::before {
+    content: "⚠ ";
+    margin-right: 0.25rem;
 }
 
 .luxury-input::placeholder {
@@ -865,7 +902,6 @@ input[type="date"].form-control.is-invalid:focus {
     font-weight: 400;
 }
 
-/* Date Input Styling - EVENZA Green */
 input[type="date"],
 input[type="date"].luxury-input,
 input[type="date"].form-control {
@@ -875,22 +911,15 @@ input[type="date"].form-control {
     position: relative;
 }
 
-/* Force EVENZA Green accent color for all date inputs */
 input[type="date"] {
     accent-color: #4A5D4E !important;
     --accent-color: #4A5D4E !important;
 }
 
-/* Webkit browsers - ensure accent color is applied */
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: none;
 }
 
-/* Note: The calendar popup's selected date color is controlled by the browser's accent-color property.
-   In Chrome/Edge/Safari, setting accent-color: #4A5D4E should change the selected date from blue to green.
-   However, the calendar popup itself is OS-controlled and cannot be fully styled with CSS. */
-
-/* Calendar Icon Styling - Keep native icon visible */
 input[type="date"]::-webkit-calendar-picker-indicator {
     cursor: pointer;
     opacity: 0.7;
@@ -911,7 +940,6 @@ input[type="date"]:focus {
     border-color: #6B7F5A;
 }
 
-/* Firefox date input calendar icon */
 input[type="date"]::-moz-calendar-picker-indicator {
     cursor: pointer;
     opacity: 0.7;
@@ -924,7 +952,6 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
 }
 
 
-/* No Results Found Message */
 .no-results-container {
     display: flex;
     flex-direction: column;
@@ -1755,6 +1782,8 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
 .reservation-form-column {
     flex: 1;
     min-width: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .reservation-summary-column {
@@ -1781,6 +1810,129 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
     .sticky-summary {
         position: relative;
         top: 0;
+    }
+}
+
+/* Mobile Responsive Styles for Reservation Form */
+@media (max-width: 768px) {
+    /* Stack date/time fields vertically */
+    .reservation-form-column .row.g-3 > [class*="col-"] {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    /* Stack package cards vertically */
+    .package-options {
+        flex-direction: column !important;
+    }
+    
+    .package-tile {
+        width: 100%;
+        min-width: 100%;
+    }
+    
+    /* Ensure package selection still works on touch */
+    .package-tile.selected {
+        transform: scale(1.02);
+    }
+    
+    /* Move summary above submit button on mobile */
+    .reservation-layout {
+        flex-direction: column;
+        display: flex;
+    }
+    
+    .reservation-form-column {
+        order: 1;
+    }
+    
+    /* Hide desktop summary on mobile */
+    .reservation-summary-column {
+        display: none !important;
+    }
+    
+    /* Show mobile summary */
+    .mobile-summary {
+        display: block !important;
+    }
+}
+
+/* Hide mobile summary on desktop */
+@media (min-width: 769px) {
+    .mobile-summary {
+        display: none !important;
+    }
+    
+    .reservation-summary-column {
+        display: block !important;
+    }
+    
+    /* Typography scaling for mobile */
+    .page-title {
+        font-size: 1.75rem;
+    }
+    
+    .reservation-summary h4 {
+        font-size: 1.5rem;
+    }
+    
+    .summary-total-value {
+        font-size: 1.5rem;
+    }
+    
+    /* Ensure inputs maintain 10px border-radius */
+    .luxury-input,
+    .form-select.luxury-input,
+    input[type="date"].luxury-input {
+        border-radius: 10px !important;
+    }
+    
+    /* Ensure Serif headers scale properly */
+    h1, h2, h3, h4, h5, h6 {
+        font-size: clamp(1.25rem, 4vw, 2rem);
+    }
+    
+    .page-title {
+        font-size: clamp(1.5rem, 5vw, 2rem);
+    }
+}
+
+@media (max-width: 576px) {
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .reservation-summary h4 {
+        font-size: 1.25rem;
+    }
+    
+    .summary-total-value {
+        font-size: 1.25rem;
+    }
+    
+    .package-tile-name {
+        font-size: 1rem;
+    }
+    
+    .package-tile-price {
+        font-size: 1.1rem;
+    }
+    
+    .form-label {
+        font-size: 0.9rem;
+    }
+    
+    .luxury-input,
+    .form-select.luxury-input {
+        font-size: 0.9rem;
+        padding: 0.65rem 0.9rem;
+    }
+    
+    .btn-primary-luxury,
+    .btn-outline-luxury {
+        font-size: 0.9rem;
+        padding: 0.75rem 1.25rem;
     }
 }
 
@@ -2634,6 +2786,169 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
     flex-shrink: 0;
 }
 
+/* Cancel Reservation Modal - Luxury Redesign */
+.cancel-reservation-modal {
+    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.cancel-reservation-body {
+    padding: 40px !important;
+}
+
+.cancel-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cancel-icon {
+    font-size: 4rem;
+    color: #8B1A1A;
+    opacity: 1;
+}
+
+.cancel-header {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--text-charcoal);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+#cancelReservationModalLabel {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    color: var(--text-charcoal);
+}
+
+.cancel-subtext {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    color: #6c757d;
+    font-size: 0.95rem;
+    margin-bottom: 0;
+}
+
+.cancel-reservation-footer {
+    padding: 1.5rem 40px !important;
+    border-top: 1px solid rgba(107, 127, 90, 0.1);
+    gap: 1rem;
+}
+
+.cancel-btn-no {
+    background-color: transparent;
+    color: #6c757d;
+    border: 1px solid #e0e0e0;
+    border-radius: 25px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.cancel-btn-no:hover {
+    background-color: #f5f5f5;
+    color: #6c757d;
+    border-color: #d0d0d0;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cancel-btn-yes {
+    background-color: #8B1A1A;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 25px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.cancel-btn-yes:hover {
+    background-color: #A01F1F;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(139, 26, 26, 0.4);
+}
+
+.cancel-btn-yes:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Custom Alert Modals (Success/Error) */
+.custom-alert-modal {
+    border-radius: 20px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border: none;
+}
+
+.custom-alert-body {
+    padding: 40px !important;
+}
+
+.custom-alert-icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-alert-icon {
+    font-size: 3.5rem;
+}
+
+.custom-alert-icon.success-icon {
+    color: #4A5D4E;
+}
+
+.custom-alert-icon.error-icon {
+    color: #8B1A1A;
+}
+
+.custom-alert-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin-bottom: 1rem;
+}
+
+.custom-alert-message {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: rgba(26, 26, 26, 0.8);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+.custom-alert-footer {
+    padding: 24px 40px;
+    border-top: 1px solid rgba(74, 93, 74, 0.1);
+}
+
+.custom-alert-btn-primary {
+    background-color: #4A5D4E;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 20px;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.custom-alert-btn-primary:hover {
+    background-color: #5A6B4F;
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(74, 93, 78, 0.3);
+}
+
 #reservationDetailsModal .col-md-7 > div {
     margin-bottom: 1.5rem;
 }
@@ -3086,7 +3401,7 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
     padding: 1.25rem;
     border-radius: 20px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -3104,7 +3419,7 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
 .package-tile[data-tier="Bronze"].selected,
 .package-tile[data-tier="bronze"].selected {
     background: linear-gradient(135deg, #B8956A 0%, #9A7A52 100%);
-    border: 3px solid #4A5D4E !important;
+    border: 4px solid #4A5D4E !important;
     transform: scale(1.05);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     filter: brightness(1.1);
@@ -3113,7 +3428,7 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
 .package-tile[data-tier="Silver"],
 .package-tile[data-tier="silver"] {
     background: #E8E8E8;
-    border: none;
+    border: 1px solid #CCCCCC;
     color: #2C2C2C;
     box-shadow: 0 4px 12px rgba(212, 212, 212, 0.3);
 }
@@ -3121,7 +3436,7 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
 .package-tile[data-tier="Silver"].selected,
 .package-tile[data-tier="silver"].selected {
     background: #E8E8E8;
-    border: 3px solid #4A5D4E !important;
+    border: 4px solid #4A5D4E !important;
     transform: scale(1.05);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     filter: brightness(1.1);
@@ -3138,7 +3453,7 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
 .package-tile[data-tier="Gold"].selected,
 .package-tile[data-tier="gold"].selected {
     background: linear-gradient(135deg, #F4D03F 0%, #D4AF37 100%);
-    border: 3px solid #4A5D4E !important;
+    border: 4px solid #4A5D4E !important;
     transform: scale(1.05);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     filter: brightness(1.1);
@@ -3224,7 +3539,7 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
 
 .luxury-input {
     border: 2px solid #E8E4DC;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 0.75rem 1rem;
     font-size: 0.95rem;
     color: var(--text-dark-gray);
@@ -3245,6 +3560,7 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
 
 .form-select.luxury-input {
     padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border-radius: 10px;
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%236B7F5A' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
@@ -3254,9 +3570,11 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
     height: 48px;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     accent-color: #6B7F5A;
+    border-radius: 10px;
+    position: relative;
+    z-index: 10;
 }
 
-/* Style dropdown options with EVENZA Green - Remove blue highlight */
 .form-select.luxury-input option {
     background-color: #FFFFFF !important;
     color: #1A1A1A !important;
@@ -3268,7 +3586,6 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
     color: #FFFFFF !important;
 }
 
-/* Remove blue highlight and use EVENZA Green for selected/hovered options */
 .form-select.luxury-input option:hover,
 .form-select.luxury-input option:focus,
 .form-select.luxury-input option[selected] {
@@ -3276,7 +3593,6 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
     color: #FFFFFF !important;
 }
 
-/* Custom Dropdown Styling - EVENZA Green (Reusable) */
 .custom-dropdown-wrapper {
     position: relative;
     z-index: 10;
@@ -3371,7 +3687,6 @@ input[type="date"]:hover::-moz-calendar-picker-indicator {
     font-weight: 600;
 }
 
-/* Custom dropdown validation error state */
 .custom-dropdown-wrapper .custom-dropdown-selected.is-invalid {
     border-color: #D93025 !important;
     border-width: 2px;

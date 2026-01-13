@@ -135,8 +135,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="form-group mb-4">
                                 <label for="password" class="form-label">Password</label>
                                 <div class="password-input-wrapper" style="position: relative;">
-                                    <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password">
-                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('password', 'toggle_password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #6c757d; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem;">
+                                    <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password" style="padding-right: 60px;">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePassword('password', 'toggle_password')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4A5D4E; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500;">
                                         <span id="toggle_password">Show</span>
                                     </button>
                                 </div>

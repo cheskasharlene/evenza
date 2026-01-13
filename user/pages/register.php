@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = isset($_POST['password']) ? trim($_POST['password']) : '';
     $confirmPassword = isset($_POST['confirmPassword']) ? trim($_POST['confirmPassword']) : '';
 
-    // Clean phone number (remove spaces and format)
     $phoneNumber = preg_replace('/\s+/', '', $phoneNumber);
     if (preg_match('/^\+639/', $phoneNumber)) {
         $phoneNumber = '0' . substr($phoneNumber, 3);
@@ -98,32 +97,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         .password-toggle-btn {
             position: absolute;
-            right: 15px;
+            right: 10px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
-            color: #6B7F5A;
+            color: #4A5D4E;
             cursor: pointer;
-            padding: 0;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-weight: 500;
             transition: color 0.3s ease;
         }
         .password-toggle-btn:hover {
-            color: #4A5D4A;
+            color: #3A4D3E;
         }
         .password-toggle-btn:focus {
             outline: none;
-        }
-        .password-toggle-btn i {
-            font-size: 1rem;
-        }
-        .luxury-input {
-            padding-right: 45px;
         }
         .login-link {
             color: #6B7F5A;
@@ -184,9 +175,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="form-group mb-4">
                                 <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
                                 <div class="password-input-wrapper position-relative">
-                                    <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password" minlength="6">
-                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password')" aria-label="Toggle password visibility">
-                                        <i class="fas fa-eye" id="passwordToggleIcon"></i>
+                                    <input id="password" name="password" type="password" class="form-control luxury-input" required placeholder="Enter your password" minlength="6" style="padding-right: 60px;">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('password')" aria-label="Toggle password visibility" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4A5D4E; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500;">
+                                        <span id="passwordToggleText">Show</span>
                                     </button>
                                 </div>
                             </div>
@@ -194,9 +185,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="form-group mb-4">
                                 <label for="confirmPassword" class="form-label">Confirm Password <span class="text-danger">*</span></label>
                                 <div class="password-input-wrapper position-relative">
-                                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control luxury-input" required placeholder="Confirm your password" minlength="6">
-                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmPassword')" aria-label="Toggle password visibility">
-                                        <i class="fas fa-eye" id="confirmPasswordToggleIcon"></i>
+                                    <input id="confirmPassword" name="confirmPassword" type="password" class="form-control luxury-input" required placeholder="Confirm your password" minlength="6" style="padding-right: 60px;">
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('confirmPassword')" aria-label="Toggle password visibility" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #4A5D4E; cursor: pointer; padding: 0.25rem 0.5rem; font-size: 0.875rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 500;">
+                                        <span id="confirmPasswordToggleText">Show</span>
                                     </button>
                                 </div>
                             </div>
@@ -215,40 +206,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../assets/js/login.js"></script>
     <script>
-        // Password visibility toggle
         function togglePasswordVisibility(fieldId) {
             const field = document.getElementById(fieldId);
-            const icon = document.getElementById(fieldId + 'ToggleIcon');
+            const toggleText = document.getElementById(fieldId + 'ToggleText');
             
             if (field.type === 'password') {
                 field.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+                if (toggleText) toggleText.textContent = 'Hide';
             } else {
                 field.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                if (toggleText) toggleText.textContent = 'Show';
             }
         }
 
-        // Philippine phone number formatting
         document.addEventListener('DOMContentLoaded', function() {
             const phoneInput = document.getElementById('phoneNumber');
             
             phoneInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, ''); // Remove all non-digits
+                let value = e.target.value.replace(/\D/g, '');
                 
-                // If starts with 63, convert to +63 format
                 if (value.startsWith('63') && value.length > 2) {
                     value = '0' + value.substring(2);
                 }
                 
-                // Limit to 11 digits (09XX XXX XXXX)
                 if (value.length > 11) {
                     value = value.substring(0, 11);
                 }
                 
-                // Format: 09XX XXX XXXX
                 if (value.length > 4) {
                     value = value.substring(0, 4) + ' ' + value.substring(4);
                 }
@@ -259,12 +243,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 e.target.value = value;
             });
 
-            // Validate phone on form submit
             document.getElementById('registerForm').addEventListener('submit', function(e) {
-                const phoneValue = phoneInput.value.replace(/\s/g, ''); // Remove spaces
+                const phoneValue = phoneInput.value.replace(/\s/g, '');
                 const phonePattern = /^(09|\+639)[0-9]{9}$/;
                 
-                // Check all required fields
                 const requiredFields = document.querySelectorAll('#registerForm [required]');
                 let hasErrors = false;
                 
@@ -294,22 +276,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             });
 
-            // Clear custom validation and invalid class on input
             phoneInput.addEventListener('input', function() {
                 this.setCustomValidity('');
                 this.classList.remove('is-invalid');
             });
             
-            // Clear invalid class on all inputs when user starts typing
             const allInputs = document.querySelectorAll('#registerForm input, #registerForm select');
             allInputs.forEach(input => {
                 input.addEventListener('input', function() {
                     this.classList.remove('is-invalid');
-                });
-                input.addEventListener('blur', function() {
-                    if (this.hasAttribute('required') && !this.value.trim()) {
-                        this.classList.add('is-invalid');
-                    }
                 });
             });
         });

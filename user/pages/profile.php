@@ -342,7 +342,6 @@ if ($stmt) {
                                     <p class="small mb-0 mt-2">Your reservation is confirmed and paid.</p>
                                 </div>
                                 
-                                <!-- Payment Deadline Notice (for confirmed but unpaid reservations) -->
                                 <div id="paymentDeadlineNotice" class="alert alert-warning text-center" style="display: none;">
                                     <i class="fas fa-exclamation-triangle me-2"></i>
                                     <strong>Payment Required</strong>
@@ -350,13 +349,11 @@ if ($stmt) {
                                     <p class="small mb-0"><strong>Deadline:</strong> <span id="deadlineDate"></span></p>
                                 </div>
                                 
-                                <!-- PayPal Payment Section (only for confirmed reservations) -->
                                 <div id="paymentSection" style="display: none;">
                                     <p class="small text-muted text-center mb-3">Your reservation is confirmed. Complete payment below.</p>
                                     <div id="paypal-button-container-modal"></div>
                                 </div>
                                 
-                                <!-- Cancel Reservation Button (for non-cancelled reservations) -->
                                 <div id="cancelReservationSection" class="mt-3" style="display: none;">
                                     <button type="button" class="btn btn-outline-danger w-100" onclick="showCancelConfirmation()">
                                         <i class="fas fa-times-circle me-2"></i>Cancel Reservation
@@ -373,29 +370,65 @@ if ($stmt) {
         </div>
     </div>
 
-    <!-- Cancel Reservation Confirmation Modal -->
     <div class="modal fade" id="cancelReservationModal" tabindex="-1" aria-labelledby="cancelReservationModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+            <div class="modal-content cancel-reservation-modal">
                 <div class="modal-header">
                     <h5 class="modal-title" id="cancelReservationModalLabel">Cancel Reservation</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-center">
-                    <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
-                    <h5>Are you sure you want to continue?</h5>
-                    <p class="text-muted">Once cancelled, this reservation cannot be modified by the admin.</p>
+                <div class="modal-body cancel-reservation-body text-center">
+                    <div class="cancel-icon-wrapper mb-4">
+                        <i class="fas fa-exclamation-circle cancel-icon"></i>
+                    </div>
+                    <h5 class="cancel-header">Are you sure you want to continue?</h5>
+                    <p class="cancel-subtext">Once cancelled, this reservation cannot be modified by the admin.</p>
                 </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-danger" onclick="confirmCancelReservation()">Yes</button>
+                <div class="modal-footer cancel-reservation-footer justify-content-center">
+                    <button type="button" class="btn cancel-btn-no" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn cancel-btn-yes" onclick="confirmCancelReservation()">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-alert-modal">
+                <div class="modal-body custom-alert-body text-center">
+                    <div class="custom-alert-icon-wrapper mb-4">
+                        <i class="fas fa-check-circle custom-alert-icon success-icon"></i>
+                    </div>
+                    <h5 class="custom-alert-title">Action Successful</h5>
+                    <p class="custom-alert-message" id="successModalMessage"></p>
+                </div>
+                <div class="modal-footer custom-alert-footer justify-content-center">
+                    <button type="button" class="btn custom-alert-btn-primary" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content custom-alert-modal">
+                <div class="modal-body custom-alert-body text-center">
+                    <div class="custom-alert-icon-wrapper mb-4">
+                        <i class="fas fa-exclamation-circle custom-alert-icon error-icon"></i>
+                    </div>
+                    <h5 class="custom-alert-title">Action Failed</h5>
+                    <p class="custom-alert-message" id="errorModalMessage"></p>
+                </div>
+                <div class="modal-footer custom-alert-footer justify-content-center">
+                    <button type="button" class="btn custom-alert-btn-primary" data-bs-dismiss="modal">OK</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- PayPal JavaScript SDK -->
     <script src="https://www.paypal.com/sdk/js?client-id=<?php echo getPayPalClientId(); ?>&currency=<?php echo PAYPAL_CURRENCY; ?>&intent=capture"></script>
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/profile.js"></script>

@@ -252,7 +252,6 @@ function getCategoryFilter($category) {
     <script src="../../assets/js/main.js"></script>
     <script src="../../assets/js/events.js"></script>
     <style>
-        /* Custom Dropdown Styling - EVENZA Green */
         .custom-dropdown-wrapper {
             position: relative;
         }
@@ -346,14 +345,12 @@ function getCategoryFilter($category) {
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize custom dropdown
             const customDropdown = document.getElementById('customCategoryFilter');
             const nativeSelect = document.getElementById('categoryFilter');
             const selectedText = customDropdown ? customDropdown.querySelector('.custom-dropdown-selected span') : null;
             const options = customDropdown ? customDropdown.querySelectorAll('.custom-dropdown-option') : [];
             
             if (customDropdown && selectedText) {
-                // Set initial selected value
                 const initialValue = nativeSelect ? nativeSelect.value : 'all';
                 options.forEach(opt => {
                     if (opt.getAttribute('data-value') === initialValue) {
@@ -362,40 +359,33 @@ function getCategoryFilter($category) {
                     }
                 });
                 
-                // Toggle dropdown
                 customDropdown.querySelector('.custom-dropdown-selected').addEventListener('click', function(e) {
                     e.stopPropagation();
                     customDropdown.classList.toggle('open');
                 });
                 
-                // Close dropdown when clicking outside
                 document.addEventListener('click', function(e) {
                     if (!customDropdown.contains(e.target)) {
                         customDropdown.classList.remove('open');
                     }
                 });
                 
-                // Handle option selection
                 options.forEach(option => {
                     option.addEventListener('click', function(e) {
                         e.stopPropagation();
                         const value = this.getAttribute('data-value');
                         const text = this.textContent;
                         
-                        // Update native select
                         if (nativeSelect) {
                             nativeSelect.value = value;
                         }
                         
-                        // Update custom dropdown
                         options.forEach(opt => opt.classList.remove('selected'));
                         this.classList.add('selected');
                         selectedText.textContent = text;
                         
-                        // Close dropdown
                         customDropdown.classList.remove('open');
                         
-                        // Trigger change event
                         if (nativeSelect) {
                             const changeEvent = new Event('change', { bubbles: true });
                             nativeSelect.dispatchEvent(changeEvent);
@@ -405,7 +395,7 @@ function getCategoryFilter($category) {
             }
             
             const searchInput = document.getElementById('searchInput');
-            const categoryFilter = nativeSelect; // Use native select for filtering logic
+            const categoryFilter = nativeSelect;
             const eventCards = document.querySelectorAll('.event-card-wrapper');
 
             function filterEvents() {

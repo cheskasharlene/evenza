@@ -157,7 +157,7 @@ if (!empty($searchQuery)) {
         }
         .table td {
             vertical-align: middle;
-            padding: 1.25rem 1rem;
+            padding: 18px 1rem;
             border-bottom: 1px solid rgba(74, 93, 74, 0.08);
         }
         .table tbody tr {
@@ -187,29 +187,53 @@ if (!empty($searchQuery)) {
             color: #721c24;
             box-shadow: 0 2px 4px rgba(114, 28, 36, 0.2);
         }
+        /* Actions column container */
+        .actions-cell {
+            width: 120px;
+            text-align: center;
+        }
+        
+        .actions-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
         .action-btn {
-            background: rgba(74, 93, 74, 0.08);
+            background: rgba(0, 0, 0, 0.05);
             border: none;
             color: #4A5D4A;
-            padding: 0.5rem 0.75rem;
+            padding: 0.5rem;
+            width: 36px;
+            height: 36px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 0 0.25rem;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
         }
-        .action-btn:hover {
-            background: rgba(74, 93, 74, 0.15);
-            color: #3a4a3a;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        
+        /* Edit button - blue hover */
+        .action-btn:not(.text-danger):hover {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            transform: translateY(-1px);
         }
+        
+        /* Delete button - red/pink hover */
         .action-btn.text-danger {
-            background: rgba(220, 53, 69, 0.1);
+            background: rgba(0, 0, 0, 0.05);
             color: #dc3545;
         }
+        
         .action-btn.text-danger:hover {
-            background: rgba(220, 53, 69, 0.2);
-            color: #c82333;
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            transform: translateY(-1px);
         }
         .toast-container {
             position: fixed;
@@ -233,15 +257,36 @@ if (!empty($searchQuery)) {
             border-left-color: rgba(74, 93, 74, 0.3) !important;
             transform: translateX(5px);
         }
-        @media (max-width: 991px) { 
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+        }
+        
+        @media (max-width: 1023px) { 
             .admin-sidebar { 
-                width: 100%; 
-                position: relative;
-                height: auto;
-                display: none;
+                width: 280px; 
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             }
             .admin-sidebar.show {
-                display: flex;
+                left: 0;
             }
             .admin-content {
                 margin-left: 0;
@@ -267,22 +312,43 @@ if (!empty($searchQuery)) {
                 flex-wrap: wrap;
             }
             .admin-top-nav h4 {
-                font-size: 1.25rem;
+                font-size: clamp(1.1rem, 4vw, 1.5rem);
             }
             .table-responsive {
                 font-size: 0.875rem;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                display: block;
+                width: 100%;
+            }
+            .table-responsive table {
+                min-width: 800px;
+                width: 100%;
             }
             .table th,
             .table td {
-                padding: 0.5rem;
+                padding: 0.75rem 0.5rem;
+                white-space: nowrap;
             }
             .table img {
                 width: 40px;
                 height: 40px;
             }
-            .btn-admin-primary {
+            /* Ensure touch targets are large enough */
+            .btn-admin-primary,
+            .btn-sm {
+                min-height: 44px;
+                min-width: 44px;
                 padding: 0.5rem 1rem;
                 font-size: 0.875rem;
+            }
+            /* Status pills - ensure they're touch-friendly */
+            .badge {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+                min-height: 32px;
+                display: inline-flex;
+                align-items: center;
             }
         }
         @media (max-width: 576px) {
@@ -299,8 +365,8 @@ if (!empty($searchQuery)) {
                 font-size: 0.75rem;
                 padding: 0.4rem;
             }
-            .table th:nth-child(2),
-            .table td:nth-child(2) {
+            .table th:nth-child(1),
+            .table td:nth-child(1) {
                 display: none;
             }
             .search-input {
@@ -312,6 +378,9 @@ if (!empty($searchQuery)) {
 
 <body>
     <div class="d-flex admin-wrapper">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
         <!-- Sidebar -->
         <div class="d-flex flex-column admin-sidebar p-4" style="background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%);">
             <div class="d-flex align-items-center mb-5" style="padding: 1rem 0;">
@@ -356,8 +425,10 @@ if (!empty($searchQuery)) {
             <!-- Top Navigation Bar -->
             <div class="admin-top-nav d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <div class="me-3 d-lg-none">
-                        <button id="adminSidebarToggle" class="btn btn-outline-secondary btn-sm">☰</button>
+                    <div class="me-3 d-xl-none">
+                        <button id="adminSidebarToggle" class="btn btn-outline-secondary btn-sm" style="border-radius: 8px; padding: 0.5rem 0.75rem;">
+                            <i class="fas fa-bars"></i>
+                        </button>
                     </div>
                     <div>
                         <h4 class="mb-0" style="font-family: 'Playfair Display', serif;">Event Management</h4>
@@ -426,19 +497,18 @@ if (!empty($searchQuery)) {
                         <table class="table align-middle">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
                                     <th>Image</th>
                                     <th>Title</th>
                                     <th>Category</th>
                                     <th>Venue</th>
                                     <th>Status</th>
-                                    <th class="text-end">Actions</th>
+                                    <th class="text-center" style="width: 120px;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php if (empty($filteredEvents)): ?>
                                 <tr>
-                                    <td colspan="7" class="text-center py-5">
+                                    <td colspan="6" class="text-center py-5">
                                         <div class="py-5">
                                             <div class="mb-4" style="font-size: 4rem; color: rgba(74, 93, 74, 0.2);">
                                                 <i class="fas fa-calendar-times"></i>
@@ -468,16 +538,13 @@ if (!empty($searchQuery)) {
                                     }
                                 ?>
                                 <tr>
-                                    <td>
-                                        <strong><?php echo htmlspecialchars($event['id'] ?? $event['eventId']); ?></strong>
-                                    </td>
-                                    <td>
+                                    <td style="width: 90px;">
                                         <img src="<?php echo htmlspecialchars($imageSrc); ?>" 
                                              alt="<?php echo htmlspecialchars($event['name'] ?? $event['title']); ?>" 
                                              class="event-thumbnail"
                                              onerror="this.src='../../assets/images/event_images/businessInnovation.jpg'">
                                     </td>
-                                    <td>
+                                    <td style="min-width: 200px;">
                                         <div class="fw-semibold"><?php echo htmlspecialchars($event['name'] ?? $event['title']); ?></div>
                                     </td>
                                     <td>
@@ -485,7 +552,7 @@ if (!empty($searchQuery)) {
                                             <?php echo htmlspecialchars(!empty($event['category']) ? $event['category'] : 'Uncategorized'); ?>
                                         </span>
                                     </td>
-                                    <td>
+                                    <td style="min-width: 250px;">
                                         <div class="text-muted small"><?php echo htmlspecialchars($event['venue']); ?></div>
                                     </td>
                                     <td>
@@ -493,13 +560,15 @@ if (!empty($searchQuery)) {
                                             <?php echo htmlspecialchars($event['status']); ?>
                                         </span>
                                     </td>
-                                    <td class="text-end">
-                                        <button class="action-btn" onclick="editEvent(<?php echo $event['eventId'] ?? $event['id']; ?>)" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="action-btn text-danger" onclick="deleteEvent(<?php echo $event['eventId'] ?? $event['id']; ?>, '<?php echo htmlspecialchars($event['name'] ?? $event['title'], ENT_QUOTES); ?>')" title="Delete">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
+                                    <td class="actions-cell">
+                                        <div class="actions-group">
+                                            <button class="action-btn" onclick="editEvent(<?php echo $event['eventId'] ?? $event['id']; ?>)" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn text-danger" onclick="deleteEvent(<?php echo $event['eventId'] ?? $event['id']; ?>, '<?php echo htmlspecialchars($event['name'] ?? $event['title'], ENT_QUOTES); ?>')" title="Delete">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>
@@ -655,12 +724,43 @@ if (!empty($searchQuery)) {
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('adminSidebarToggle');
             const sidebar = document.querySelector('.admin-sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            function toggleSidebar() {
+                sidebar.classList.toggle('show');
+                if (overlay) {
+                    overlay.classList.toggle('show');
+                }
+                // Prevent body scroll when sidebar is open
+                if (sidebar.classList.contains('show')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
             
             if (sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('show');
+                sidebarToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleSidebar();
                 });
             }
+            
+            // Close sidebar when clicking overlay
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    toggleSidebar();
+                });
+            }
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 1024 && sidebar && sidebar.classList.contains('show')) {
+                    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                        toggleSidebar();
+                    }
+                }
+            });
         });
 
         // Show feedback toast

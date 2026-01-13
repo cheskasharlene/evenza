@@ -13,3 +13,6 @@
 [2026-01-13T01:35:11+01:00] Throwable: Failed opening required '../../core/connect.php' (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\evenza\user\process\cancellation\cancelReservation.php on line 36
 #0 {main}
 SMS notification failed for reservation 43
+SMS notification failed for reservation 69
+SMS notification failed for reservation 42
+SMS notification failed for reservation 41

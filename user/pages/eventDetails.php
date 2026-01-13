@@ -14,15 +14,12 @@ function getEventImagePath($imagePath) {
     
     $imagePath = ltrim($imagePath, '/\\');
     
-    // Remove '../../assets/' if already present
     if (strpos($imagePath, '../../assets/images/event_images/') === 0) {
         $imagePath = substr($imagePath, strlen('../../assets/images/event_images/'));
     }
-    // Remove '../assets/' if already present
     if (strpos($imagePath, '../assets/images/event_images/') === 0) {
         $imagePath = substr($imagePath, strlen('../assets/images/event_images/'));
     }
-    // Remove 'assets/' if present
     if (strpos($imagePath, 'assets/images/event_images/') === 0) {
         $imagePath = substr($imagePath, strlen('assets/images/event_images/'));
     }
@@ -31,7 +28,6 @@ function getEventImagePath($imagePath) {
     $filename = str_replace(['/', '\\'], '', $filename);
     $imagePath = $imageDir . $filename;
     
-    // Check if file exists (use __DIR__ to get script directory and normalize path)
     $fullPath = realpath(__DIR__ . '/' . $imagePath);
     if ($fullPath && file_exists($fullPath)) {
         return $imagePath;
@@ -83,7 +79,6 @@ function getPackageFeatures($category, $tier, $eventTitle = '') {
     $category = strtolower(trim($category ?? ''));
     $eventTitle = strtolower(trim($eventTitle ?? ''));
     
-    // Check for art exhibition, auction, or wine tasting events first
     if (stripos($eventTitle, 'art') !== false || stripos($eventTitle, 'exhibition') !== false || 
         stripos($eventTitle, 'auction') !== false || stripos($eventTitle, 'wine') !== false || 
         stripos($eventTitle, 'tasting') !== false || stripos($category, 'art') !== false || 
@@ -275,7 +270,7 @@ if (!$event) {
             padding: 1.25rem;
             display: flex;
             flex-direction: column;
-            transition: all 0.3s ease;
+            transition: all 0.3s ease-in-out;
             cursor: pointer;
         }
         .package-card[data-package-tier="bronze"] {
@@ -286,7 +281,7 @@ if (!$event) {
         }
         .package-card[data-package-tier="silver"] {
             background: #E8E8E8;
-            border: none;
+            border: 1px solid #CCCCCC;
             color: #2C2C2C;
             box-shadow: 0 4px 12px rgba(212, 212, 212, 0.3);
         }
@@ -644,7 +639,6 @@ if (!$event) {
         </div>
     </div>
 
-    <!-- Package Modal -->
     <div id="packageModal" class="package-modal-overlay">
         <div class="package-modal">
             <div class="package-modal-header">
@@ -660,7 +654,6 @@ if (!$event) {
                 <div class="package-modal-features">
                     <h6>What's Included</h6>
                     <ul class="modal-feature-list" id="modalFeatureList">
-                        <!-- Features will be populated by JavaScript -->
                     </ul>
                 </div>
             </div>
@@ -754,7 +747,6 @@ if (!$event) {
         document.addEventListener('DOMContentLoaded', function() {
             const packageCards = document.querySelectorAll('.package-card');
             packageCards.forEach(card => {
-                // Handle card click to open modal
                 card.addEventListener('click', function() {
                     const packageId = this.getAttribute('data-package-id');
                     const packageName = this.getAttribute('data-package-name');

@@ -4,7 +4,7 @@ require_once '../../core/connect.php';
 require_once '../../includes/helpers.php';
 
 $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-$perPage = 20;
+$perPage = 5;
 $offset = ($page - 1) * $perPage;
 
 $unreadQuery = "SELECT COUNT(*) as unread_count FROM sms_messages WHERE is_read = 0 AND (raw_data IS NULL OR raw_data NOT LIKE ?)";
@@ -130,6 +130,64 @@ $totalPages = ceil($totalCount / $perPage);
             border-left: 4px solid #4A5D4A;
             font-weight: 600;
         }
+        .sms-message-item:last-of-type {
+            margin-bottom: 0;
+        }
+        
+        /* Pagination Styling - Matching User Management */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .pagination-btn {
+            min-width: 35px;
+            width: 35px;
+            height: 35px;
+            padding: 0;
+            border: 1px solid #E0E0E0;
+            background-color: #FFFFFF;
+            color: #4A5D4A;
+            border-radius: 50%;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        .pagination-btn:hover:not(:disabled):not([style*="opacity"]) {
+            background-color: #E0E0E0;
+            color: #4A5D4A;
+            border-color: #E0E0E0;
+        }
+        .pagination-btn.active {
+            background-color: #4A5D4E;
+            color: #FFFFFF;
+            border-color: #4A5D4E;
+        }
+        .pagination-btn:disabled,
+        .pagination-btn[style*="opacity: 0.5"] {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        /* Prev/Next buttons - wider for text, use Sans-Serif with bolder weight */
+        .pagination-wrapper > a:first-child,
+        .pagination-wrapper > span:first-child,
+        .pagination-wrapper > a:last-child,
+        .pagination-wrapper > span:last-child {
+            min-width: auto;
+            width: auto;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+        }
         .sms-phone {
             font-family: 'Playfair Display', serif;
             font-size: 1.1rem;
@@ -177,15 +235,36 @@ $totalPages = ceil($totalCount / $perPage);
             border-left-color: rgba(74, 93, 74, 0.3) !important;
             transform: translateX(5px);
         }
-        @media (max-width: 991px) { 
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+        }
+        
+        @media (max-width: 1023px) { 
             .admin-sidebar { 
-                width: 100%; 
-                position: relative;
-                height: auto;
-                display: none;
+                width: 280px; 
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             }
             .admin-sidebar.show {
-                display: flex;
+                left: 0;
             }
             .admin-content {
                 margin-left: 0;
@@ -195,11 +274,49 @@ $totalPages = ceil($totalCount / $perPage);
                 flex-direction: column;
             }
         }
+        
+        @media (max-width: 768px) {
+            .admin-top-nav {
+                padding: 0.75rem 1rem;
+                flex-wrap: wrap;
+            }
+            .admin-top-nav h4 {
+                font-size: clamp(1.1rem, 4vw, 1.5rem);
+            }
+            .sms-message-item {
+                padding: 1rem;
+            }
+            .sms-phone {
+                font-size: clamp(1rem, 3vw, 1.1rem);
+            }
+            .empty-state-message {
+                font-size: clamp(1.25rem, 4vw, 1.5rem);
+            }
+            .pagination-wrapper {
+                gap: 0.35rem;
+            }
+            .pagination-btn {
+                min-width: 32px;
+                width: 32px;
+                height: 32px;
+                font-size: 0.85rem;
+            }
+            .pagination-wrapper > a:first-child,
+            .pagination-wrapper > span:first-child,
+            .pagination-wrapper > a:last-child,
+            .pagination-wrapper > span:last-child {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.85rem;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="d-flex admin-wrapper">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
         <div class="d-flex flex-column admin-sidebar p-4" style="background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%);">
             <div class="d-flex align-items-center mb-5" style="padding: 1rem 0;">
                 <div class="luxury-logo">
@@ -244,8 +361,10 @@ $totalPages = ceil($totalCount / $perPage);
         <div class="flex-fill admin-content">
             <div class="admin-top-nav d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <div class="me-3 d-lg-none">
-                        <button id="adminSidebarToggle" class="btn btn-outline-secondary btn-sm">☰</button>
+                    <div class="me-3 d-xl-none">
+                        <button id="adminSidebarToggle" class="btn btn-outline-secondary btn-sm" style="border-radius: 8px; padding: 0.5rem 0.75rem;">
+                            <i class="fas fa-bars"></i>
+                        </button>
                     </div>
                     <div>
                         <h4 class="mb-0" style="font-family: 'Playfair Display', serif;">SMS Inbox</h4>
@@ -265,13 +384,17 @@ $totalPages = ceil($totalCount / $perPage);
             <div class="p-4" style="padding: 2rem !important;">
                 <div class="admin-card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h5 class="mb-0" style="font-family: 'Playfair Display', serif;">Incoming Messages</h5>
-                        <div class="text-muted small">
-                            Total: <?php echo $totalCount; ?> messages
-                            <?php if ($unreadCount > 0): ?>
-                                | <span class="text-danger"><?php echo $unreadCount; ?> unread</span>
-                            <?php endif; ?>
+                        <div class="d-flex align-items-center" style="gap: 10px;">
+                            <h5 class="mb-0" style="font-family: 'Playfair Display', serif;">Incoming Messages</h5>
+                            <span class="badge bg-light text-dark" style="font-size: 0.9rem; padding: 0.4rem 0.8rem; border-radius: 50px; background-color: #f0f0f0 !important; font-weight: 600;">
+                                <?php echo $totalCount; ?>
+                            </span>
                         </div>
+                        <?php if ($unreadCount > 0): ?>
+                            <div class="text-muted small">
+                                <span class="text-danger"><?php echo $unreadCount; ?> unread</span>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                     <?php if (empty($smsMessages)): ?>
@@ -307,27 +430,55 @@ $totalPages = ceil($totalCount / $perPage);
                         </div>
 
                         <?php if ($totalPages > 1): ?>
-                            <nav aria-label="SMS pagination" class="mt-4">
-                                <ul class="pagination justify-content-center">
-                                    <?php if ($page > 1): ?>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page=<?php echo $page - 1; ?>">Previous</a>
-                                        </li>
-                                    <?php endif; ?>
-                                    
-                                    <?php for ($i = max(1, $page - 2); $i <= min($totalPages, $page + 2); $i++): ?>
-                                        <li class="page-item <?php echo $i == $page ? 'active' : ''; ?>">
-                                            <a class="page-link" href="?page=<?php echo $i; ?>"><?php echo $i; ?></a>
-                                        </li>
-                                    <?php endfor; ?>
-                                    
-                                    <?php if ($page < $totalPages): ?>
-                                        <li class="page-item">
-                                            <a class="page-link" href="?page=<?php echo $page + 1; ?>">Next</a>
-                                        </li>
-                                    <?php endif; ?>
-                                </ul>
-                            </nav>
+                        <div class="pagination-wrapper">
+                            <?php if ($page > 1): ?>
+                                <a href="?page=<?php echo $page - 1; ?>" class="pagination-btn">Prev</a>
+                            <?php else: ?>
+                                <span class="pagination-btn" style="opacity: 0.5; cursor: not-allowed;">Prev</span>
+                            <?php endif; ?>
+                            
+                            <?php
+                            // Calculate page range to show (max 5 page numbers)
+                            $startPage = max(1, $page - 2);
+                            $endPage = min($totalPages, $page + 2);
+                            
+                            // Adjust if we're near the start
+                            if ($page <= 3) {
+                                $startPage = 1;
+                                $endPage = min(5, $totalPages);
+                            }
+                            
+                            // Adjust if we're near the end
+                            if ($page >= $totalPages - 2) {
+                                $startPage = max(1, $totalPages - 4);
+                                $endPage = $totalPages;
+                            }
+                            
+                            // Show first page if not in range
+                            if ($startPage > 1): ?>
+                                <a href="?page=1" class="pagination-btn">1</a>
+                                <?php if ($startPage > 2): ?>
+                                    <span class="pagination-btn" style="border: none; cursor: default;">...</span>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                            
+                            <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
+                                <a href="?page=<?php echo $i; ?>" class="pagination-btn <?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                            <?php endfor; ?>
+                            
+                            <?php if ($endPage < $totalPages): ?>
+                                <?php if ($endPage < $totalPages - 1): ?>
+                                    <span class="pagination-btn" style="border: none; cursor: default;">...</span>
+                                <?php endif; ?>
+                                <a href="?page=<?php echo $totalPages; ?>" class="pagination-btn"><?php echo $totalPages; ?></a>
+                            <?php endif; ?>
+                            
+                            <?php if ($page < $totalPages): ?>
+                                <a href="?page=<?php echo $page + 1; ?>" class="pagination-btn">Next</a>
+                            <?php else: ?>
+                                <span class="pagination-btn" style="opacity: 0.5; cursor: not-allowed;">Next</span>
+                            <?php endif; ?>
+                        </div>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
@@ -339,12 +490,43 @@ $totalPages = ceil($totalCount / $perPage);
     <script>
         const sidebarToggle = document.getElementById('adminSidebarToggle');
         const sidebar = document.querySelector('.admin-sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        function toggleSidebar() {
+            sidebar.classList.toggle('show');
+            if (overlay) {
+                overlay.classList.toggle('show');
+            }
+            // Prevent body scroll when sidebar is open
+            if (sidebar.classList.contains('show')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+        }
         
         if (sidebarToggle && sidebar) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('show');
+            sidebarToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                toggleSidebar();
             });
         }
+        
+        // Close sidebar when clicking overlay
+        if (overlay) {
+            overlay.addEventListener('click', function() {
+                toggleSidebar();
+            });
+        }
+        
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            if (window.innerWidth < 1024 && sidebar && sidebar.classList.contains('show')) {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    toggleSidebar();
+                }
+            }
+        });
 
         function markAsRead(smsId) {
             fetch('/evenza/admin/process/sms/markSMSRead.php', {

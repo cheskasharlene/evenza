@@ -256,9 +256,13 @@ try {
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(74, 93, 74, 0.05);
             padding: 24px;
+            padding-bottom: 24px;
             height: 100%;
             display: flex;
             flex-direction: column;
+        }
+        .top-events-card .admin-card {
+            height: auto;
         }
         .dashboard-grid {
             display: flex;
@@ -286,6 +290,15 @@ try {
             flex: 1;
             display: flex;
             flex-direction: column;
+        }
+        .top-events-card table {
+            margin-bottom: 0 !important;
+        }
+        .top-events-card table td {
+            padding: 18px 10px;
+        }
+        .top-events-card table th {
+            padding: 18px 10px;
         }
         .btn-admin-primary {
             background-color: #5A6B4F;
@@ -331,15 +344,36 @@ try {
             border-left-color: rgba(74, 93, 74, 0.3) !important;
             transform: translateX(5px);
         }
-        @media (max-width: 991px) { 
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+        }
+        
+        @media (max-width: 1023px) { 
             .admin-sidebar { 
-                width: 100%; 
-                position: relative;
-                height: auto;
-                display: none;
+                width: 280px; 
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             }
             .admin-sidebar.show {
-                display: flex;
+                left: 0;
             }
             .admin-content {
                 margin-left: 0;
@@ -349,33 +383,55 @@ try {
                 flex-direction: column;
             }
             .stat-number {
-                font-size: 1.5rem;
+                font-size: clamp(1.3rem, 4vw, 1.8rem);
             }
             .row.g-3 > [class*="col-"] {
                 margin-bottom: 1rem;
             }
         }
+        /* Dynamic Analytics Grid */
+        @media (max-width: 599px) {
+            /* Single column on mobile */
+            .row.g-3 > [class*="col-"] {
+                flex: 0 0 100%;
+                max-width: 100%;
+                margin-bottom: 1rem;
+            }
+        }
+        
+        @media (min-width: 600px) and (max-width: 1024px) {
+            /* 2-column grid on tablet */
+            .row.g-3 > [class*="col-"] {
+                flex: 0 0 calc(50% - 0.75rem);
+                max-width: calc(50% - 0.75rem);
+            }
+        }
+        
         @media (max-width: 768px) {
             .admin-top-nav {
                 padding: 0.75rem 1rem;
                 flex-wrap: wrap;
             }
             .admin-top-nav h4 {
-                font-size: 1.25rem;
+                font-size: clamp(1.1rem, 4vw, 1.5rem);
             }
             .stat-number {
-                font-size: 1.3rem;
+                font-size: clamp(1.3rem, 4vw, 1.8rem);
             }
             .stat-label {
-                font-size: 0.85rem;
+                font-size: clamp(0.8rem, 2vw, 0.9rem);
             }
             .admin-card {
-                padding: 1rem;
+                padding: 20px;
+                border-radius: 20px;
             }
             .card-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.5rem;
+            }
+            .card-header h5 {
+                font-size: clamp(1rem, 3vw, 1.25rem);
             }
             .table-responsive {
                 font-size: 0.875rem;
@@ -383,6 +439,21 @@ try {
             .table th,
             .table td {
                 padding: 0.5rem;
+            }
+            /* Ensure dashboard grid stacks vertically */
+            .dashboard-grid {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .top-events-card,
+            .recent-activity-card {
+                flex: 0 0 100%;
+                max-width: 100%;
+            }
+            /* Fix padding - remove excess white space */
+            .top-events-card .admin-card {
+                height: auto;
+                padding-bottom: 24px;
             }
         }
         @media (max-width: 576px) {
@@ -422,6 +493,9 @@ try {
 
 <body>
     <div class="d-flex admin-wrapper">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
         <div class="d-flex flex-column admin-sidebar p-4" style="background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%);">
             <div class="d-flex align-items-center mb-5" style="padding: 1rem 0;">
                 <div class="luxury-logo">
@@ -463,8 +537,10 @@ try {
         <div class="flex-fill admin-content">
             <div class="admin-top-nav d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <div class="me-3 d-lg-none">
-                        <button id="adminSidebarToggle" class="btn btn-outline-secondary btn-sm">☰</button>
+                    <div class="me-3 d-xl-none">
+                        <button id="adminSidebarToggle" class="btn btn-outline-secondary btn-sm" style="border-radius: 8px; padding: 0.5rem 0.75rem;">
+                            <i class="fas fa-bars"></i>
+                        </button>
                     </div>
                     <div>
                         <h4 class="mb-0" style="font-family: 'Playfair Display', serif;">Dashboard</h4>
@@ -567,7 +643,7 @@ try {
                                     <table class="table table-sm align-middle mb-0">
                                     <thead>
                                         <tr style="border-bottom: 2px solid rgba(74, 93, 74, 0.1);">
-                                            <th style="font-weight: 600; color: #1A1A1A;">Event Name</th>
+                                            <th style="font-weight: 600; color: #1A1A1A; font-family: 'Playfair Display', serif;">Event Name</th>
                                             <th style="font-weight: 600; color: #1A1A1A;">Reservations</th>
                                             <th style="font-weight: 600; color: #1A1A1A;">Revenue</th>
                                         </tr>
@@ -656,12 +732,43 @@ try {
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('adminSidebarToggle');
             const sidebar = document.querySelector('.admin-sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            function toggleSidebar() {
+                sidebar.classList.toggle('show');
+                if (overlay) {
+                    overlay.classList.toggle('show');
+                }
+                // Prevent body scroll when sidebar is open
+                if (sidebar.classList.contains('show')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
             
             if (sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('show');
+                sidebarToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleSidebar();
                 });
             }
+            
+            // Close sidebar when clicking overlay
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    toggleSidebar();
+                });
+            }
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 1024 && sidebar && sidebar.classList.contains('show')) {
+                    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                        toggleSidebar();
+                    }
+                }
+            });
         });
     </script>
 </body>

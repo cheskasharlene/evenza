@@ -157,10 +157,11 @@ $totalAmount = $selectedPackage['price'];
                                 <div class="col-md-4">
                                     <label for="reservationDate" class="form-label">Preferred Date <span class="text-danger">*</span></label>
                                     <input type="date" class="form-control luxury-input" id="reservationDate" name="reservationDate" required style="accent-color: #4A5D4E;">
+                                    <div class="error-message" id="reservationDateError"></div>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="eventStartTime" class="form-label">Event Start Time <span class="text-danger">*</span></label>
-                                    <select class="form-select luxury-input" id="eventStartTime" name="eventStartTime" required>
+                                    <select class="form-select luxury-input" id="eventStartTime" name="eventStartTime" required style="position: relative; z-index: 10;">
                                         <option value="">Select start time</option>
                                         <option value="08:00 AM">8:00 AM</option>
                                         <option value="09:00 AM">9:00 AM</option>
@@ -176,10 +177,11 @@ $totalAmount = $selectedPackage['price'];
                                         <option value="07:00 PM">7:00 PM</option>
                                         <option value="08:00 PM">8:00 PM</option>
                                     </select>
+                                    <div class="error-message" id="eventStartTimeError"></div>
                                 </div>
                                 <div class="col-md-4">
                                     <label for="eventEndTime" class="form-label">Event End Time <span class="text-danger">*</span></label>
-                                    <select class="form-select luxury-input" id="eventEndTime" name="eventEndTime" required>
+                                    <select class="form-select luxury-input" id="eventEndTime" name="eventEndTime" required style="position: relative; z-index: 10;">
                                         <option value="">Select end time</option>
                                         <option value="09:00 AM">9:00 AM</option>
                                         <option value="10:00 AM">10:00 AM</option>
@@ -197,6 +199,7 @@ $totalAmount = $selectedPackage['price'];
                                         <option value="10:00 PM">10:00 PM</option>
                                         <option value="11:00 PM">11:00 PM</option>
                                     </select>
+                                    <div class="error-message" id="eventEndTimeError"></div>
                                 </div>
                             </div>
 
@@ -211,6 +214,48 @@ $totalAmount = $selectedPackage['price'];
                                     <?php endforeach; ?>
                                 </div>
                                 <small class="text-muted d-block mt-2">Choose a package to reserve the event as a single purchase.</small>
+                            </div>
+
+                            <div class="mobile-summary d-none">
+                                <div class="luxury-card reservation-summary p-4 mb-4">
+                                    <h4 class="mb-4">Reservation Summary</h4>
+                                    
+                                    <div class="summary-item mb-3">
+                                        <div class="summary-label">Event Name</div>
+                                        <div class="summary-value"><?php echo htmlspecialchars($event['name']); ?></div>
+                                    </div>
+
+                                    <div class="summary-item mb-3">
+                                        <div class="summary-label">Date & Time</div>
+                                        <div class="summary-value">
+                                            <div id="mobileSummaryDate"><?php echo htmlspecialchars($event['date']); ?></div>
+                                            <div class="text-muted small" id="mobileSummaryTimeRange"><?php echo htmlspecialchars($event['time']); ?></div>
+                                        </div>
+                                    </div>
+
+                                    <div class="summary-item mb-3">
+                                        <div class="summary-label">Venue</div>
+                                        <div class="summary-value small"><?php echo htmlspecialchars($event['venue']); ?></div>
+                                    </div>
+
+                                    <hr class="my-4">
+                                    <div class="summary-item mb-2">
+                                        <div class="summary-label">Package</div>
+                                        <div class="summary-value" id="mobileSummaryPackage"><?php echo htmlspecialchars($selectedPackage['name']); ?></div>
+                                    </div>
+
+                                    <hr class="my-4">
+                                    <div class="summary-total">
+                                        <div class="summary-total-label">Total Amount</div>
+                                        <div class="summary-total-value" id="mobileSummaryTotal">₱ <?php echo number_format($totalAmount, 2); ?></div>
+                                    </div>
+
+                                    <div class="summary-note mt-4">
+                                        <p class="small text-muted mb-0">
+                                            Your reservation will be submitted for admin confirmation. Payment will be available once confirmed.
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="d-flex gap-3 mt-4">
@@ -292,7 +337,6 @@ $totalAmount = $selectedPackage['price'];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../../assets/js/main.js"></script>
     <script>
-        // Check if reservation was successful and show modal
         <?php if (isset($_GET['success']) && $_GET['success'] === '1'): ?>
         document.addEventListener('DOMContentLoaded', function() {
             const successModal = new bootstrap.Modal(document.getElementById('reservationSuccessModal'));

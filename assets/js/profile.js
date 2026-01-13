@@ -295,15 +295,17 @@
                 const detailsModal = bootstrap.Modal.getInstance(document.getElementById('reservationDetailsModal'));
                 if (detailsModal) detailsModal.hide();
 
-                alert('Reservation cancelled successfully');
-                window.location.reload();
+                showSuccessModal('Reservation cancelled successfully');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
             } else {
                 throw new Error(data.message || 'Failed to cancel reservation');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert(error.message || 'An error occurred while cancelling the reservation. Please try again.');
+            showErrorModal(error.message || 'An error occurred while cancelling the reservation. Please try again.');
             if (confirmBtn) {
                 confirmBtn.disabled = false;
                 confirmBtn.textContent = 'Yes';
@@ -311,10 +313,33 @@
         });
     }
 
+    // Custom Modal Functions
+    function showSuccessModal(message) {
+        const modal = document.getElementById('successModal');
+        const messageElement = document.getElementById('successModalMessage');
+        if (messageElement) {
+            messageElement.textContent = message;
+        }
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+
+    function showErrorModal(message) {
+        const modal = document.getElementById('errorModal');
+        const messageElement = document.getElementById('errorModalMessage');
+        if (messageElement) {
+            messageElement.textContent = message;
+        }
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
+
     // Expose functions globally for inline handlers
     window.openReservationDetails = openReservationDetails;
     window.showCancelConfirmation = showCancelConfirmation;
     window.confirmCancelReservation = confirmCancelReservation;
+    window.showSuccessModal = showSuccessModal;
+    window.showErrorModal = showErrorModal;
 
     // -------------------------------
     // Profile editing (existing)

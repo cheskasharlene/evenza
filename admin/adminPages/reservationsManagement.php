@@ -568,15 +568,36 @@ uksort($groupedReservations, function($a, $b) {
             border-left-color: rgba(74, 93, 74, 0.3) !important;
             transform: translateX(5px);
         }
-        @media (max-width: 991px) { 
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar-overlay.show {
+            display: block;
+        }
+        
+        @media (max-width: 1023px) { 
             .admin-sidebar { 
-                width: 100%; 
-                position: relative;
-                height: auto;
-                display: none;
+                width: 280px; 
+                position: fixed;
+                left: -280px;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
             }
             .admin-sidebar.show {
-                display: flex;
+                left: 0;
             }
             .admin-content {
                 margin-left: 0;
@@ -602,18 +623,39 @@ uksort($groupedReservations, function($a, $b) {
                 flex-wrap: wrap;
             }
             .admin-top-nav h4 {
-                font-size: 1.25rem;
+                font-size: clamp(1.1rem, 4vw, 1.5rem);
             }
             .table-responsive {
                 font-size: 0.875rem;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                display: block;
+                width: 100%;
+            }
+            .table-responsive table {
+                min-width: 900px;
+                width: 100%;
             }
             .table th,
             .table td {
-                padding: 0.5rem;
+                padding: 0.75rem 0.5rem;
+                white-space: nowrap;
             }
-            .btn-admin-primary {
+            /* Ensure touch targets are large enough */
+            .btn-admin-primary,
+            .btn-sm {
+                min-height: 44px;
+                min-width: 44px;
                 padding: 0.5rem 1rem;
                 font-size: 0.875rem;
+            }
+            /* Status pills - ensure they're touch-friendly */
+            .badge {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.8rem;
+                min-height: 32px;
+                display: inline-flex;
+                align-items: center;
             }
             .reservation-item {
                 flex-direction: column;
@@ -651,6 +693,9 @@ uksort($groupedReservations, function($a, $b) {
 
 <body>
     <div class="d-flex admin-wrapper">
+        <!-- Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
         <div class="d-flex flex-column admin-sidebar p-4" style="background: linear-gradient(180deg, #FFFFFF 0%, #F9F7F2 100%);">
             <div class="d-flex align-items-center mb-5" style="padding: 1rem 0;">
                 <div class="luxury-logo">
@@ -692,8 +737,10 @@ uksort($groupedReservations, function($a, $b) {
         <div class="flex-fill admin-content">
             <div class="admin-top-nav d-flex justify-content-between align-items-center">
                 <div class="d-flex align-items-center">
-                    <div class="me-3 d-lg-none">
-                        <button id="adminSidebarToggle" class="btn btn-outline-secondary btn-sm">☰</button>
+                    <div class="me-3 d-xl-none">
+                        <button id="adminSidebarToggle" class="btn btn-outline-secondary btn-sm" style="border-radius: 8px; padding: 0.5rem 0.75rem;">
+                            <i class="fas fa-bars"></i>
+                        </button>
                     </div>
                     <div>
                         <h4 class="mb-0" style="font-family: 'Playfair Display', serif;">Reservations Management</h4>
@@ -990,12 +1037,43 @@ uksort($groupedReservations, function($a, $b) {
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggle = document.getElementById('adminSidebarToggle');
             const sidebar = document.querySelector('.admin-sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            
+            function toggleSidebar() {
+                sidebar.classList.toggle('show');
+                if (overlay) {
+                    overlay.classList.toggle('show');
+                }
+                // Prevent body scroll when sidebar is open
+                if (sidebar.classList.contains('show')) {
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
+            }
             
             if (sidebarToggle && sidebar) {
-                sidebarToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('show');
+                sidebarToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    toggleSidebar();
                 });
             }
+            
+            // Close sidebar when clicking overlay
+            if (overlay) {
+                overlay.addEventListener('click', function() {
+                    toggleSidebar();
+                });
+            }
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 1024 && sidebar && sidebar.classList.contains('show')) {
+                    if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                        toggleSidebar();
+                    }
+                }
+            });
         });
 
         // Show feedback toast
