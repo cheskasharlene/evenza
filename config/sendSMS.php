@@ -164,7 +164,7 @@ if (!$success) {
 if ($success) {
     require_once '../core/connect.php';
     if ($conn) {
-        $query = "INSERT INTO sms_messages (phone_number, message_body, received_at, raw_data, is_read) 
+        $query = "INSERT INTO sms_messages (phone, message_body, received_at, raw_data, is_read) 
                   VALUES (?, ?, NOW(), ?, 1)";
         $stmt = mysqli_prepare($conn, $query);
         if ($stmt) {

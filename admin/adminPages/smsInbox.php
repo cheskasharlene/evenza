@@ -35,7 +35,7 @@ if ($countStmt) {
     mysqli_stmt_close($countStmt);
 }
 
-$query = "SELECT sms_id, phone_number, message_body, received_at, is_read, created_at 
+$query = "SELECT sms_id, phone AS phone, message_body, received_at, is_read, created_at 
           FROM sms_messages 
           WHERE raw_data IS NULL OR raw_data NOT LIKE ? 
           ORDER BY received_at DESC, created_at DESC 
@@ -413,7 +413,7 @@ $totalPages = ceil($totalCount / $perPage);
                                      onclick="markAsRead(<?php echo $sms['sms_id']; ?>)">
                                     <div class="sms-phone">
                                         <i class="fas fa-phone me-2"></i>
-                                        <?php echo htmlspecialchars(formatPhoneNumber($sms['phone_number'])); ?>
+                                        <?php echo htmlspecialchars(formatPhoneNumber($sms['phone'])); ?>
                                         <?php if ($sms['is_read'] == 0): ?>
                                             <span class="unread-badge">New</span>
                                         <?php endif; ?>

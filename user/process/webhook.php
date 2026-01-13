@@ -49,7 +49,7 @@ if ($from && $body) {
         require_once '../../core/connect.php';
         
         if ($conn) {
-            $query = "INSERT INTO sms_messages (phone_number, message_body, received_at, raw_data) 
+            $query = "INSERT INTO sms_messages (phone, message_body, received_at, raw_data) 
                       VALUES (?, ?, ?, ?)";
             $stmt = mysqli_prepare($conn, $query);
             
